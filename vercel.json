@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install --prefix build/InventoryManagementSystem",
+  "buildCommand": "npm run build --prefix build/InventoryManagementSystem",
+  "outputDirectory": "build/InventoryManagementSystem/build",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
