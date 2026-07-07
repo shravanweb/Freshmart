@@ -21,6 +21,7 @@ public class DBWebSecurityConfig {
 	SecurityFilterChain configure(HttpSecurity http)
 			throws java.lang.Exception {
 		http.cors().and().csrf().disable().authorizeHttpRequests()
+		.requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
 		.requestMatchers("/actuator/**").authenticated()
 		.requestMatchers("/**").permitAll();
 		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
