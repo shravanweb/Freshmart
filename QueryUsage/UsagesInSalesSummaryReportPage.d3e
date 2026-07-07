@@ -1,0 +1,59 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onAllSalesOrdersChange'
+        'SalesSummaryReportPage'
+        'ordersData_synchronise'
+    ]
+    struct AllSalesOrders
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getAllSalesOrders'
+        'SalesSummaryReportPage'
+        'properties_ordersData_computation'
+    ]
+    struct AllSalesOrders
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUserProfileByUserChange'
+        'SalesSummaryReportPage'
+        'userProfileData_synchronise'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUserProfileByUser'
+        'SalesSummaryReportPage'
+        'properties_userProfileData_computation'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}

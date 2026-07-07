@@ -1,0 +1,229 @@
+Page {
+    package 'inventory.management.system'
+    name 'ExpiryReportPage'
+    description 'Expiring batches report within 30 days'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'daysAhead'
+            type Integer
+            internal true
+            defaultValue `30`
+        }
+        {
+            name 'reportData'
+            type ExpiringBatches
+            computed true
+            computation `organization != null ? Query.getExpiringBatches(ExpiringBatchesRequest(organization: organization, daysAhead: daysAhead)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'reportItems'
+            type StockBatch
+            collection true
+            computed true
+            computation `reportData != null ? reportData.items : []`
+            internal true
+        }
+        {
+            name 'rowCountLabel'
+            type String
+            computed true
+            computation `reportData != null ? reportData.count.toString() + ' batches' : '0 batches'`
+            internal true
+        }
+        {
+            name 'reportExportRows'
+            type String
+            collection true
+            computed true
+            computation `reportItems.map((row) => row.product.name + ',' + row.batchNumber + ',' + row.warehouse.name + ',' + row.expiryDate.toString() + ',' + row.quantityOnHand.toString()).toList()`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Expiry Report'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'titleRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'pageTitleRef'
+                                                    data {
+                                                        data 'Expiry Report'
+                                                        textStyle {
+                                                            color '@c4'
+                                                            fontSize '24'
+                                                            fontWeight 'w700'
+                                                        }
+                                                    }
+                                                }
+                                                ReportExportButtonWidget {
+                                                    name 'exportRef'
+                                                    data {
+                                                        reportData `reportExportRows`
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        TextView {
+                                            name 'countLabelRef'
+                                            data {
+                                                data `rowCountLabel`
+                                                margin '0 0 8 0'
+                                                textStyle {
+                                                    color '@c5'
+                                                    fontSize '13'
+                                                }
+                                            }
+                                        }
+                                        TextView {
+                                            name 'windowLabelRef'
+                                            data {
+                                                data 'Batches expiring within 30 days'
+                                                margin '8 0 16 0'
+                                                textStyle {
+                                                    color '@c5'
+                                                    fontSize '13'
+                                                }
+                                            }
+                                        }
+                                        ExpiryAlertWidget {
+                                            name 'expiryRef'
+                                            data {
+                                                batches `reportItems`
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onNavigateHandler'
+            type OnEvent
+            on sidebarRef
+            event onNavigate
+            block ```
+                if (route == '/dashboard') {
+                    navigator.pushDashboardPage(user: user, target: 'main', replace: true);
+                } else if (route == '/reports/stock-valuation') {
+                    navigator.pushStockValuationReportPage(user: user, target: 'main', replace: true);
+                }
+            ```
+        }
+    ]
+}

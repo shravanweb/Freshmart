@@ -1,0 +1,27 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'AuditAction'
+    options [
+        {
+            name 'Create'
+        }
+        {
+            name 'Update'
+        }
+        {
+            name 'Delete'
+        }
+        {
+            name 'Approve'
+        }
+        {
+            name 'Cancel'
+        }
+        {
+            name 'Login'
+        }
+        {
+            name 'Export'
+        }
+    ]
+}

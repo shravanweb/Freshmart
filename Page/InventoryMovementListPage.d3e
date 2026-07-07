@@ -1,0 +1,327 @@
+Page {
+    package 'inventory.management.system'
+    name 'InventoryMovementListPage'
+    description 'List inventory movements with date range filter'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'searchTerm'
+            type String
+            internal true
+        }
+        {
+            name 'startDate'
+            type DateTime
+            internal true
+        }
+        {
+            name 'endDate'
+            type DateTime
+            internal true
+        }
+        {
+            name 'inventoryMovementsData'
+            type AllInventoryMovements
+            computed true
+            computation `organization != null ? Query.getAllInventoryMovements(AllInventoryMovementsRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'inventoryMovements'
+            type InventoryMovement
+            collection true
+            computed true
+            computation `inventoryMovementsData != null ? inventoryMovementsData.items : []`
+            internal true
+        }
+        {
+            name 'itemCount'
+            type Integer
+            computed true
+            computation `inventoryMovementsData != null ? inventoryMovementsData.count : 0`
+            internal true
+        }
+        {
+            name 'filteredInventoryMovements'
+            type InventoryMovement
+            collection true
+            computed true
+            computation `applyMovementFilters() as List<InventoryMovement>`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Inventory Movements'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'toolbarRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                                margin '0 0 16 0'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'countRef'
+                                                    data {
+                                                        data `itemCount.toString() + ' movements'`
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        DateRangeFilterWidget {
+                                            name 'dateFilterRef'
+                                        }
+                                        IMSInputFieldWidget {
+                                            name 'searchRef'
+                                            data {
+                                                label 'Search'
+                                                text `searchTerm`
+                                                placeHolder 'Movement number or product'
+                                                margin '16 0 0 0'
+                                            }
+                                        }
+                                        Container {
+                                            name 'listSpacerRef'
+                                            data {
+                                                margin '16 0 0 0'
+                                            }
+                                        }
+                                        CIf {
+                                            name 'emptyIfRef'
+                                            condition `filteredInventoryMovements.isEmpty`
+                                            then EmptyStateWidget {
+                                                name 'emptyStateRef'
+                                                data {
+                                                    title 'No movements'
+                                                    message 'Inventory movements will appear here as stock changes occur.'
+                                                }
+                                            }
+                                            else Column {
+                                                name 'listColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    CFor {
+                                                        name 'listCForRef'
+                                                        var 'listItem'
+                                                        items `filteredInventoryMovements`
+                                                        type InventoryMovement
+                                                        item Container {
+                                                            name 'listCardRef'
+                                                            tags [
+                                                                'glassCard'
+                                                            ]
+                                                            data {
+                                                                margin '0 0 12 0'
+                                                                padding '16'
+                                                            }
+                                                            child Row {
+                                                                name 'listRowRef'
+                                                                data {
+                                                                    mainAxisAlignment 'spaceBetween'
+                                                                    crossAxisAlignment 'center'
+                                                                    mainAxisSize 'max'
+                                                                }
+                                                                children [
+                                                                    Column {
+                                                                        name 'infoColRef'
+                                                                        data {
+                                                                            crossAxisAlignment 'start'
+                                                                        }
+                                                                        children [
+                                                                            TextView {
+                                                                                name 'movementRef'
+                                                                                data {
+                                                                                    data `listItem.movementNumber`
+                                                                                    textStyle {
+                                                                                        color '@c4'
+                                                                                        fontSize '16'
+                                                                                        fontWeight 'w600'
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            TextView {
+                                                                                name 'productRef'
+                                                                                data {
+                                                                                    data `listItem.product.name + ' · ' + listItem.movementType.name`
+                                                                                    margin '4 0 0 0'
+                                                                                    textStyle {
+                                                                                        color '@c5'
+                                                                                        fontSize '13'
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                    DateTimeView {
+                                                                        name 'dateRef'
+                                                                        data {
+                                                                            value `listItem.movementDate`
+                                                                            format 'MMM d, yyyy'
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                startDate = DateTime.now().subtract(Duration(days: 30));
+                endDate = DateTime.now();
+            ```
+        }
+        {
+            name 'applyMovementFilters'
+            block ```
+                List<InventoryMovement> result = [];
+                for (InventoryMovement movement in inventoryMovements) {
+                    Boolean matchesSearch = searchTerm == null || searchTerm.trim().isEmpty ||
+                        movement.movementNumber.toLowerCase().contains(searchTerm.toLowerCase()) ||
+                        movement.product.name.toLowerCase().contains(searchTerm.toLowerCase());
+                    Boolean matchesDate = startDate == null || endDate == null ||
+                        (movement.movementDate.isAfter(startDate) && movement.movementDate.isBefore(endDate.add(Duration(days: 1))));
+                    if (matchesSearch && matchesDate) {
+                        result.add(movement);
+                    }
+                }
+                return result;
+            ```
+            returnType List
+        }
+        {
+            name 'onDateFilterHandler'
+            type OnEvent
+            on dateFilterRef
+            event onChange
+            block ```
+                startDate = filterStart;
+                endDate = filterEnd;
+            ```
+        }
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+    ]
+}

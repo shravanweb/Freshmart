@@ -1,0 +1,14 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'UserProfileByUser'
+    query `UserProfile.all
+    .where((row) => row.user == inputs.user)`
+    inputs [
+        {
+            name 'user'
+            type User
+            required true
+        }
+    ]
+    enableSync true
+}

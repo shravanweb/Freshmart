@@ -1,0 +1,59 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onExpiringBatchesChange'
+        'ExpiryReportPage'
+        'reportData_synchronise'
+    ]
+    struct ExpiringBatches
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getExpiringBatches'
+        'ExpiryReportPage'
+        'properties_reportData_computation'
+    ]
+    struct ExpiringBatches
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUserProfileByUserChange'
+        'ExpiryReportPage'
+        'userProfileData_synchronise'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUserProfileByUser'
+        'ExpiryReportPage'
+        'properties_userProfileData_computation'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}

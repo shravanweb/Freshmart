@@ -1,0 +1,277 @@
+Page {
+    package 'inventory.management.system'
+    name 'StockTransferFormPage'
+    description 'Create and edit stock transfers'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'stockTransfer'
+            type StockTransfer
+            required true
+        }
+        {
+            name 'transferData'
+            type StockTransferItem
+            computed true
+            computation `isEditMode ? Query.getStockTransferItem(StockTransferItemRequest(stockTransfer: stockTransfer)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'isEditMode'
+            type Boolean
+            computed true
+            internal true
+            computation `stockTransfer != null && stockTransfer.saveStatus != DBSaveStatus.New`
+        }
+        {
+            name 'notes'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            internal true
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `isEditMode ? 'Edit Stock Transfer' : 'New Stock Transfer'`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'formColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Container {
+                                            name 'cardRef'
+                                            tags [
+                                                'glassCard'
+                                            ]
+                                            child Column {
+                                                name 'headerFormRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    WarehousePickerWidget {
+                                                        name 'sourceWarehousePickerRef'
+                                                        data {
+                                                            organization `organization`
+                                                        }
+                                                    }
+                                                    Container {
+                                                        name 'spacer1Ref'
+                                                        data {
+                                                            margin '0 0 16 0'
+                                                        }
+                                                    }
+                                                    WarehousePickerWidget {
+                                                        name 'destWarehousePickerRef'
+                                                        data {
+                                                            organization `organization`
+                                                        }
+                                                    }
+                                                    Container {
+                                                        name 'spacer2Ref'
+                                                        data {
+                                                            margin '0 0 16 0'
+                                                        }
+                                                    }
+                                                    IMSInputFieldWidget {
+                                                        name 'notesFieldRef'
+                                                        data {
+                                                            label 'Notes'
+                                                            text `notes`
+                                                            placeHolder 'Transfer notes'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                        Container {
+                                            name 'spacer3Ref'
+                                            data {
+                                                margin '0 0 16 0'
+                                            }
+                                        }
+                                        LineItemEditorWidget {
+                                            name 'lineItemsRef'
+                                            data {
+                                                mode 'edit'
+                                            }
+                                        }
+                                        Row {
+                                            name 'actionsRowRef'
+                                            data {
+                                                mainAxisAlignment 'end'
+                                                mainAxisSize 'max'
+                                                margin '24 0 0 0'
+                                            }
+                                            children [
+                                                TextButton {
+                                                    name 'cancelRef'
+                                                    tags [
+                                                        'secondary'
+                                                    ]
+                                                    data {
+                                                        label 'Cancel'
+                                                        margin '0 8 0 0'
+                                                    }
+                                                }
+                                                TextButton {
+                                                    name 'saveRef'
+                                                    tags [
+                                                        'primary'
+                                                    ]
+                                                    data {
+                                                        label `isEditMode ? 'Update' : 'Create'`
+                                                        disable `isLoading`
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                StockTransfer source = stockTransfer;
+                if (isEditMode && transferData != null && transferData.items.isNotEmpty) {
+                    source = transferData.items.first;
+                }
+                notes = source.notes;
+            ```
+        }
+        {
+            name 'onSourceWarehouseSelectedHandler'
+            type OnEvent
+            on sourceWarehousePickerRef
+            event onWarehouseSelected
+            block ```
+                stockTransfer.sourceWarehouse = warehouse;
+            ```
+        }
+        {
+            name 'onDestWarehouseSelectedHandler'
+            type OnEvent
+            on destWarehousePickerRef
+            event onWarehouseSelected
+            block ```
+                stockTransfer.destinationWarehouse = warehouse;
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                navigator.pushStockTransferListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                isLoading = true;
+                stockTransfer.organization = organization;
+                stockTransfer.notes = notes;
+                // TODO: D3EClass StockTransferService.createStockTransfer / updateStockTransfer
+                isLoading = false;
+                navigator.pushStockTransferListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'WarehousesByStore'
+    query `Warehouse.all
+    .where((row) => row.store == inputs.store)
+    .orderBy((row) => row.name, asc: true)`
+    inputs [
+        {
+            name 'store'
+            type Store
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

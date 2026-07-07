@@ -1,0 +1,24 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'AdjustmentReason'
+    options [
+        {
+            name 'PhysicalCount'
+        }
+        {
+            name 'Damage'
+        }
+        {
+            name 'Theft'
+        }
+        {
+            name 'Expiry'
+        }
+        {
+            name 'SystemCorrection'
+        }
+        {
+            name 'OpeningBalance'
+        }
+    ]
+}

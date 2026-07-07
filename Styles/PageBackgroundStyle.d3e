@@ -1,0 +1,30 @@
+Style {
+    package 'inventory.management.system'
+    name 'PageBackgroundStyle'
+    description 'Full-viewport page background gradient'
+    items [
+        {
+            selector 'Container.pageBackground'
+            values {
+                decoration {
+                    gradientType 'LinearGradient'
+                    linearGradient {
+                        colors '@c9,@c15,@c11'
+                        stops '0.0,0.45,1.0'
+                        begin 'topLeft'
+                        end 'bottomRight'
+                    }
+                }
+                width '100%'
+                height '100%'
+            }
+        }
+        {
+            selector 'Container.pageContent'
+            values {
+                width '100%'
+                padding '32 24'
+            }
+        }
+    ]
+}

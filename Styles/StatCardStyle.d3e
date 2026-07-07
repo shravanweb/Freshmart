@@ -1,0 +1,135 @@
+Style {
+    package 'inventory.management.system'
+    name 'StatCardStyle'
+    description 'Dashboard KPI metric tile'
+    items [
+        {
+            selector 'Container.statCard'
+            values {
+                glassmorphism {
+                    blurSigma {
+                        dx '8'
+                        dy '8'
+                    }
+                    borderRadius '16'
+                    blendMode 'srcOver'
+                }
+                decoration {
+                    color '@c25'
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                }
+                padding '20 24'
+                width '100%'
+            }
+        }
+        {
+            selector 'Container.statCardA'
+            values {
+                decoration {
+                    gradientType 'LinearGradient'
+                    linearGradient {
+                        colors '@c15,@c13'
+                        stops '0.0,1.0'
+                        begin 'topLeft'
+                        end 'bottomRight'
+                    }
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                    borderRadius '16'
+                }
+                padding '20 24'
+            }
+        }
+        {
+            selector 'Container.statCardB'
+            values {
+                decoration {
+                    gradientType 'LinearGradient'
+                    linearGradient {
+                        colors 'FFFFF7ED,@c11'
+                        stops '0.0,1.0'
+                        begin 'topLeft'
+                        end 'bottomRight'
+                    }
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                    borderRadius '16'
+                }
+                padding '20 24'
+            }
+        }
+        {
+            selector 'Container.statCardC'
+            values {
+                decoration {
+                    gradientType 'LinearGradient'
+                    linearGradient {
+                        colors '@c16,FFFFE4E6'
+                        stops '0.0,1.0'
+                        begin 'topLeft'
+                        end 'bottomRight'
+                    }
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                    borderRadius '16'
+                }
+                padding '20 24'
+            }
+        }
+        {
+            selector 'Container.statCardD'
+            values {
+                decoration {
+                    gradientType 'LinearGradient'
+                    linearGradient {
+                        colors 'FFECFDF5,@c12'
+                        stops '0.0,1.0'
+                        begin 'topLeft'
+                        end 'bottomRight'
+                    }
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                    borderRadius '16'
+                }
+                padding '20 24'
+            }
+        }
+        {
+            selector 'TextView.statValue'
+            values {
+                textStyle {
+                    color '@c4'
+                    fontSize '30'
+                    fontWeight 'w700'
+                }
+            }
+        }
+        {
+            selector 'TextView.statLabel'
+            values {
+                textStyle {
+                    color '@c5'
+                    fontSize '14'
+                    fontWeight 'w500'
+                }
+                margin '8 0 0 0'
+            }
+        }
+    ]
+}

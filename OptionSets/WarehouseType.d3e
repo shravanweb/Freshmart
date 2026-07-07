@@ -1,0 +1,18 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'WarehouseType'
+    options [
+        {
+            name 'Main'
+        }
+        {
+            name 'Store'
+        }
+        {
+            name 'ColdStorage'
+        }
+        {
+            name 'Distribution'
+        }
+    ]
+}

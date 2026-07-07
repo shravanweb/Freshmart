@@ -1,0 +1,59 @@
+Model {
+    package 'inventory.management.system'
+    name 'StockAlert'
+    master Organization
+    creatable true
+    display `product.name + ' - ' + alertType.name`
+    properties [
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Alert Type'
+            type StockAlertType
+            required true
+        }
+        {
+            name 'Current Quantity'
+            type Double
+            required true
+        }
+        {
+            name 'Threshold'
+            type Double
+        }
+        {
+            name 'Expiry Date'
+            type Date
+        }
+        {
+            name 'Status'
+            type AlertStatus
+            required true
+            defaultValue `AlertStatus.Open`
+        }
+        {
+            name 'Acknowledged By'
+            type User
+            onDelete Clear
+        }
+        {
+            name 'Acknowledged At'
+            type DateTime
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+    ]
+}

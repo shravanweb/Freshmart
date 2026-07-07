@@ -1,0 +1,59 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUserProfileByUserChange'
+        'GoodsReceiptDetailPage'
+        'userProfileData_synchronise'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUserProfileByUser'
+        'GoodsReceiptDetailPage'
+        'properties_userProfileData_computation'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onGoodsReceiptItemChange'
+        'GoodsReceiptDetailPage'
+        'receiptData_synchronise'
+    ]
+    struct GoodsReceiptItem
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getGoodsReceiptItem'
+        'GoodsReceiptDetailPage'
+        'properties_receiptData_computation'
+    ]
+    struct GoodsReceiptItem
+    usage [
+        '*'
+        'items.*'
+    ]
+}

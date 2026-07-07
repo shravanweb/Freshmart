@@ -1,0 +1,56 @@
+Model {
+    package 'inventory.management.system'
+    name 'StockBatch'
+    master Organization
+    creatable true
+    display `batchNumber`
+    properties [
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Batch Number'
+            type String
+            required true
+        }
+        {
+            name 'Quantity On Hand'
+            type Double
+            required true
+            defaultValue `0.0`
+        }
+        {
+            name 'Manufacturing Date'
+            type Date
+        }
+        {
+            name 'Expiry Date'
+            type Date
+        }
+        {
+            name 'Unit Cost'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Status'
+            type BatchStatus
+            required true
+            defaultValue `BatchStatus.Active`
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+UserType {
+    package 'inventory.management.system'
+    name 'AnonymousUser'
+    userModel AnonymousUser
+    loginSettings {
+    }
+    modelAccess [
+        {
+            model AnonymousUser
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+    ]
+    queries [
+    ]
+}

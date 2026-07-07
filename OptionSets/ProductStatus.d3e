@@ -1,0 +1,15 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'ProductStatus'
+    options [
+        {
+            name 'Active'
+        }
+        {
+            name 'Inactive'
+        }
+        {
+            name 'Discontinued'
+        }
+    ]
+}

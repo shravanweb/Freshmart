@@ -1,0 +1,59 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onWarehouseStockByWarehouseChange'
+        'WarehouseDetailPage'
+        'stockData_synchronise'
+    ]
+    struct WarehouseStockByWarehouse
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUserProfileByUserChange'
+        'WarehouseDetailPage'
+        'userProfileData_synchronise'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUserProfileByUser'
+        'WarehouseDetailPage'
+        'properties_userProfileData_computation'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getWarehouseStockByWarehouse'
+        'WarehouseDetailPage'
+        'properties_stockData_computation'
+    ]
+    struct WarehouseStockByWarehouse
+    usage [
+        '*'
+        'items.*'
+    ]
+}

@@ -1,0 +1,106 @@
+Widget {
+    package 'inventory.management.system'
+    name 'KPICardWidget'
+    description 'Dashboard KPI metric card'
+    properties [
+        {
+            name 'label'
+            type String
+            required true
+        }
+        {
+            name 'value'
+            type String
+            required true
+        }
+        {
+            name 'icon'
+            type String
+        }
+        {
+            name 'trend'
+            type String
+        }
+        {
+            name 'variant'
+            type String
+            defaultValue `'a'`
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+            StatCardStyle
+        ]
+        tags [
+            'statCard'
+        ]
+        child Column {
+            name 'cardColumnRef'
+            data {
+                mainAxisSize 'min'
+                crossAxisAlignment 'start'
+            }
+            children [
+                CIf {
+                    name 'iconIfRef'
+                    condition `icon != null && icon.isNotEmpty`
+                    then TextView {
+                        name 'iconRef'
+                        data {
+                            data `icon`
+                            margin '0 0 8 0'
+                            textStyle {
+                                fontSize '24'
+                            }
+                        }
+                    }
+                }
+                TextView {
+                    name 'valueRef'
+                    tags [
+                        'statValue'
+                    ]
+                    data {
+                        data `value`
+                    }
+                }
+                TextView {
+                    name 'labelRef'
+                    tags [
+                        'statLabel'
+                    ]
+                    data {
+                        data `label`
+                    }
+                }
+                TextView {
+                    name 'variantRef'
+                    data {
+                        data `variant`
+                        margin '4 0 0 0'
+                        textStyle {
+                            color '@c8'
+                            fontSize '10'
+                        }
+                    }
+                }
+                CIf {
+                    name 'trendIfRef'
+                    condition `trend != null && trend.isNotEmpty`
+                    then TextView {
+                        name 'trendRef'
+                        data {
+                            data `trend`
+                            margin '8 0 0 0'
+                            textStyle {
+                                color '@c8'
+                                fontSize '12'
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,333 @@
+Page {
+    package 'inventory.management.system'
+    name 'SalesSummaryReportPage'
+    description 'Sales summary report with date range filter'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'startDate'
+            type DateTime
+            internal true
+            defaultValue `DateTime.now().subtract(Duration(days: 30))`
+        }
+        {
+            name 'endDate'
+            type DateTime
+            internal true
+            defaultValue `DateTime.now()`
+        }
+        {
+            name 'ordersData'
+            type AllSalesOrders
+            computed true
+            computation `organization != null ? Query.getAllSalesOrders(AllSalesOrdersRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'allOrders'
+            type SalesOrder
+            collection true
+            computed true
+            computation `ordersData != null ? ordersData.items : []`
+            internal true
+        }
+        {
+            name 'filteredOrders'
+            type SalesOrder
+            collection true
+            computed true
+            computation `allOrders.where((row) => row.orderDate >= startDate && row.orderDate <= endDate).toList()`
+            internal true
+        }
+        {
+            name 'rowCountLabel'
+            type String
+            computed true
+            computation `filteredOrders.length.toString() + ' orders'`
+            internal true
+        }
+        {
+            name 'totalSales'
+            type Double
+            computed true
+            computation `filteredOrders.fold(0.0, (sum, row) => sum + row.totalAmount)`
+            internal true
+        }
+        {
+            name 'totalSalesLabel'
+            type String
+            computed true
+            computation `'$' + totalSales.toStringAsFixed(2)`
+            internal true
+        }
+        {
+            name 'reportExportRows'
+            type String
+            collection true
+            computed true
+            computation `filteredOrders.map((row) => row.orderNumber + ',' + row.customerName + ',' + row.orderDate.toString() + ',' + row.totalAmount.toString()).toList()`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            StatCardStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Sales Summary'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'titleRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'pageTitleRef'
+                                                    data {
+                                                        data 'Sales Summary Report'
+                                                        textStyle {
+                                                            color '@c4'
+                                                            fontSize '24'
+                                                            fontWeight 'w700'
+                                                        }
+                                                    }
+                                                }
+                                                ReportExportButtonWidget {
+                                                    name 'exportRef'
+                                                    data {
+                                                        reportData `reportExportRows`
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        Container {
+                                            name 'filterSpacerRef'
+                                            data {
+                                                margin '0 0 16 0'
+                                            }
+                                        }
+                                        DateRangeFilterWidget {
+                                            name 'dateFilterRef'
+                                        }
+                                        TextView {
+                                            name 'dateFilterHintRef'
+                                            data {
+                                                data 'Date filter applied client-side; AllSalesOrders query loads all orders for organization'
+                                                margin '8 0 16 0'
+                                                textStyle {
+                                                    color '@c5'
+                                                    fontSize '12'
+                                                }
+                                            }
+                                        }
+                                        KPICardWidget {
+                                            name 'totalSalesRef'
+                                            data {
+                                                label 'Total Sales'
+                                                value `totalSalesLabel`
+                                                icon '📈'
+                                                trend `rowCountLabel`
+                                                variant 'b'
+                                            }
+                                        }
+                                        Container {
+                                            name 'tableSpacerRef'
+                                            data {
+                                                margin '0 0 16 0'
+                                            }
+                                        }
+                                        Container {
+                                            name 'tableCardRef'
+                                            tags [
+                                                'glassCardFlat'
+                                            ]
+                                            child Column {
+                                                name 'tableColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    TextView {
+                                                        name 'tableTitleRef'
+                                                        data {
+                                                            data 'Sales Orders'
+                                                            margin '0 0 8 0'
+                                                            textStyle {
+                                                                color '@c4'
+                                                                fontSize '18'
+                                                                fontWeight 'w600'
+                                                            }
+                                                        }
+                                                    }
+                                                    TextView {
+                                                        name 'tableCountRef'
+                                                        data {
+                                                            data `rowCountLabel`
+                                                            margin '0 0 16 0'
+                                                            textStyle {
+                                                                color '@c5'
+                                                                fontSize '13'
+                                                            }
+                                                        }
+                                                    }
+                                                    Container {
+                                                        name 'tableRef'
+                                                        tags [
+                                                            'glassPanel'
+                                                        ]
+                                                        data {
+                                                            padding '16'
+                                                        }
+                                                        child TextView {
+                                                            name 'tableHintRef'
+                                                            data {
+                                                                data 'Bind sales order rows from AllSalesOrders query with date filter'
+                                                                textStyle {
+                                                                    color '@c5'
+                                                                    fontSize '14'
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onNavigateHandler'
+            type OnEvent
+            on sidebarRef
+            event onNavigate
+            block ```
+                if (route == '/dashboard') {
+                    navigator.pushDashboardPage(user: user, target: 'main', replace: true);
+                } else if (route == '/reports/stock-valuation') {
+                    navigator.pushStockValuationReportPage(user: user, target: 'main', replace: true);
+                }
+            ```
+        }
+        {
+            name 'onDateRangeChangedHandler'
+            type OnEvent
+            on dateFilterRef
+            event onChange
+            block ```
+                startDate = filterStart;
+                endDate = filterEnd;
+            ```
+        }
+    ]
+}

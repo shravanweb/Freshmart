@@ -1,0 +1,49 @@
+@RPCService
+server class SupplierService {
+    static Vendor createSupplier(Vendor supplier) {
+        if (supplier == null) {
+            throw Exception('Vendor cannot be null');
+        }
+        supplier.createdAt = DateTime.now();
+        Database.save(supplier);
+        return supplier;
+    }
+
+    static Vendor updateSupplier(Vendor supplier) {
+        if (supplier == null) {
+            throw Exception('Vendor cannot be null');
+        }
+        Database.save(supplier);
+        return supplier;
+    }
+
+    static void deleteSupplier(Vendor supplier) {
+        if (supplier == null) {
+            return;
+        }
+        Database.delete(supplier);
+    }
+
+    static SupplierContact createSupplierContact(SupplierContact supplierContact) {
+        if (supplierContact == null) {
+            throw Exception('SupplierContact cannot be null');
+        }
+        Database.save(supplierContact);
+        return supplierContact;
+    }
+
+    static SupplierContact updateSupplierContact(SupplierContact supplierContact) {
+        if (supplierContact == null) {
+            throw Exception('SupplierContact cannot be null');
+        }
+        Database.save(supplierContact);
+        return supplierContact;
+    }
+
+    static void deleteSupplierContact(SupplierContact supplierContact) {
+        if (supplierContact == null) {
+            return;
+        }
+        Database.delete(supplierContact);
+    }
+}

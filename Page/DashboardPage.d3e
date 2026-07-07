@@ -1,0 +1,410 @@
+Page {
+    package 'inventory.management.system'
+    name 'DashboardPage'
+    description 'Operations dashboard with KPIs and alerts'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'productsData'
+            type AllProducts
+            computed true
+            computation `organization != null ? Query.getAllProducts(AllProductsRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'totalProducts'
+            type Integer
+            computed true
+            computation `productsData != null ? productsData.count : 0`
+            internal true
+        }
+        {
+            name 'lowStockData'
+            type LowStockItems
+            computed true
+            computation `organization != null ? Query.getLowStockItems(LowStockItemsRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'lowStockItems'
+            type WarehouseStock
+            collection true
+            computed true
+            computation `lowStockData != null ? lowStockData.items.where((row) => row.quantityOnHand <= row.product.reorderLevel).toList() : []`
+            internal true
+        }
+        {
+            name 'lowStockCount'
+            type Integer
+            computed true
+            computation `lowStockItems.length`
+            internal true
+        }
+        {
+            name 'outOfStockData'
+            type OutOfStockItems
+            computed true
+            computation `organization != null ? Query.getOutOfStockItems(OutOfStockItemsRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'outOfStockCount'
+            type Integer
+            computed true
+            computation `outOfStockData != null ? outOfStockData.count : 0`
+            internal true
+        }
+        {
+            name 'expiringData'
+            type ExpiringBatches
+            computed true
+            computation `organization != null ? Query.getExpiringBatches(ExpiringBatchesRequest(organization: organization, daysAhead: 30)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'expiringBatches'
+            type StockBatch
+            collection true
+            computed true
+            computation `expiringData != null ? expiringData.items : []`
+            internal true
+        }
+        {
+            name 'movementsData'
+            type InventoryMovementsByDateRange
+            computed true
+            computation `organization != null ? Query.getInventoryMovementsByDateRange(InventoryMovementsByDateRangeRequest(organization: organization, startDate: DateTime.now().subtract(Duration(days: 7)), endDate: DateTime.now())).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'recentMovements'
+            type InventoryMovement
+            collection true
+            computed true
+            computation `movementsData != null ? (movementsData.items.length > 5 ? movementsData.items.sublist(0, 5) : movementsData.items) : []`
+            internal true
+        }
+        {
+            name 'unreadNotificationsData'
+            type UnreadNotificationCount
+            computed true
+            computation `organization != null ? Query.getUnreadNotificationCount(UnreadNotificationCountRequest(organization: organization, user: user)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'unreadCount'
+            type Integer
+            computed true
+            computation `unreadNotificationsData != null ? unreadNotificationsData.count : 0`
+            internal true
+        }
+        {
+            name 'notificationsData'
+            type AllInAppNotifications
+            computed true
+            computation `organization != null ? Query.getAllInAppNotifications(AllInAppNotificationsRequest(organization: organization, user: user)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'notifications'
+            type InAppNotification
+            collection true
+            computed true
+            computation `notificationsData != null ? notificationsData.items : []`
+            internal true
+        }
+        {
+            name 'stockValueLabel'
+            type String
+            computed true
+            computation `'$' + (lowStockData != null ? lowStockData.count.toString() : '0')`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            StatCardStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Dashboard'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'titleRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                                margin '0 0 24 0'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'pageTitleRef'
+                                                    data {
+                                                        data 'Operations Dashboard'
+                                                        textStyle {
+                                                            color '@c4'
+                                                            fontSize '24'
+                                                            fontWeight 'w700'
+                                                        }
+                                                    }
+                                                }
+                                                NotificationCenterWidget {
+                                                    name 'notificationsRef'
+                                                    data {
+                                                        user `user`
+                                                        organization `organization`
+                                                        unreadCount `unreadCount`
+                                                        notifications `notifications`
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        TextView {
+                                            name 'stockValueRef'
+                                            data {
+                                                data `stockValueLabel`
+                                                margin '0 0 24 0'
+                                                textStyle {
+                                                    color '@c5'
+                                                    fontSize '13'
+                                                }
+                                            }
+                                        }
+                                        Row {
+                                            name 'kpiRowRef'
+                                            data {
+                                                mainAxisSize 'max'
+                                            }
+                                            children [
+                                                KPICardWidget {
+                                                    name 'kpiProductsRef'
+                                                    data {
+                                                        label 'Total Products'
+                                                        value `totalProducts.toString()`
+                                                        icon '📦'
+                                                        trend '+ catalog'
+                                                        variant 'a'
+                                                    }
+                                                }
+                                                Container {
+                                                    name 'kpiSpacer1Ref'
+                                                    data {
+                                                        margin '0 12 0 12'
+                                                    }
+                                                }
+                                                KPICardWidget {
+                                                    name 'kpiLowStockRef'
+                                                    data {
+                                                        label 'Low Stock Items'
+                                                        value `lowStockCount.toString()`
+                                                        icon '⚠️'
+                                                        trend `outOfStockCount.toString() + ' out'`
+                                                        variant 'c'
+                                                    }
+                                                }
+                                                Container {
+                                                    name 'kpiSpacer2Ref'
+                                                    data {
+                                                        margin '0 12 0 12'
+                                                    }
+                                                }
+                                                KPICardWidget {
+                                                    name 'kpiExpiringRef'
+                                                    data {
+                                                        label 'Expiring Soon'
+                                                        value `expiringBatches.length.toString()`
+                                                        icon '📅'
+                                                        trend '30 days'
+                                                        variant 'd'
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        Container {
+                                            name 'widgetsSpacerRef'
+                                            data {
+                                                margin '0 0 24 0'
+                                            }
+                                        }
+                                        Row {
+                                            name 'tablesRowRef'
+                                            data {
+                                                mainAxisSize 'max'
+                                                crossAxisAlignment 'start'
+                                            }
+                                            children [
+                                                Container {
+                                                    name 'lowStockColRef'
+                                                    data {
+                                                        expand 'true'
+                                                        margin '0 12 0 0'
+                                                    }
+                                                    child LowStockTableWidget {
+                                                        name 'lowStockRef'
+                                                        data {
+                                                            items `lowStockItems`
+                                                        }
+                                                    }
+                                                }
+                                                Container {
+                                                    name 'expiryColRef'
+                                                    data {
+                                                        expand 'true'
+                                                    }
+                                                    child ExpiryAlertWidget {
+                                                        name 'expiryRef'
+                                                        data {
+                                                            batches `expiringBatches`
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        Container {
+                                            name 'movementsSpacerRef'
+                                            data {
+                                                margin '24 0 0 0'
+                                            }
+                                        }
+                                        RecentMovementsWidget {
+                                            name 'movementsRef'
+                                            data {
+                                                movements `recentMovements`
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onNavigateHandler'
+            type OnEvent
+            on sidebarRef
+            event onNavigate
+            block ```
+                navigator.pushDashboardPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onCreatePoHandler'
+            type OnEvent
+            on lowStockRef
+            event onCreatePO
+            block ```
+                navigator.pushPurchaseOrderFormPage(user: user, purchaseOrder: PurchaseOrder(), target: 'main', replace: false);
+            ```
+        }
+    ]
+}

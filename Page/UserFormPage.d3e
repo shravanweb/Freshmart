@@ -1,0 +1,249 @@
+Page {
+    package 'inventory.management.system'
+    name 'UserFormPage'
+    description 'Edit user profile and role'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'profile'
+            type UserProfile
+            required true
+        }
+        {
+            name 'isEditMode'
+            type Boolean
+            computed true
+            internal true
+            computation `profile != null && profile.saveStatus != DBSaveStatus.New`
+        }
+        {
+            name 'displayName'
+            type String
+            internal true
+        }
+        {
+            name 'phone'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            internal true
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `isEditMode ? 'Edit User' : 'New User'`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Container {
+                                    name 'cardRef'
+                                    tags [
+                                        'glassCard'
+                                    ]
+                                    data {
+                                        width '640'
+                                    }
+                                    child Column {
+                                        name 'formColumnRef'
+                                        data {
+                                            crossAxisAlignment 'stretch'
+                                        }
+                                        children [
+                                            IMSInputFieldWidget {
+                                                name 'displayNameFieldRef'
+                                                data {
+                                                    label 'Display Name'
+                                                    text `displayName`
+                                                    placeHolder 'Full name'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer1Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'phoneFieldRef'
+                                                data {
+                                                    label 'Phone'
+                                                    text `phone`
+                                                    placeHolder 'Phone number'
+                                                    keyboardType 'phone'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer2Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            Container {
+                                                name 'roleHintRef'
+                                                tags [
+                                                    'formField'
+                                                ]
+                                                child TextView {
+                                                    name 'roleHintTextRef'
+                                                    data {
+                                                        data `profile.appRole != null ? 'Role: ' + profile.appRole.name : 'Bind AppUserRole picker in Page'`
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            Row {
+                                                name 'actionsRowRef'
+                                                data {
+                                                    mainAxisAlignment 'end'
+                                                    mainAxisSize 'max'
+                                                    margin '24 0 0 0'
+                                                }
+                                                children [
+                                                    TextButton {
+                                                        name 'cancelRef'
+                                                        tags [
+                                                            'secondary'
+                                                        ]
+                                                        data {
+                                                            label 'Cancel'
+                                                            margin '0 8 0 0'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'saveRef'
+                                                        tags [
+                                                            'primary'
+                                                        ]
+                                                        data {
+                                                            label `isEditMode ? 'Update' : 'Create'`
+                                                            disable `isLoading`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                displayName = profile.displayName;
+                phone = profile.phone;
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                navigator.pushUserListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                isLoading = true;
+                profile.displayName = displayName;
+                profile.phone = phone;
+                // TODO: D3EClass UserProfileService.updateUserProfile
+                isLoading = false;
+                navigator.pushUserListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

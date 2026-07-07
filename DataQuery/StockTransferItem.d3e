@@ -1,0 +1,14 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'StockTransferItem'
+    query `StockTransfer.all
+    .where((row) => row == inputs.stockTransfer)`
+    inputs [
+        {
+            name 'stockTransfer'
+            type StockTransfer
+            required true
+        }
+    ]
+    enableSync true
+}

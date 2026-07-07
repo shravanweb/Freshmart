@@ -1,0 +1,84 @@
+Model {
+    package 'inventory.management.system'
+    name 'SalesOrder'
+    master Organization
+    creatable true
+    searchable true
+    display `orderNumber`
+    properties [
+        {
+            name 'Store'
+            type Store
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Order Number'
+            type String
+            required true
+        }
+        {
+            name 'Order Date'
+            type DateTime
+            required true
+        }
+        {
+            name 'Customer Name'
+            type String
+        }
+        {
+            name 'Customer Phone'
+            type String
+        }
+        {
+            name 'Status'
+            type SalesOrderStatus
+            required true
+            defaultValue `SalesOrderStatus.Draft`
+        }
+        {
+            name 'Subtotal'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Discount Amount'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Tax Amount'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Total Amount'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Payment Status'
+            type PaymentStatus
+            defaultValue `PaymentStatus.Unpaid`
+        }
+        {
+            name 'Sold By'
+            type User
+            readType ReadOnly
+            onDelete Clear
+        }
+        {
+            name 'Lines'
+            type SalesOrderLine
+            collection true
+            inverse true
+            inverseProperty salesOrder
+        }
+    ]
+}

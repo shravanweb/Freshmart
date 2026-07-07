@@ -1,0 +1,27 @@
+Model {
+    package 'inventory.management.system'
+    name 'SupplierContact'
+    master Vendor
+    creatable true
+    display `name`
+    properties [
+        {
+            name 'Name'
+            type String
+            required true
+        }
+        {
+            name 'Email'
+            type String
+        }
+        {
+            name 'Phone'
+            type String
+        }
+        {
+            name 'Is Primary'
+            type Boolean
+            defaultValue `false`
+        }
+    ]
+}

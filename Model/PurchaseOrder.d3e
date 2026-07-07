@@ -1,0 +1,92 @@
+Model {
+    package 'inventory.management.system'
+    name 'PurchaseOrder'
+    master Organization
+    creatable true
+    searchable true
+    display `poNumber`
+    properties [
+        {
+            name 'Po Number'
+            type String
+            required true
+            readType ReadOnly
+        }
+        {
+            name 'Vendor'
+            type Vendor
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Order Date'
+            type Date
+            required true
+        }
+        {
+            name 'Expected Delivery Date'
+            type Date
+        }
+        {
+            name 'Status'
+            type PurchaseOrderStatus
+            required true
+            defaultValue `PurchaseOrderStatus.Draft`
+        }
+        {
+            name 'Subtotal'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Tax Amount'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Total Amount'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Notes'
+            type String
+            longText true
+        }
+        {
+            name 'Created By'
+            type User
+            readType ReadOnly
+            onDelete Clear
+        }
+        {
+            name 'Approved By'
+            type User
+            readType ReadOnly
+            onDelete Clear
+        }
+        {
+            name 'Approved At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Lines'
+            type PurchaseOrderLine
+            collection true
+            inverse true
+            inverseProperty purchaseOrder
+        }
+    ]
+}

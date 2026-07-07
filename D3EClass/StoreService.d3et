@@ -1,0 +1,28 @@
+@RPCService
+server class StoreService {
+    static Store createStore(Store store) {
+        if (store == null) {
+            throw Exception('Store cannot be null');
+        }
+        store.createdAt = DateTime.now();
+        store.updatedAt = DateTime.now();
+        Database.save(store);
+        return store;
+    }
+
+    static Store updateStore(Store store) {
+        if (store == null) {
+            throw Exception('Store cannot be null');
+        }
+        store.updatedAt = DateTime.now();
+        Database.save(store);
+        return store;
+    }
+
+    static void deleteStore(Store store) {
+        if (store == null) {
+            return;
+        }
+        Database.delete(store);
+    }
+}

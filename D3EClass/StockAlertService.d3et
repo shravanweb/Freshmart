@@ -1,0 +1,27 @@
+@RPCService
+server class StockAlertService {
+    static StockAlert createStockAlert(StockAlert stockAlert) {
+        if (stockAlert == null) {
+            throw Exception('StockAlert cannot be null');
+        }
+        stockAlert.createdAt = DateTime.now();
+        stockAlert.status = AlertStatus.Open;
+        Database.save(stockAlert);
+        return stockAlert;
+    }
+
+    static StockAlert updateStockAlert(StockAlert stockAlert) {
+        if (stockAlert == null) {
+            throw Exception('StockAlert cannot be null');
+        }
+        Database.save(stockAlert);
+        return stockAlert;
+    }
+
+    static void deleteStockAlert(StockAlert stockAlert) {
+        if (stockAlert == null) {
+            return;
+        }
+        Database.delete(stockAlert);
+    }
+}

@@ -1,0 +1,280 @@
+Page {
+    package 'inventory.management.system'
+    name 'StockTransferDetailPage'
+    description 'Stock transfer detail with approve workflow'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'stockTransfer'
+            type StockTransfer
+            required true
+        }
+        {
+            name 'transferData'
+            type StockTransferItem
+            computed true
+            computation `Query.getStockTransferItem(StockTransferItemRequest(stockTransfer: stockTransfer)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'loadedTransfer'
+            type StockTransfer
+            computed true
+            computation `transferData != null && transferData.items.isNotEmpty ? transferData.items.first : stockTransfer`
+            internal true
+        }
+        {
+            name 'statusLabel'
+            type String
+            computed true
+            computation `loadedTransfer.status != null ? loadedTransfer.status.name : ''`
+            internal true
+        }
+        {
+            name 'allowedActions'
+            type String
+            collection true
+            computed true
+            computation `loadedTransfer.status == StockTransferStatus.Draft ? ['submit', 'cancel'] : loadedTransfer.status == StockTransferStatus.Submitted ? ['approve', 'cancel'] : loadedTransfer.status == StockTransferStatus.Approved ? ['confirm'] : []`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `loadedTransfer.transferNumber`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'detailColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'actionsRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                mainAxisSize 'max'
+                                                margin '0 0 16 0'
+                                            }
+                                            children [
+                                                StatusBadgeWidget {
+                                                    name 'statusBadgeRef'
+                                                    data {
+                                                        status `statusLabel`
+                                                        optionSetType 'StockTransferStatus'
+                                                    }
+                                                }
+                                                Row {
+                                                    name 'buttonsRowRef'
+                                                    data {
+                                                        mainAxisSize 'min'
+                                                    }
+                                                    children [
+                                                        TextButton {
+                                                            name 'editRef'
+                                                            tags [
+                                                                'primary'
+                                                            ]
+                                                            data {
+                                                                label 'Edit'
+                                                                margin '0 8 0 0'
+                                                            }
+                                                        }
+                                                        TextButton {
+                                                            name 'deleteRef'
+                                                            tags [
+                                                                'secondary'
+                                                            ]
+                                                            data {
+                                                                label 'Delete'
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                        DocumentActionBarWidget {
+                                            name 'workflowRef'
+                                            data {
+                                                document 'StockTransfer'
+                                                allowedActions `allowedActions`
+                                            }
+                                        }
+                                        Container {
+                                            name 'spacerRef'
+                                            data {
+                                                margin '0 0 16 0'
+                                            }
+                                        }
+                                        Container {
+                                            name 'infoCardRef'
+                                            tags [
+                                                'glassCard'
+                                            ]
+                                            child Column {
+                                                name 'infoColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    TextView {
+                                                        name 'sourceRef'
+                                                        data {
+                                                            data `'From: ' + (loadedTransfer.sourceWarehouse != null ? loadedTransfer.sourceWarehouse.name : 'N/A')`
+                                                            margin '0 0 8 0'
+                                                        }
+                                                    }
+                                                    TextView {
+                                                        name 'destRef'
+                                                        data {
+                                                            data `'To: ' + (loadedTransfer.destinationWarehouse != null ? loadedTransfer.destinationWarehouse.name : 'N/A')`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onEditHandler'
+            type OnEvent
+            on editRef
+            event onPressed
+            block ```
+                navigator.pushStockTransferFormPage(user: user, stockTransfer: loadedTransfer, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onDeleteHandler'
+            type OnEvent
+            on deleteRef
+            event onPressed
+            block ```
+                // TODO: D3EClass StockTransferService.deleteStockTransfer(loadedTransfer)
+                navigator.pushStockTransferListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSubmitHandler'
+            type OnEvent
+            on workflowRef
+            event onSubmit
+            block ```
+                // TODO: D3EClass StockTransferService.submitStockTransfer(loadedTransfer)
+            ```
+        }
+        {
+            name 'onApproveHandler'
+            type OnEvent
+            on workflowRef
+            event onApprove
+            block ```
+                // TODO: D3EClass StockTransferService.approveStockTransfer(loadedTransfer)
+            ```
+        }
+        {
+            name 'onConfirmHandler'
+            type OnEvent
+            on workflowRef
+            event onConfirm
+            block ```
+                // TODO: D3EClass StockTransferService.completeStockTransfer(loadedTransfer)
+            ```
+        }
+        {
+            name 'onCancelWorkflowHandler'
+            type OnEvent
+            on workflowRef
+            event onCancel
+            block ```
+                // TODO: D3EClass StockTransferService.cancelStockTransfer(loadedTransfer)
+            ```
+        }
+    ]
+}

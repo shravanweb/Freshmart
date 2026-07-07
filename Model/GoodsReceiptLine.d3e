@@ -1,0 +1,38 @@
+Model {
+    package 'inventory.management.system'
+    name 'GoodsReceiptLine'
+    master GoodsReceipt
+    creatable true
+    display `product.name`
+    properties [
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Received Quantity'
+            type Double
+            required true
+        }
+        {
+            name 'Unit Cost'
+            type Double
+            required true
+        }
+        {
+            name 'Batch Number'
+            type String
+        }
+        {
+            name 'Expiry Date'
+            type Date
+        }
+        {
+            name 'Purchase Order Line'
+            type PurchaseOrderLine
+            onDelete Clear
+        }
+    ]
+}

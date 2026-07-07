@@ -1,0 +1,248 @@
+Page {
+    package 'inventory.management.system'
+    name 'ProductCategoryFormPage'
+    description 'Create and edit product categories'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'category'
+            type ProductCategory
+            required true
+        }
+        {
+            name 'isEditMode'
+            type Boolean
+            computed true
+            internal true
+            computation `category != null && category.saveStatus != DBSaveStatus.New`
+        }
+        {
+            name 'name'
+            type String
+            internal true
+        }
+        {
+            name 'code'
+            type String
+            internal true
+        }
+        {
+            name 'description'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            internal true
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `isEditMode ? 'Edit Category' : 'New Category'`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Container {
+                                    name 'cardRef'
+                                    tags [
+                                        'glassCard'
+                                    ]
+                                    data {
+                                        width '640'
+                                    }
+                                    child Column {
+                                        name 'formColumnRef'
+                                        data {
+                                            crossAxisAlignment 'stretch'
+                                        }
+                                        children [
+                                            IMSInputFieldWidget {
+                                                name 'nameFieldRef'
+                                                data {
+                                                    label 'Name'
+                                                    text `name`
+                                                    placeHolder 'Category name'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer1Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'codeFieldRef'
+                                                data {
+                                                    label 'Code'
+                                                    text `code`
+                                                    placeHolder 'Category code'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer2Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'descriptionFieldRef'
+                                                data {
+                                                    label 'Description'
+                                                    text `description`
+                                                    placeHolder 'Category description'
+                                                }
+                                            }
+                                            Row {
+                                                name 'actionsRowRef'
+                                                data {
+                                                    mainAxisAlignment 'end'
+                                                    mainAxisSize 'max'
+                                                    margin '24 0 0 0'
+                                                }
+                                                children [
+                                                    TextButton {
+                                                        name 'cancelRef'
+                                                        tags [
+                                                            'secondary'
+                                                        ]
+                                                        data {
+                                                            label 'Cancel'
+                                                            margin '0 8 0 0'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'saveRef'
+                                                        tags [
+                                                            'primary'
+                                                        ]
+                                                        data {
+                                                            label `isEditMode ? 'Update' : 'Create'`
+                                                            disable `isLoading`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                name = category.name;
+                code = category.code;
+                description = category.description;
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                navigator.pushProductCategoryListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                isLoading = true;
+                category.organization = organization;
+                category.name = name;
+                category.code = code;
+                category.description = description;
+                // TODO: D3EClass ProductCategoryService.createProductCategory / updateProductCategory
+                isLoading = false;
+                navigator.pushProductCategoryListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

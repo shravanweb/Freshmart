@@ -1,0 +1,30 @@
+Model {
+    package 'inventory.management.system'
+    name 'StockTransferLine'
+    master StockTransfer
+    creatable true
+    display `product.name`
+    properties [
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Quantity'
+            type Double
+            required true
+        }
+        {
+            name 'Batch Number'
+            type String
+        }
+        {
+            name 'Uom'
+            type UnitOfMeasure
+            required true
+            onDelete Prevent
+        }
+    ]
+}

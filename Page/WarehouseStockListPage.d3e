@@ -1,0 +1,316 @@
+Page {
+    package 'inventory.management.system'
+    name 'WarehouseStockListPage'
+    description 'Warehouse stock levels by warehouse'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'searchTerm'
+            type String
+            internal true
+        }
+        {
+            name 'selectedWarehouse'
+            type Warehouse
+            internal true
+        }
+        {
+            name 'warehousesData'
+            type AllWarehouses
+            computed true
+            computation `organization != null ? Query.getAllWarehouses(AllWarehousesRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'warehouses'
+            type Warehouse
+            collection true
+            computed true
+            computation `warehousesData != null ? warehousesData.items : []`
+            internal true
+        }
+        {
+            name 'stockData'
+            type WarehouseStockByWarehouse
+            computed true
+            computation `selectedWarehouse != null ? Query.getWarehouseStockByWarehouse(WarehouseStockByWarehouseRequest(warehouse: selectedWarehouse)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'stockItems'
+            type WarehouseStock
+            collection true
+            computed true
+            computation `stockData != null ? stockData.items : []`
+            internal true
+        }
+        {
+            name 'itemCount'
+            type Integer
+            computed true
+            computation `stockData != null ? stockData.count : 0`
+            internal true
+        }
+        {
+            name 'filteredStockItems'
+            type WarehouseStock
+            collection true
+            computed true
+            computation `searchTerm == null || searchTerm.trim().isEmpty ? stockItems : stockItems.where((s) => s.product.name.toLowerCase().contains(searchTerm.toLowerCase())).toList()`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Warehouse Stock'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'toolbarRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                                margin '0 0 16 0'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'countRef'
+                                                    data {
+                                                        data `selectedWarehouse != null ? itemCount.toString() + ' stock records' : 'Select a warehouse'`
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        BasicDropdown {
+                                            name 'warehousePickerRef'
+                                            type Warehouse
+                                            data {
+                                                value `selectedWarehouse`
+                                                items `warehouses`
+                                                placeHolder 'Select warehouse'
+                                                popupWidth '320'
+                                            }
+                                            builder TextView {
+                                                name 'warehouseItemRef'
+                                                data {
+                                                    data `item.name`
+                                                }
+                                            }
+                                            twoWayBinding true
+                                        }
+                                        IMSInputFieldWidget {
+                                            name 'searchRef'
+                                            data {
+                                                label 'Search'
+                                                text `searchTerm`
+                                                placeHolder 'Product name'
+                                                margin '16 0 0 0'
+                                            }
+                                        }
+                                        Container {
+                                            name 'listSpacerRef'
+                                            data {
+                                                margin '16 0 0 0'
+                                            }
+                                        }
+                                        CIf {
+                                            name 'emptyIfRef'
+                                            condition `selectedWarehouse == null || filteredStockItems.isEmpty`
+                                            then EmptyStateWidget {
+                                                name 'emptyStateRef'
+                                                data {
+                                                    title `selectedWarehouse == null ? 'No warehouse selected' : 'No stock records'`
+                                                    message `selectedWarehouse == null ? 'Choose a warehouse to view stock levels.' : 'No stock found for this warehouse.'`
+                                                }
+                                            }
+                                            else Column {
+                                                name 'listColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    CFor {
+                                                        name 'listCForRef'
+                                                        var 'listItem'
+                                                        items `filteredStockItems`
+                                                        type WarehouseStock
+                                                        item Container {
+                                                            name 'listCardRef'
+                                                            tags [
+                                                                'glassCard'
+                                                            ]
+                                                            data {
+                                                                margin '0 0 12 0'
+                                                                padding '16'
+                                                            }
+                                                            child Row {
+                                                                name 'listRowRef'
+                                                                data {
+                                                                    mainAxisAlignment 'spaceBetween'
+                                                                    crossAxisAlignment 'center'
+                                                                    mainAxisSize 'max'
+                                                                }
+                                                                children [
+                                                                    Column {
+                                                                        name 'infoColRef'
+                                                                        data {
+                                                                            crossAxisAlignment 'start'
+                                                                        }
+                                                                        children [
+                                                                            TextView {
+                                                                                name 'productRef'
+                                                                                data {
+                                                                                    data `listItem.product.name`
+                                                                                    textStyle {
+                                                                                        color '@c4'
+                                                                                        fontSize '16'
+                                                                                        fontWeight 'w600'
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            TextView {
+                                                                                name 'qtyRef'
+                                                                                data {
+                                                                                    data `'On hand: ' + listItem.quantityOnHand.toString() + ' · Available: ' + listItem.quantityAvailable.toString()`
+                                                                                    margin '4 0 0 0'
+                                                                                    textStyle {
+                                                                                        color '@c5'
+                                                                                        fontSize '13'
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                    StockLevelBadgeWidget {
+                                                                        name 'stockBadgeRef'
+                                                                        data {
+                                                                            warehouseStock `listItem`
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+    ]
+}

@@ -1,0 +1,89 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onSalesOrdersByStoreChange'
+        'StoreDetailPage'
+        'salesOrdersData_synchronise'
+    ]
+    struct SalesOrdersByStore
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getSalesOrdersByStore'
+        'StoreDetailPage'
+        'properties_salesOrdersData_computation'
+    ]
+    struct SalesOrdersByStore
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUserProfileByUserChange'
+        'StoreDetailPage'
+        'userProfileData_synchronise'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUserProfileByUser'
+        'StoreDetailPage'
+        'properties_userProfileData_computation'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getStoreItem'
+        'StoreDetailPage'
+        'properties_storeData_computation'
+    ]
+    struct StoreItem
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onStoreItemChange'
+        'StoreDetailPage'
+        'storeData_synchronise'
+    ]
+    struct StoreItem
+    usage [
+        '*'
+        'items.*'
+    ]
+}

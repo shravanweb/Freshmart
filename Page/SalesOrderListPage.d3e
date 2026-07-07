@@ -1,0 +1,392 @@
+Page {
+    package 'inventory.management.system'
+    name 'SalesOrderListPage'
+    description 'List sales orders'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'searchTerm'
+            type String
+            internal true
+        }
+        {
+            name 'showDeleteDialog'
+            type Boolean
+            defaultValue `false`
+            internal true
+        }
+        {
+            name 'selectedEntity'
+            type SalesOrder
+            internal true
+        }
+        {
+            name 'salesOrdersData'
+            type AllSalesOrders
+            computed true
+            computation `organization != null ? Query.getAllSalesOrders(AllSalesOrdersRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'salesOrders'
+            type SalesOrder
+            collection true
+            computed true
+            computation `salesOrdersData != null ? salesOrdersData.items : []`
+            internal true
+        }
+        {
+            name 'itemCount'
+            type Integer
+            computed true
+            computation `salesOrdersData != null ? salesOrdersData.count : 0`
+            internal true
+        }
+        {
+            name 'filteredSalesOrders'
+            type SalesOrder
+            collection true
+            computed true
+            computation `searchTerm == null || searchTerm.trim().isEmpty ? salesOrders : salesOrders.where((o) => o.orderNumber.toLowerCase().contains(searchTerm.toLowerCase())).toList()`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Sales Orders'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'toolbarRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                                margin '0 0 16 0'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'countRef'
+                                                    data {
+                                                        data `itemCount.toString() + ' sales orders'`
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                                TextButton {
+                                                    name 'addButtonRef'
+                                                    tags [
+                                                        'primary'
+                                                    ]
+                                                    data {
+                                                        label 'Add Sales Order'
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        IMSInputFieldWidget {
+                                            name 'searchRef'
+                                            data {
+                                                label 'Search'
+                                                text `searchTerm`
+                                                placeHolder 'Order number'
+                                            }
+                                        }
+                                        Container {
+                                            name 'listSpacerRef'
+                                            data {
+                                                margin '16 0 0 0'
+                                            }
+                                        }
+                                        CIf {
+                                            name 'emptyIfRef'
+                                            condition `filteredSalesOrders.isEmpty`
+                                            then EmptyStateWidget {
+                                                name 'emptyStateRef'
+                                                data {
+                                                    title 'No sales orders'
+                                                    message 'Create a sales order to record customer purchases.'
+                                                    actionLabel 'Add Sales Order'
+                                                }
+                                            }
+                                            else Column {
+                                                name 'listColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    CFor {
+                                                        name 'listCForRef'
+                                                        var 'listItem'
+                                                        items `filteredSalesOrders`
+                                                        type SalesOrder
+                                                        item Container {
+                                                            name 'listCardRef'
+                                                            tags [
+                                                                'glassCard'
+                                                            ]
+                                                            data {
+                                                                margin '0 0 12 0'
+                                                                padding '16'
+                                                            }
+                                                            child Row {
+                                                                name 'listRowRef'
+                                                                data {
+                                                                    mainAxisAlignment 'spaceBetween'
+                                                                    crossAxisAlignment 'center'
+                                                                    mainAxisSize 'max'
+                                                                }
+                                                                children [
+                                                                    Column {
+                                                                        name 'infoColRef'
+                                                                        data {
+                                                                            crossAxisAlignment 'start'
+                                                                        }
+                                                                        children [
+                                                                            TextView {
+                                                                                name 'orderRef'
+                                                                                data {
+                                                                                    data `listItem.orderNumber`
+                                                                                    textStyle {
+                                                                                        color '@c4'
+                                                                                        fontSize '16'
+                                                                                        fontWeight 'w600'
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            TextView {
+                                                                                name 'storeRef'
+                                                                                data {
+                                                                                    data `listItem.store.name`
+                                                                                    margin '4 0 0 0'
+                                                                                    textStyle {
+                                                                                        color '@c5'
+                                                                                        fontSize '13'
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                    Row {
+                                                                        name 'actionsRef'
+                                                                        data {
+                                                                            mainAxisSize 'min'
+                                                                        }
+                                                                        children [
+                                                                            StatusBadgeWidget {
+                                                                                name 'statusRef'
+                                                                                data {
+                                                                                    status `listItem.status.name`
+                                                                                }
+                                                                            }
+                                                                            TextButton {
+                                                                                name 'editButtonRef'
+                                                                                data {
+                                                                                    label 'Edit'
+                                                                                    margin '0 8 0 8'
+                                                                                }
+                                                                            }
+                                                                            TextButton {
+                                                                                name 'deleteButtonRef'
+                                                                                tags [
+                                                                                    'destructive'
+                                                                                ]
+                                                                                data {
+                                                                                    label 'Delete'
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onAddHandler'
+            type OnEvent
+            on addButtonRef
+            event onPressed
+            block ```
+                navigator.pushSalesOrderFormPage(user: user, salesOrder: SalesOrder(), target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onEmptyActionHandler'
+            type OnEvent
+            on emptyStateRef
+            event onAction
+            block ```
+                navigator.pushSalesOrderFormPage(user: user, salesOrder: SalesOrder(), target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onEditHandler'
+            type OnEvent
+            on editButtonRef
+            event onPressed
+            block ```
+                navigator.pushSalesOrderFormPage(user: user, salesOrder: listItem, target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onDeleteHandler'
+            type OnEvent
+            on deleteButtonRef
+            event onPressed
+            block ```
+                selectedEntity = listItem;
+                showDeleteDialog = true;
+                showDeleteDialogPopup();
+            ```
+        }
+        {
+            name 'onConfirmDeleteHandler'
+            type OnEvent
+            popup deleteDialogPopup
+            event onConfirm
+            block ```
+                showDeleteDialog = false;
+                hideDeleteDialogPopup();
+                selectedEntity = null;
+            ```
+        }
+        {
+            name 'onCancelDeleteHandler'
+            type OnEvent
+            popup deleteDialogPopup
+            event onCancel
+            block ```
+                showDeleteDialog = false;
+                hideDeleteDialogPopup();
+                selectedEntity = null;
+            ```
+        }
+    ]
+    popups [
+        {
+            name 'deleteDialogPopup'
+            component ConfirmDeleteDialogWidget
+            data {
+                entityName `'Sales Order'`
+                message `'Are you sure you want to delete this sales order?'`
+            }
+        }
+    ]
+}

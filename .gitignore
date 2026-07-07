@@ -1,0 +1,39 @@
+# Dependencies
+**/node_modules/
+
+# Frontend build output
+build/InventoryManagementSystem/build/
+
+# Backend build output
+build/SpringBoot/build/
+build/SpringBoot/bin/
+build/SpringBoot/.gradle/
+
+# Generated preview assets
+_preview/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Java
+*.class
+hs_err_pid*
+
+# Diagnostics cache
+.d3e-diagnostics-meta.json
+.d3e-diagnostics.json

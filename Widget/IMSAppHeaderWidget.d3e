@@ -1,0 +1,133 @@
+Widget {
+    package 'inventory.management.system'
+    name 'IMSAppHeaderWidget'
+    description 'Top header bar with title and user actions'
+    properties [
+        {
+            name 'title'
+            type String
+            required true
+        }
+        {
+            name 'organization'
+            type Organization
+        }
+        {
+            name 'orgName'
+            type String
+            computed true
+            computation `organization != null ? organization.name : ''`
+            internal true
+        }
+    ]
+    build Container {
+        name 'headerRef'
+        styles [
+GlassPanelStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '16 24'
+        }
+        child Row {
+            name 'headerRowRef'
+            data {
+                mainAxisAlignment 'spaceBetween'
+                crossAxisAlignment 'center'
+                mainAxisSize 'max'
+            }
+            children [
+                Column {
+                    name 'titleColumnRef'
+                    data {
+                        mainAxisSize 'min'
+                        crossAxisAlignment 'start'
+                    }
+                    children [
+                        TextView {
+                            name 'titleRef'
+                            data {
+                                data `title`
+                                textStyle {
+                                    color '@c4'
+                                    fontSize '20'
+                                    fontWeight 'w700'
+                                }
+                            }
+                        }
+                        CIf {
+                            name 'orgIfRef'
+                            condition `organization != null`
+                            then TextView {
+                                name 'orgRef'
+                                data {
+                                    data `orgName`
+                                    textStyle {
+                                        color '@c5'
+                                        fontSize '13'
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+                Row {
+                    name 'actionsRef'
+                    data {
+                        mainAxisSize 'min'
+                        crossAxisAlignment 'center'
+                    }
+                    children [
+                        TextButton {
+                            name 'profileRef'
+                            data {
+                                label 'Profile'
+                                margin '0 12 0 0'
+                            }
+                        }
+                        TextButton {
+                            name 'logoutRef'
+                            tags [
+                                'secondary'
+                            ]
+                            data {
+                                label 'Logout'
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on profileRef
+            event onPressed
+            block ```
+                onProfile();
+            ```
+        }
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on logoutRef
+            event onPressed
+            block ```
+                onLogout();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onLogout'
+        }
+        {
+            name 'onProfile'
+        }
+    ]
+}

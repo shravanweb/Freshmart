@@ -1,0 +1,2029 @@
+# BuildACompleteInventory — D3E Application Blueprint (Phase 1 MVP)
+
+**Package:** `inventory.management.system`  
+**Domain:** `inventory.management.system`  
+**Output root:** `C:/Users/Nikhil/Downloads/cursor-sdk 1/cursor-sdk/projects/InventoryManagementSystem/`  
+**Reference layout:** `cursor-sdk/samples/Cgig/` (folder conventions only)
+
+---
+
+## A. PROJECT SUMMARY
+
+### App Overview
+
+**BuildACompleteInventory** is a multi-tenant inventory management platform for supermarkets, grocery stores, retail chains, mini marts, wholesale distributors, and warehouses. It centralizes product catalog management, real-time stock tracking across stores and warehouses, procurement (suppliers → purchase orders → goods receipt), inter-warehouse transfers, sales and returns, batch/expiry tracking, low-stock monitoring, inventory valuation, operational reporting, role-based access, and full audit history.
+
+### User Roles (via `UserRole` + `AppUserRole` OptionSet — not separate UserTypes)
+
+| Role | Primary Responsibilities |
+|------|--------------------------|
+| OrganizationAdmin | Tenant setup, users, stores, warehouses, global settings |
+| StoreManager | Store operations, sales, returns, local stock view |
+| WarehouseManager | Warehouse stock, transfers, receipts, adjustments |
+| PurchaseManager | Suppliers, POs, goods receipt |
+| InventoryClerk | Stock counts, adjustments, batch management |
+| SalesStaff | Sales orders, returns (POS-lite) |
+| Accountant | Reports, valuation (read + export) |
+| Viewer | Read-only across assigned scope |
+
+### Modules (MVP)
+
+1. **Tenant & Org Setup** — Organization, stores, warehouses, users, invitations  
+2. **Product Catalog** — Categories, products, UOM, barcodes, pricing  
+3. **Inventory Core** — Warehouse stock, batches, movements, adjustments  
+4. **Procurement** — Suppliers, purchase orders, goods receipt  
+5. **Stock Transfers** — Inter-warehouse transfers with approval flow  
+6. **Sales & Returns** — Sales orders, sales returns, stock deduction/restoration  
+7. **Alerts & Notifications** — Low-stock, expiry-soon, in-app + email  
+8. **Dashboard & Reports** — KPIs, stock valuation, movement history  
+9. **Audit & Security** — AuditLog, login audit, role-scoped data access  
+
+### MVP vs Later Phases
+
+| MVP (Phase 1 — this blueprint) | Phase 2 | Phase 3 |
+|--------------------------------|---------|---------|
+| Multi-tenant org, stores, warehouses | Barcode scanner integration | EDI / supplier API sync |
+| Product catalog + batches/expiry | POS hardware integration | Demand forecasting / AI reorder |
+| PO → Goods Receipt → Stock | Recurring PO templates | Multi-currency / tax engines |
+| Stock transfers + adjustments | Customer master + CRM-lite | Marketplace integrations |
+| Sales orders + returns | Advanced pricing (tiers, promos) | Mobile offline mode (Flutter) |
+| Low-stock + expiry alerts | Scheduled report email delivery | Warehouse bin/slot management |
+| Dashboard + tabular reports | OAuth social login | IoT scale / RFID hooks |
+| OTP + password auth, RBAC | Push notifications (mobile) | Franchise / subsidiary hierarchies |
+
+---
+
+## B. REUSED CORE MODELS & PLATFORM SERVICES
+
+**Do not redefine in `Model/` — register via `UserTypes/` `modelAccess` and queries.**
+
+### Core Models (d3e.core)
+
+| Core Model | Usage in App |
+|------------|--------------|
+| `BaseUser` | Authenticated user identity (email, password hash) |
+| `BaseUserSession` | Session management |
+| `OneTimePassword` | OTP login |
+| `ChangePasswordRequest` | Password change flow |
+| `UserLoginRecord` | Login audit trail |
+| `EmailMessage` | Outbound email queue |
+| `SMSMessage` | SMS (optional MVP — invite/OTP fallback) |
+| `VerificationData` | Email verification / invite links |
+| `PushNotification` | Deferred to Phase 2 |
+| `UserDevice` | Deferred to Phase 2 |
+| `DFile` | Product images, receipt attachments |
+
+### Core Services / Classes (D3EClass / d3e.core)
+
+| Service | Usage |
+|---------|-------|
+| `Database` | save, update, delete, saveAll |
+| `EmailService` | Invitations, low-stock alerts, PO approval |
+| `OTPService` | OTP generation/validation |
+| `SMSService` | Optional OTP delivery |
+| `FileService` | Product image upload/download |
+| `FieldValidation` | Server-side field checks |
+| `Criteria` / `Restrictions` | Dynamic query filtering in services |
+
+### Core UI / Report Framework
+
+| Construct | Usage |
+|-----------|-------|
+| `Report` framework | Tabular + KPI reports |
+| `studio.d3e.charts` | Dashboard charts (stock trend, category breakdown) |
+| `Component/*`, `models/ui/*` | TextButton, Scaffold, form composites |
+
+### Project Dependencies
+
+```
+dependencies: [d3e.core, studio.d3e.charts]
+```
+
+### securitySettings (Project.d3e)
+
+- Password policy (min length, complexity)  
+- Session timeout  
+- OTP expiry duration  
+- Max failed login attempts  
+- Tenant isolation enforced at query + service layer  
+
+---
+
+## C. CUSTOM MODELS (`Model/`)
+
+### C.1 Organization
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `Organization` |
+| master | true |
+| parent | — |
+| display | `name` |
+| archetype | config |
+| creatable | true |
+| transient | false |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| name | String | required, unique (global) | min 2, max 200 | — |
+| code | String | required, unique (global) | alphanumeric, max 20 | — |
+| legalName | String | — | max 300 | — |
+| taxId | String | — | max 50 | — |
+| email | String | — | email format | — |
+| phone | String | — | phone format | — |
+| address | String | longText | max 500 | — |
+| logo | DFile | — | image mime types | — |
+| currency | String | required, defaultValue `'USD'` | ISO 4217 length 3 | — |
+| timezone | String | defaultValue `'UTC'` | — | — |
+| status | OptionSet `OrganizationStatus` | required, defaultValue `Active` | — | — |
+| createdAt | DateTime | readType ReadOnly | — | — |
+| updatedAt | DateTime | readType ReadOnly, computed | — | — |
+| createdBy | model BaseUser | readType ReadOnly, internal | — | — |
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| setTimestamps | OnCreateAndUpdate | Set createdAt/updatedAt |
+| validateUniqueCode | OnCreateAndUpdate | Enforce global unique code |
+
+---
+
+### C.2 Store
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `Store` |
+| master | true |
+| display | `name` |
+| archetype | config |
+| creatable | true |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required, onDelete Restrict | — | — |
+| name | String | required | max 200 | — |
+| code | String | required, unique scoped per organization | alphanumeric max 20 | — |
+| storeType | OptionSet `StoreType` | required | — | — |
+| address | String | longText | — | — |
+| phone | String | — | — | — |
+| email | String | — | email format | — |
+| manager | model BaseUser | — | must belong to same org | — |
+| defaultWarehouse | model Warehouse | — | same organization | — |
+| status | OptionSet `EntityStatus` | required, defaultValue `Active` | — | — |
+| createdAt | DateTime | readType ReadOnly | — | — |
+| updatedAt | DateTime | readType ReadOnly | — | — |
+
+**Collections:** `warehouses` → inverse on `Warehouse.store` (multi-ref)
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| validateOrgScope | OnCreateAndUpdate | Manager/warehouse same tenant |
+| setTimestamps | OnCreateAndUpdate | Audit timestamps |
+
+---
+
+### C.3 Warehouse
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `Warehouse` |
+| master | true |
+| display | `name` |
+| archetype | config |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required, onDelete Restrict | — | — |
+| store | model Store | — | same organization | existsIf store-linked |
+| name | String | required | max 200 | — |
+| code | String | required, unique scoped per organization | max 20 | — |
+| warehouseType | OptionSet `WarehouseType` | required | — | — |
+| address | String | longText | — | — |
+| isDefault | Boolean | defaultValue false | only one default per org | — |
+| status | OptionSet `EntityStatus` | required, defaultValue `Active` | — | — |
+| createdAt | DateTime | readType ReadOnly | — | — |
+| updatedAt | DateTime | readType ReadOnly | — | — |
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| enforceSingleDefault | OnCreateAndUpdate | Clear other defaults if isDefault=true |
+| setTimestamps | OnCreateAndUpdate | — |
+
+---
+
+### C.4 UnitOfMeasure
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `UnitOfMeasure` |
+| master | true |
+| display | `name` |
+| archetype | config |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| name | String | required | max 50 | — |
+| symbol | String | required, unique scoped per organization | max 10 | — |
+| uomType | OptionSet `UomType` | required | — | — |
+| baseFactor | Double | defaultValue 1.0 | positive | existsIf uomType = Derived |
+| status | OptionSet `EntityStatus` | required | — | — |
+
+---
+
+### C.5 ProductCategory
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `ProductCategory` |
+| master | true |
+| display | `name` |
+| archetype | config (hierarchy) |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| parentCategory | model ProductCategory | — | same org, no circular ref | — |
+| name | String | required | max 150 | — |
+| code | String | required, unique scoped per organization | — | — |
+| description | String | longText | — | — |
+| status | OptionSet `EntityStatus` | required | — | — |
+
+**Collections:** `childCategories` → inverse `parentCategory`; `products` → inverse `Product.category`
+
+---
+
+### C.6 Product
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `Product` |
+| master | true |
+| display | `name` |
+| archetype | transaction/config hybrid (catalog master) |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| category | model ProductCategory | required | same org | — |
+| sku | String | required, unique scoped per organization | max 50 | — |
+| name | String | required | max 300 | — |
+| description | String | longText | — | — |
+| barcode | String | unique scoped per organization | max 50 | — |
+| baseUom | model UnitOfMeasure | required | same org | — |
+| purchasePrice | Double | defaultValue 0 | >= 0 | — |
+| sellingPrice | Double | defaultValue 0 | >= 0 | — |
+| reorderLevel | Double | defaultValue 0 | >= 0 | — |
+| reorderQuantity | Double | defaultValue 0 | >= 0 | — |
+| trackBatch | Boolean | defaultValue false | — | — |
+| trackExpiry | Boolean | defaultValue false | — | — |
+| shelfLifeDays | Integer | — | positive | existsIf trackExpiry |
+| image | DFile | — | image types | — |
+| status | OptionSet `ProductStatus` | required, defaultValue `Active` | — | — |
+| createdAt | DateTime | readType ReadOnly | — | — |
+| updatedAt | DateTime | readType ReadOnly | — | — |
+
+**Collections:** `warehouseStocks` → inverse `WarehouseStock.product`; `batches` → inverse `StockBatch.product`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| validatePricing | OnCreateAndUpdate | sellingPrice >= 0, purchasePrice >= 0 |
+| createInitialStockRecords | OnCreate | Optional: seed zero-stock rows per warehouse |
+| setTimestamps | OnCreateAndUpdate | — |
+
+---
+
+### C.7 WarehouseStock
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `WarehouseStock` |
+| master | false |
+| display | computed `product.name + ' @ ' + warehouse.name` |
+| archetype | embedded/transaction (inventory snapshot) |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| warehouse | model Warehouse | required | — | — |
+| product | model Product | required | — | — |
+| quantityOnHand | Double | required, defaultValue 0 | >= 0 | — |
+| quantityReserved | Double | defaultValue 0 | >= 0 | — |
+| quantityAvailable | Double | computed, readType ReadOnly | onHand - reserved | — |
+| averageCost | Double | defaultValue 0 | >= 0 | — |
+| stockValue | Double | computed, readType ReadOnly | onHand * averageCost | — |
+| lastMovementAt | DateTime | readType ReadOnly | — | — |
+| lowStockNotifiedAt | DateTime | internal | — | — |
+
+**Unique:** `(organization, warehouse, product)` composite
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| recalculateAvailable | OnCreateAndUpdate | Update quantityAvailable |
+| checkLowStock | OnUpdate | Trigger StockAlert if below reorder |
+
+---
+
+### C.8 StockBatch
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `StockBatch` |
+| master | false |
+| display | `batchNumber` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| product | model Product | required | trackBatch=true on product | — |
+| warehouse | model Warehouse | required | — | — |
+| batchNumber | String | required | max 50 | — |
+| quantityOnHand | Double | required, defaultValue 0 | >= 0 | — |
+| manufacturingDate | Date | — | — | — |
+| expiryDate | Date | — | >= manufacturingDate | existsIf trackExpiry |
+| unitCost | Double | defaultValue 0 | >= 0 | — |
+| status | OptionSet `BatchStatus` | required, defaultValue `Active` | — | — |
+| createdAt | DateTime | readType ReadOnly | — | — |
+
+**Unique:** `(organization, warehouse, product, batchNumber)`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| validateExpiry | OnCreateAndUpdate | Expiry rules |
+| markExpired | OnUpdate | Auto-set status Expired if past expiryDate |
+
+---
+
+### C.9 Supplier
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `Supplier` |
+| master | true |
+| display | `name` |
+| archetype | config |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| name | String | required | max 200 | — |
+| code | String | required, unique scoped per organization | — | — |
+| contactPerson | String | — | — | — |
+| email | String | — | email format | — |
+| phone | String | — | — | — |
+| address | String | longText | — | — |
+| paymentTerms | String | — | — | — |
+| taxId | String | — | — | — |
+| rating | Integer | — | min 1 max 5 | — |
+| status | OptionSet `EntityStatus` | required | — | — |
+| createdAt | DateTime | readType ReadOnly | — | — |
+
+**Collections:** `contacts` → child `SupplierContact` (inverse `supplier`)
+
+---
+
+### C.10 SupplierContact (child)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `SupplierContact` |
+| parent | Supplier |
+| archetype | embedded child |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| supplier | model Supplier | required, inverse, inverseProperty `contacts` | — |
+| name | String | required | — |
+| email | String | — | email format |
+| phone | String | — | — |
+| isPrimary | Boolean | defaultValue false | — |
+
+---
+
+### C.11 PurchaseOrder
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `PurchaseOrder` |
+| master | true |
+| display | `poNumber` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| poNumber | String | required, unique scoped per organization, readType ReadOnly | auto-generated | — |
+| supplier | model Supplier | required | same org | — |
+| warehouse | model Warehouse | required | destination warehouse | — |
+| orderDate | Date | required, defaultValue today | — | — |
+| expectedDeliveryDate | Date | — | >= orderDate | — |
+| status | OptionSet `PurchaseOrderStatus` | required, defaultValue `Draft` | — | — |
+| subtotal | Double | computed, readType ReadOnly | sum of lines | — |
+| taxAmount | Double | defaultValue 0 | >= 0 | — |
+| totalAmount | Double | computed, readType ReadOnly | subtotal + tax | — |
+| notes | String | longText | — | — |
+| createdBy | model BaseUser | readType ReadOnly | — | — |
+| approvedBy | model BaseUser | readType ReadOnly | — | existsIf status >= Approved |
+| approvedAt | DateTime | readType ReadOnly | — | existsIf approved |
+| createdAt | DateTime | readType ReadOnly | — | — |
+
+**Collections:** `lines` → child `PurchaseOrderLine`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| generatePoNumber | OnCreate | Auto PO number |
+| recalculateTotals | OnCreateAndUpdate | Sum line amounts |
+| validateStatusTransition | OnUpdate | Enforce PO workflow |
+| preventEditWhenClosed | OnUpdate | Block edits if Received/Cancelled |
+
+---
+
+### C.12 PurchaseOrderLine (child)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `PurchaseOrderLine` |
+| parent | PurchaseOrder |
+| archetype | embedded child |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| purchaseOrder | model PurchaseOrder | required, child, inverse `lines` | — |
+| lineNumber | Integer | required | positive |
+| product | model Product | required | same org |
+| orderedQuantity | Double | required | positive |
+| receivedQuantity | Double | defaultValue 0, readType ReadOnly | >= 0, <= ordered |
+| unitPrice | Double | required | >= 0 |
+| lineTotal | Double | computed, readType ReadOnly | qty * unitPrice |
+| uom | model UnitOfMeasure | required | — |
+
+---
+
+### C.13 GoodsReceipt
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `GoodsReceipt` |
+| master | true |
+| display | `receiptNumber` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations | existsIf |
+|------|------|-----------|-------------|----------|
+| organization | model Organization | required | — | — |
+| receiptNumber | String | required, unique scoped per org, readType ReadOnly | — | — |
+| purchaseOrder | model PurchaseOrder | — | same org | existsIf linked PO |
+| supplier | model Supplier | required | — | — |
+| warehouse | model Warehouse | required | — | — |
+| receiptDate | Date | required | — | — |
+| status | OptionSet `GoodsReceiptStatus` | required, defaultValue `Draft` | — | — |
+| notes | String | longText | — | — |
+| receivedBy | model BaseUser | readType ReadOnly | — | — |
+| createdAt | DateTime | readType ReadOnly | — | — |
+
+**Collections:** `lines` → child `GoodsReceiptLine`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| generateReceiptNumber | OnCreate | Auto number |
+| postToInventory | OnUpdate | When Confirmed: increase stock, create movements, update PO lines |
+| createStockBatches | OnUpdate | Create/update StockBatch if product.trackBatch |
+
+---
+
+### C.14 GoodsReceiptLine (child)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `GoodsReceiptLine` |
+| parent | GoodsReceipt |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| goodsReceipt | model GoodsReceipt | required, child | — |
+| product | model Product | required | — |
+| receivedQuantity | Double | required | positive |
+| unitCost | Double | required | >= 0 |
+| batchNumber | String | — | required if product.trackBatch |
+| expiryDate | Date | — | required if product.trackExpiry |
+| purchaseOrderLine | model PurchaseOrderLine | — | link back to PO line |
+
+---
+
+### C.15 StockTransfer
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `StockTransfer` |
+| master | true |
+| display | `transferNumber` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| transferNumber | String | required, unique scoped per org, readType ReadOnly | — |
+| sourceWarehouse | model Warehouse | required | != destination |
+| destinationWarehouse | model Warehouse | required | same org |
+| transferDate | Date | required | — |
+| status | OptionSet `StockTransferStatus` | required, defaultValue `Draft` | — |
+| notes | String | longText | — |
+| requestedBy | model BaseUser | readType ReadOnly | — |
+| approvedBy | model BaseUser | readType ReadOnly | — |
+| shippedAt | DateTime | readType ReadOnly | — |
+| receivedAt | DateTime | readType ReadOnly | — |
+
+**Collections:** `lines` → child `StockTransferLine`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| validateWarehouses | OnCreateAndUpdate | Source != dest, same org |
+| reserveStock | OnUpdate | On Approved: reserve source qty |
+| executeTransfer | OnUpdate | On Completed: move stock, create movements |
+| releaseReservation | OnUpdate | On Cancelled: release reserved |
+
+---
+
+### C.16 StockTransferLine (child)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `StockTransferLine` |
+| parent | StockTransfer |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| stockTransfer | model StockTransfer | required, child | — |
+| product | model Product | required | — |
+| quantity | Double | required | positive, <= available at source |
+| batchNumber | String | — | if batch-tracked |
+| uom | model UnitOfMeasure | required | — |
+
+---
+
+### C.17 InventoryAdjustment
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `InventoryAdjustment` |
+| master | true |
+| display | `adjustmentNumber` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| adjustmentNumber | String | required, unique scoped per org | — |
+| warehouse | model Warehouse | required | — |
+| adjustmentDate | Date | required | — |
+| reason | OptionSet `AdjustmentReason` | required | — |
+| status | OptionSet `AdjustmentStatus` | required, defaultValue `Draft` | — |
+| notes | String | longText | — |
+| adjustedBy | model BaseUser | readType ReadOnly | — |
+
+**Collections:** `lines` → child `InventoryAdjustmentLine`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| postAdjustment | OnUpdate | On Confirmed: update stock, log movements |
+
+---
+
+### C.18 InventoryAdjustmentLine (child)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `InventoryAdjustmentLine` |
+| parent | InventoryAdjustment |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| inventoryAdjustment | model InventoryAdjustment | required, child | — |
+| product | model Product | required | — |
+| quantityBefore | Double | readType ReadOnly | — |
+| quantityChange | Double | required | != 0 |
+| quantityAfter | Double | computed, readType ReadOnly | before + change |
+| batchNumber | String | — | if batch-tracked |
+| unitCost | Double | — | >= 0 |
+
+---
+
+### C.19 InventoryMovement (immutable log)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `InventoryMovement` |
+| master | true |
+| display | `movementNumber` |
+| archetype | transaction (audit log) |
+| creatable | false (system-generated) |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| movementNumber | String | required, unique scoped per org | — |
+| warehouse | model Warehouse | required | — |
+| product | model Product | required | — |
+| movementType | OptionSet `MovementType` | required | — |
+| quantity | Double | required | positive |
+| direction | OptionSet `MovementDirection` | required | In/Out |
+| referenceType | OptionSet `MovementReferenceType` | required | PO/GR/Transfer/Sale/etc. |
+| referenceId | String | required | — |
+| batchNumber | String | — | — |
+| unitCost | Double | — | — |
+| balanceAfter | Double | required | — |
+| movementDate | DateTime | required | — |
+| performedBy | model BaseUser | — | — |
+| notes | String | longText | — |
+
+---
+
+### C.20 SalesOrder
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `SalesOrder` |
+| master | true |
+| display | `orderNumber` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| store | model Store | required | — |
+| warehouse | model Warehouse | required | fulfillment warehouse |
+| orderNumber | String | required, unique scoped per org | — |
+| orderDate | DateTime | required | — |
+| customerName | String | — | MVP walk-in/custom name |
+| customerPhone | String | — | — |
+| status | OptionSet `SalesOrderStatus` | required, defaultValue `Draft` | — |
+| subtotal | Double | computed | — |
+| discountAmount | Double | defaultValue 0 | >= 0 |
+| taxAmount | Double | defaultValue 0 | — |
+| totalAmount | Double | computed | — |
+| paymentStatus | OptionSet `PaymentStatus` | defaultValue `Unpaid` | — |
+| soldBy | model BaseUser | readType ReadOnly | — |
+
+**Collections:** `lines` → child `SalesOrderLine`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| deductStock | OnUpdate | On Confirmed: reduce warehouse stock |
+| restoreStock | OnDelete | If cancelled from confirmed state |
+| recalculateTotals | OnCreateAndUpdate | — |
+
+---
+
+### C.21 SalesOrderLine (child)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `SalesOrderLine` |
+| parent | SalesOrder |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| salesOrder | model SalesOrder | required, child | — |
+| product | model Product | required | — |
+| quantity | Double | required | positive |
+| unitPrice | Double | required | >= 0 |
+| discount | Double | defaultValue 0 | >= 0 |
+| lineTotal | Double | computed | — |
+| batchNumber | String | — | FIFO if batch-tracked |
+
+---
+
+### C.22 SalesReturn
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `SalesReturn` |
+| master | true |
+| display | `returnNumber` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| salesOrder | model SalesOrder | — | same org |
+| store | model Store | required | — |
+| warehouse | model Warehouse | required | restock destination |
+| returnNumber | String | required, unique scoped per org | — |
+| returnDate | DateTime | required | — |
+| status | OptionSet `SalesReturnStatus` | required, defaultValue `Draft` | — |
+| reason | OptionSet `ReturnReason` | required | — |
+| refundAmount | Double | computed | — |
+| processedBy | model BaseUser | readType ReadOnly | — |
+
+**Collections:** `lines` → child `SalesReturnLine`
+
+**Model Actions**
+
+| name | runOn | purpose |
+|------|-------|---------|
+| restockInventory | OnUpdate | On Confirmed: add stock back |
+
+---
+
+### C.23 SalesReturnLine (child)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `SalesReturnLine` |
+| parent | SalesReturn |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| salesReturn | model SalesReturn | required, child | — |
+| product | model Product | required | — |
+| quantity | Double | required | positive |
+| unitPrice | Double | required | refund basis |
+| lineTotal | Double | computed | — |
+| batchNumber | String | — | — |
+
+---
+
+### C.24 StockAlert
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `StockAlert` |
+| master | true |
+| display | computed |
+| archetype | transaction (notification record) |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| warehouse | model Warehouse | required | — |
+| product | model Product | required | — |
+| alertType | OptionSet `StockAlertType` | required | LowStock/OutOfStock/ExpirySoon |
+| currentQuantity | Double | required | — |
+| threshold | Double | — | reorder level or 0 |
+| expiryDate | Date | — | existsIf ExpirySoon |
+| status | OptionSet `AlertStatus` | required, defaultValue `Open` | — |
+| acknowledgedBy | model BaseUser | — | — |
+| acknowledgedAt | DateTime | — | — |
+| createdAt | DateTime | readType ReadOnly | — |
+
+---
+
+### C.25 AuditLog
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `AuditLog` |
+| master | true |
+| creatable | false |
+| archetype | audit |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| entityType | String | required | model name |
+| entityId | String | required | — |
+| action | OptionSet `AuditAction` | required | Create/Update/Delete/Approve/etc. |
+| performedBy | model BaseUser | required | — |
+| performedAt | DateTime | required | — |
+| oldValues | String | longText, internal | JSON snapshot |
+| newValues | String | longText, internal | JSON snapshot |
+| ipAddress | String | — | — |
+| userAgent | String | — | — |
+
+---
+
+### C.26 UserProfile
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `UserProfile` |
+| master | true |
+| display | `displayName` |
+| archetype | config |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| user | model BaseUser | required, unique | — |
+| organization | model Organization | required | — |
+| displayName | String | required | — |
+| phone | String | — | — |
+| avatar | DFile | — | — |
+| appRole | OptionSet `AppUserRole` | required | — |
+| assignedStores | collection model Store | — | scope for StoreManager |
+| assignedWarehouses | collection model Warehouse | — | scope for WarehouseManager |
+| status | OptionSet `EntityStatus` | required | — |
+| lastLoginAt | DateTime | readType ReadOnly | — |
+
+---
+
+### C.27 UserRole (role template — UserManagement pattern)
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `UserRole` |
+| master | true |
+| display | `name` |
+| archetype | config |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| name | String | required | — |
+| roleCode | OptionSet `AppUserRole` | required | — |
+| description | String | longText | — |
+| isSystem | Boolean | defaultValue false | seeded roles |
+| permissions | String | longText | JSON permission flags MVP |
+
+---
+
+### C.28 UserInvitation
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `UserInvitation` |
+| master | true |
+| display | `email` |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| email | String | required | email format |
+| appRole | OptionSet `AppUserRole` | required | — |
+| invitedBy | model BaseUser | required | — |
+| token | String | required, unique | — |
+| status | OptionSet `InvitationStatus` | required, defaultValue `Pending` | — |
+| expiresAt | DateTime | required | — |
+| acceptedAt | DateTime | — | — |
+
+---
+
+### C.29 InAppNotification
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `InAppNotification` |
+| master | true |
+| archetype | transaction |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| recipient | model BaseUser | required | — |
+| title | String | required | — |
+| message | String | longText | required | — |
+| notificationType | OptionSet `NotificationType` | required | — |
+| referenceType | String | — | entity type |
+| referenceId | String | — | — |
+| isRead | Boolean | defaultValue false | — |
+| createdAt | DateTime | readType ReadOnly | — |
+
+---
+
+### C.30 NotificationTemplate
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `NotificationTemplate` |
+| master | true |
+| archetype | config |
+
+**Properties**
+
+| name | type | modifiers | validations |
+|------|------|-----------|-------------|
+| organization | model Organization | required | — |
+| templateCode | String | required, unique scoped per org | — |
+| channel | OptionSet `NotificationChannel` | required | Email/InApp |
+| subject | String | — | existsIf Email |
+| bodyTemplate | String | longText | required | — |
+| status | OptionSet `EntityStatus` | required | — |
+
+---
+
+## D. STRUCTS (`Struct/`)
+
+### D.1 LoginResult
+| name | type | modifiers |
+|------|------|-----------|
+| success | Boolean | required |
+| user | model BaseUser | — |
+| userProfile | model UserProfile | — |
+| message | String | — |
+
+### D.2 DashboardMetrics
+| name | type | modifiers |
+|------|------|-----------|
+| totalProducts | Integer | — |
+| totalStockValue | Double | — |
+| lowStockCount | Integer | — |
+| outOfStockCount | Integer | — |
+| expiringSoonCount | Integer | — |
+| openPurchaseOrders | Integer | — |
+| todaySalesTotal | Double | — |
+| todaySalesCount | Integer | — |
+| pendingTransfers | Integer | — |
+
+### D.3 StockValuationRow
+| name | type | modifiers |
+|------|------|-----------|
+| product | model Product | — |
+| warehouse | model Warehouse | — |
+| quantityOnHand | Double | — |
+| averageCost | Double | — |
+| stockValue | Double | — |
+| category | model ProductCategory | — |
+
+### D.4 InventoryMovementReportRow
+| name | type | modifiers |
+|------|------|-----------|
+| movementDate | DateTime | — |
+| productName | String | — |
+| warehouseName | String | — |
+| movementType | OptionSet MovementType | — |
+| direction | OptionSet MovementDirection | — |
+| quantity | Double | — |
+| referenceNumber | String | — |
+
+### D.5 ProductSearchRequest
+| name | type | modifiers |
+|------|------|-----------|
+| organization | model Organization | required |
+| searchTerm | String | — |
+| category | model ProductCategory | — |
+| status | OptionSet ProductStatus | — |
+
+### D.6 PurchaseOrderSummary
+| name | type | modifiers |
+|------|------|-----------|
+| purchaseOrder | model PurchaseOrder | — |
+| lineCount | Integer | — |
+| receivedPercent | Double | — |
+
+### D.7 ApproveDocumentRequest
+| name | type | modifiers |
+|------|------|-----------|
+| documentId | String | required |
+| documentType | String | required |
+| approver | model BaseUser | required |
+| notes | String | — |
+
+### D.8 StockAvailabilityCheck
+| name | type | modifiers |
+|------|------|-----------|
+| product | model Product | required |
+| warehouse | model Warehouse | required |
+| requestedQuantity | Double | required |
+| isAvailable | Boolean | computed |
+| availableQuantity | Double | — |
+
+---
+
+## E. OPTIONSETS (`OptionSets/`)
+
+| Name | Options |
+|------|---------|
+| `OrganizationStatus` | Active, Suspended, Archived |
+| `EntityStatus` | Active, Inactive, Archived |
+| `StoreType` | Supermarket, Grocery, Retail, MiniMart, Wholesale, Warehouse |
+| `WarehouseType` | Main, Store, ColdStorage, Distribution |
+| `UomType` | Base, Derived |
+| `ProductStatus` | Active, Inactive, Discontinued |
+| `BatchStatus` | Active, Depleted, Expired, Quarantined |
+| `PurchaseOrderStatus` | Draft, Submitted, Approved, PartiallyReceived, Received, Cancelled |
+| `GoodsReceiptStatus` | Draft, Confirmed, Cancelled |
+| `StockTransferStatus` | Draft, Submitted, Approved, InTransit, Completed, Cancelled |
+| `AdjustmentReason` | PhysicalCount, Damage, Theft, Expiry, SystemCorrection, OpeningBalance |
+| `AdjustmentStatus` | Draft, Confirmed, Cancelled |
+| `MovementType` | PurchaseReceipt, SalesIssue, TransferOut, TransferIn, Adjustment, ReturnIn, ReturnOut, OpeningBalance |
+| `MovementDirection` | In, Out |
+| `MovementReferenceType` | PurchaseOrder, GoodsReceipt, StockTransfer, SalesOrder, SalesReturn, InventoryAdjustment |
+| `SalesOrderStatus` | Draft, Confirmed, Completed, Cancelled |
+| `PaymentStatus` | Unpaid, PartiallyPaid, Paid, Refunded |
+| `SalesReturnStatus` | Draft, Confirmed, Completed, Cancelled |
+| `ReturnReason` | Defective, WrongItem, CustomerChangedMind, Expired, Other |
+| `StockAlertType` | LowStock, OutOfStock, ExpirySoon |
+| `AlertStatus` | Open, Acknowledged, Resolved, Dismissed |
+| `AuditAction` | Create, Update, Delete, Approve, Cancel, Login, Export |
+| `AppUserRole` | OrganizationAdmin, StoreManager, WarehouseManager, PurchaseManager, InventoryClerk, SalesStaff, Accountant, Viewer |
+| `InvitationStatus` | Pending, Accepted, Expired, Revoked |
+| `NotificationType` | LowStock, Expiry, PurchaseApproval, TransferApproval, System |
+| `NotificationChannel` | Email, InApp, SMS |
+
+---
+
+## F. DATAQUERIES (`DataQuery/`)
+
+| Name | inputs | return type | purpose |
+|------|--------|-------------|---------|
+| `AllOrganizations` | — | collection Organization | Super-admin list (internal) |
+| `OrganizationById` | organization | Organization | Detail lookup |
+| `AllStores` | organization | collection Store | Store list filtered by tenant |
+| `StoreById` | store | Store | Detail |
+| `AllWarehouses` | organization | collection Warehouse | Warehouse list |
+| `WarehousesByStore` | store | collection Warehouse | Store-scoped warehouses |
+| `AllUnitOfMeasures` | organization | collection UnitOfMeasure | UOM picker |
+| `AllProductCategories` | organization | collection ProductCategory | Category tree/list |
+| `AllProducts` | organization | collection Product | Product list |
+| `ProductsByCategory` | organization, category | collection Product | Filtered catalog |
+| `ProductSearch` | ProductSearchRequest | collection Product | Search by SKU/name/barcode |
+| `ProductById` | product | Product | Detail |
+| `WarehouseStockByWarehouse` | warehouse | collection WarehouseStock | Stock per warehouse |
+| `WarehouseStockByProduct` | product | collection WarehouseStock | Stock across warehouses |
+| `LowStockItems` | organization | collection WarehouseStock | Below reorder level |
+| `OutOfStockItems` | organization | collection WarehouseStock | quantityOnHand = 0 |
+| `AllStockBatches` | organization | collection StockBatch | Batch list |
+| `ExpiringBatches` | organization, daysAhead Integer | collection StockBatch | Expiry alert source |
+| `AllSuppliers` | organization | collection Supplier | Supplier list |
+| `SupplierById` | supplier | Supplier | Detail |
+| `AllPurchaseOrders` | organization | collection PurchaseOrder | PO list |
+| `PurchaseOrdersByStatus` | organization, status | collection PurchaseOrder | Filtered POs |
+| `PurchaseOrderById` | purchaseOrder | PurchaseOrder | Detail with lines |
+| `AllGoodsReceipts` | organization | collection GoodsReceipt | Receipt list |
+| `GoodsReceiptById` | goodsReceipt | GoodsReceipt | Detail |
+| `AllStockTransfers` | organization | collection StockTransfer | Transfer list |
+| `StockTransferById` | stockTransfer | StockTransfer | Detail |
+| `AllInventoryAdjustments` | organization | collection InventoryAdjustment | Adjustment list |
+| `AllInventoryMovements` | organization | collection InventoryMovement | Movement log |
+| `InventoryMovementsByDateRange` | organization, startDate, endDate | collection InventoryMovement | Report source |
+| `AllSalesOrders` | organization | collection SalesOrder | Sales list |
+| `SalesOrdersByStore` | store | collection SalesOrder | Store-scoped sales |
+| `SalesOrderById` | salesOrder | SalesOrder | Detail |
+| `AllSalesReturns` | organization | collection SalesReturn | Returns list |
+| `AllStockAlerts` | organization | collection StockAlert | Open alerts |
+| `AllAuditLogs` | organization | collection AuditLog | Audit trail |
+| `AllUserProfiles` | organization | collection UserProfile | User management |
+| `UserProfileByUser` | user | UserProfile | Current user context |
+| `AllUserInvitations` | organization | collection UserInvitation | Pending invites |
+| `AllInAppNotifications` | organization, user | collection InAppNotification | Notification bell |
+| `UnreadNotificationCount` | organization, user | Integer | Badge count |
+| `DashboardMetrics` | organization | DashboardMetrics | Dashboard KPIs |
+| `StockValuationReport` | organization, warehouse (optional) | collection StockValuationRow | Valuation report |
+| `MovementReportRows` | organization, startDate, endDate, warehouse (optional) | collection InventoryMovementReportRow | Movement report |
+
+All DataQueries: `enableSync true`
+
+---
+
+## G. QUERY USAGES (`QueryUsage/`)
+
+| Page/Widget | DataQuery | purpose |
+|-------------|-----------|---------|
+| DashboardPage | DashboardMetrics | KPI cards |
+| DashboardPage | LowStockItems | Low-stock widget |
+| DashboardPage | ExpiringBatches | Expiry widget |
+| DashboardPage | InventoryMovementsByDateRange | Recent activity |
+| OrganizationListPage | AllOrganizations | Org list (admin bootstrap) |
+| OrganizationFormPage | OrganizationById | Edit load |
+| StoreListPage | AllStores | Store list |
+| StoreFormPage | StoreById | Edit load |
+| StoreFormPage | AllWarehouses | Default warehouse picker |
+| WarehouseListPage | AllWarehouses | Warehouse list |
+| WarehouseFormPage | WarehouseById | Edit load |
+| UnitOfMeasureListPage | AllUnitOfMeasures | UOM list |
+| ProductCategoryListPage | AllProductCategories | Category list |
+| ProductCategoryFormPage | AllProductCategories | Parent picker |
+| ProductListPage | AllProducts | Product list |
+| ProductListPage | ProductSearch | Search/filter |
+| ProductFormPage | ProductById | Edit load |
+| ProductFormPage | AllProductCategories | Category picker |
+| ProductFormPage | AllUnitOfMeasures | UOM picker |
+| ProductDetailPage | ProductById | Detail header |
+| ProductDetailPage | WarehouseStockByProduct | Stock across warehouses |
+| ProductDetailPage | AllStockBatches | Batch tab |
+| WarehouseStockListPage | WarehouseStockByWarehouse | Per-warehouse stock |
+| StockBatchListPage | AllStockBatches | Batch list |
+| StockBatchListPage | ExpiringBatches | Expiry filter |
+| SupplierListPage | AllSuppliers | Supplier list |
+| SupplierFormPage | SupplierById | Edit load |
+| PurchaseOrderListPage | AllPurchaseOrders | PO list |
+| PurchaseOrderListPage | PurchaseOrdersByStatus | Status tabs |
+| PurchaseOrderFormPage | PurchaseOrderById | Edit load |
+| PurchaseOrderFormPage | AllSuppliers | Supplier picker |
+| PurchaseOrderFormPage | AllWarehouses | Destination picker |
+| PurchaseOrderFormPage | AllProducts | Line item picker |
+| GoodsReceiptListPage | AllGoodsReceipts | Receipt list |
+| GoodsReceiptFormPage | GoodsReceiptById | Edit load |
+| GoodsReceiptFormPage | AllPurchaseOrders | Link PO |
+| StockTransferListPage | AllStockTransfers | Transfer list |
+| StockTransferFormPage | StockTransferById | Edit load |
+| StockTransferFormPage | AllWarehouses | Source/dest pickers |
+| InventoryAdjustmentListPage | AllInventoryAdjustments | Adjustment list |
+| InventoryAdjustmentFormPage | AllProducts | Line picker |
+| InventoryMovementListPage | AllInventoryMovements | Movement log |
+| InventoryMovementListPage | InventoryMovementsByDateRange | Date filter |
+| SalesOrderListPage | AllSalesOrders | Sales list |
+| SalesOrderListPage | SalesOrdersByStore | Store filter |
+| SalesOrderFormPage | SalesOrderById | Edit load |
+| SalesOrderFormPage | ProductSearch | Line item search |
+| SalesReturnListPage | AllSalesReturns | Returns list |
+| SalesReturnFormPage | AllSalesOrders | Link original order |
+| StockAlertListPage | AllStockAlerts | Alert inbox |
+| AuditLogListPage | AllAuditLogs | Audit viewer |
+| UserListPage | AllUserProfiles | User admin |
+| UserInvitePage | AllUserInvitations | Invitation list |
+| NotificationCenterWidget | AllInAppNotifications | Notification dropdown |
+| NotificationCenterWidget | UnreadNotificationCount | Badge |
+| StockValuationReportPage | StockValuationReport | Report data |
+| MovementReportPage | MovementReportRows | Report data |
+| IMSidebarWidget | UserProfileByUser | Nav user context |
+| ProductPickerWidget | ProductSearch | Reusable product search |
+| WarehouseStockBadgeWidget | WarehouseStockByProduct | Inline stock display |
+
+**QueryUsage files (naming):** `UsagesInDashboardPage.d3e`, `UsagesInProductListPage.d3e`, etc.
+
+---
+
+## H. REPORTS (`Report/`)
+
+| Name | source | filters | columns/grouping | chart type |
+|------|--------|---------|------------------|------------|
+| `StockValuationReport` | WarehouseStock + Product | organization, warehouse, category | product, SKU, warehouse, qty, avg cost, value; group by category | KPI total value + bar by category |
+| `InventoryMovementReport` | InventoryMovement | date range, warehouse, movementType | date, product, type, direction, qty, reference | line chart daily in/out |
+| `LowStockReport` | WarehouseStock | organization, warehouse | product, SKU, on hand, reorder level, deficit | table only |
+| `ExpiryReport` | StockBatch | organization, days ahead | product, batch, warehouse, expiry, qty | table + KPI expiring count |
+| `PurchaseOrderStatusReport` | PurchaseOrder | date range, supplier, status | PO number, supplier, status, total, received % | pie by status |
+| `SalesSummaryReport` | SalesOrder | date range, store | date, order count, subtotal, tax, total | bar daily sales |
+| `SupplierPerformanceReport` | PurchaseOrder + GoodsReceipt | date range | supplier, PO count, total spend, avg delivery | table |
+| `ProfitabilitySnapshotReport` | SalesOrderLine + Product | date range, category | product, qty sold, revenue, cost, margin | bar top products |
+
+---
+
+## I. D3ECLASSES / SERVICES (`D3EClass/`)
+
+### I.1 InventoryAuthService.d3et
+| Method | Purpose |
+|--------|---------|
+| `loginWithPassword(email, password): LoginResult` | Password login |
+| `loginWithOtp(email, otp): LoginResult` | OTP login |
+| `sendLoginOtp(email): Boolean` | OTP dispatch |
+| `acceptInvitation(token, password, displayName): LoginResult` | Invite acceptance |
+| `changePassword(request: ChangePasswordRequest): Boolean` | Password change |
+
+### I.2 OrganizationService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createOrganization(org): Organization` | Tenant onboarding |
+| `updateOrganization(org): Organization` | Update tenant |
+| `deleteOrganization(org): Boolean` | Soft archive |
+
+### I.3 StoreService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createStore(store): Store` | Create store |
+| `updateStore(store): Store` | Update store |
+| `deleteStore(store): Boolean` | Archive store |
+
+### I.4 WarehouseService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createWarehouse(warehouse): Warehouse` | Create warehouse |
+| `updateWarehouse(warehouse): Warehouse` | Update warehouse |
+| `deleteWarehouse(warehouse): Boolean` | Archive warehouse |
+
+### I.5 UnitOfMeasureService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createUnitOfMeasure(uom): UnitOfMeasure` | — |
+| `updateUnitOfMeasure(uom): UnitOfMeasure` | — |
+| `deleteUnitOfMeasure(uom): Boolean` | — |
+
+### I.6 ProductCategoryService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createProductCategory(category): ProductCategory` | — |
+| `updateProductCategory(category): ProductCategory` | — |
+| `deleteProductCategory(category): Boolean` | — |
+
+### I.7 ProductService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createProduct(product): Product` | Create with validation |
+| `updateProduct(product): Product` | Update catalog item |
+| `deleteProduct(product): Boolean` | Soft discontinue |
+| `uploadProductImage(product, file): Product` | Image via FileService |
+
+### I.8 WarehouseStockService.d3et
+| Method | Purpose |
+|--------|---------|
+| `getStockAvailability(check: StockAvailabilityCheck): StockAvailabilityCheck` | Pre-sale check |
+| `recalculateStockValue(warehouseStock): WarehouseStock` | Cost rollup |
+
+### I.9 StockBatchService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createStockBatch(batch): StockBatch` | Manual batch entry |
+| `updateStockBatch(batch): StockBatch` | — |
+| `deleteStockBatch(batch): Boolean` | Quarantine/delete |
+
+### I.10 SupplierService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createSupplier(supplier): Supplier` | — |
+| `updateSupplier(supplier): Supplier` | — |
+| `deleteSupplier(supplier): Boolean` | — |
+
+### I.11 PurchaseOrderService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createPurchaseOrder(po): PurchaseOrder` | Draft PO |
+| `updatePurchaseOrder(po): PurchaseOrder` | Edit draft |
+| `deletePurchaseOrder(po): Boolean` | Cancel draft |
+| `submitPurchaseOrder(po): PurchaseOrder` | Draft → Submitted |
+| `approvePurchaseOrder(request: ApproveDocumentRequest): PurchaseOrder` | Approve PO |
+| `cancelPurchaseOrder(po): PurchaseOrder` | Cancel |
+
+### I.12 GoodsReceiptService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createGoodsReceipt(receipt): GoodsReceipt` | — |
+| `updateGoodsReceipt(receipt): GoodsReceipt` | — |
+| `deleteGoodsReceipt(receipt): Boolean` | Cancel draft |
+| `confirmGoodsReceipt(receipt): GoodsReceipt` | Post to inventory |
+
+### I.13 StockTransferService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createStockTransfer(transfer): StockTransfer` | — |
+| `updateStockTransfer(transfer): StockTransfer` | — |
+| `deleteStockTransfer(transfer): Boolean` | — |
+| `submitStockTransfer(transfer): StockTransfer` | — |
+| `approveStockTransfer(request: ApproveDocumentRequest): StockTransfer` | — |
+| `completeStockTransfer(transfer): StockTransfer` | Execute movement |
+| `cancelStockTransfer(transfer): StockTransfer` | — |
+
+### I.14 InventoryAdjustmentService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createInventoryAdjustment(adj): InventoryAdjustment` | — |
+| `updateInventoryAdjustment(adj): InventoryAdjustment` | — |
+| `deleteInventoryAdjustment(adj): Boolean` | — |
+| `confirmInventoryAdjustment(adj): InventoryAdjustment` | Post adjustment |
+
+### I.15 SalesOrderService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createSalesOrder(order): SalesOrder` | — |
+| `updateSalesOrder(order): SalesOrder` | — |
+| `deleteSalesOrder(order): Boolean` | — |
+| `confirmSalesOrder(order): SalesOrder` | Deduct stock |
+| `cancelSalesOrder(order): SalesOrder` | Restore stock |
+
+### I.16 SalesReturnService.d3et
+| Method | Purpose |
+|--------|---------|
+| `createSalesReturn(ret): SalesReturn` | — |
+| `updateSalesReturn(ret): SalesReturn` | — |
+| `deleteSalesReturn(ret): SalesReturn` | — |
+| `confirmSalesReturn(ret): SalesReturn` | Restock |
+
+### I.17 StockAlertService.d3et
+| Method | Purpose |
+|--------|---------|
+| `acknowledgeAlert(alert): StockAlert` | Mark acknowledged |
+| `resolveAlert(alert): StockAlert` | Mark resolved |
+| `generateLowStockAlerts(organization): Integer` | Batch scan (also used by scheduler) |
+
+### I.18 InventoryMovementService.d3et
+| Method | Purpose |
+|--------|---------|
+| `recordMovement(...): InventoryMovement` | Central movement writer (internal) |
+
+### I.19 AuditLogService.d3et
+| Method | Purpose |
+|--------|---------|
+| `logAction(entityType, entityId, action, old, new): AuditLog` | Central audit writer |
+
+### I.20 UserManagementService.d3et
+| Method | Purpose |
+|--------|---------|
+| `inviteUser(invitation): UserInvitation` | Send invite email |
+| `createUserProfile(profile): UserProfile` | — |
+| `updateUserProfile(profile): UserProfile` | — |
+| `deactivateUser(profile): UserProfile` | — |
+| `revokeInvitation(invitation): UserInvitation` | — |
+
+### I.21 NotificationService.d3et
+| Method | Purpose |
+|--------|---------|
+| `sendInAppNotification(...): InAppNotification` | Create in-app |
+| `sendEmailFromTemplate(templateCode, recipient, vars): Boolean` | Email dispatch |
+| `markNotificationRead(notification): InAppNotification` | — |
+
+### I.22 ReportService.d3et
+| Method | Purpose |
+|--------|---------|
+| `getDashboardMetrics(organization): DashboardMetrics` | Dashboard aggregation |
+| `getStockValuation(organization, warehouse): collection StockValuationRow` | — |
+| `getMovementReport(organization, filters): collection InventoryMovementReportRow` | — |
+
+---
+
+## J. SCHEDULED ACTIONS (`ScheduledAction/`)
+
+| Name | cron | purpose | models/services used |
+|------|------|---------|----------------------|
+| `LowStockAlertJob` | `0 0 6 * * *` (daily 6 AM) | Scan all orgs for low/out-of-stock | WarehouseStock, StockAlertService, NotificationService |
+| `ExpiryAlertJob` | `0 0 7 * * *` (daily 7 AM) | Flag batches expiring within 30 days | StockBatch, StockAlertService, NotificationService |
+| `ExpiredBatchCleanupJob` | `0 30 0 * * *` (daily 12:30 AM) | Mark expired batches, optional alerts | StockBatch, StockBatchService |
+| `InvitationExpiryJob` | `0 0 */1 * * *` (hourly) | Expire pending invitations | UserInvitation |
+| `AuditLogRetentionJob` | `0 0 2 1 * *` (monthly) | Archive audit logs older than retention | AuditLog |
+
+---
+
+## K. PAGES (`Page/`)
+
+### K.1 Auth & Landing
+
+#### LandingPage
+| Attribute | Value |
+|-----------|-------|
+| route | `/` |
+| roles | AnonymousUser |
+| purpose | Marketing/redirect to login |
+| data sources | — |
+| key widgets | IMSHeroWidget, LoginLinkButton |
+
+**React UI layers:** Layout variant `LayoutCenteredAuthPage` (landing variant) | Sections: Hero, Features, CTA | Slots: hero, features, footer | Variants: light | Behavior: redirect if session exists | State: none | Services: none | Theme: IMSTheme light
+
+#### LoginPage
+| Attribute | Value |
+|-----------|-------|
+| route | `/login` |
+| roles | AnonymousUser |
+| purpose | Email/password + OTP login |
+| data sources | — |
+| key widgets | LoginFormWidget, OtpLoginWidget |
+
+**React UI:** LayoutCenteredAuthPage | Sections: Logo, Form, OTP toggle | Slots: form, footer | Behavior: InventoryAuthService.login* | State: form local | Theme: IMSTheme
+
+#### ForgotPasswordPage
+| route `/forgot-password` | AnonymousUser | OTP/password reset | OTPService |
+
+#### AcceptInvitationPage
+| route `/invite/:token` | AnonymousUser | Accept user invite | UserManagementService.acceptInvitation |
+
+#### ChangePasswordPage
+| route `/change-password` | BuildACompleteInventoryUser | Password change | ChangePasswordRequest |
+
+---
+
+### K.2 App Shell
+
+#### DashboardPage
+| Attribute | Value |
+|-----------|-------|
+| route | `/dashboard` |
+| roles | All authenticated (role-scoped widgets) |
+| purpose | KPI overview, alerts, recent activity |
+| data sources | DashboardMetrics, LowStockItems, ExpiringBatches, InventoryMovementsByDateRange |
+| key widgets | IMSidebarWidget, KPICardWidget, LowStockTableWidget, ExpiryAlertWidget, RecentMovementsWidget, NotificationCenterWidget |
+
+**React UI:** LayoutAppShellSidebarPage | Sections: Sidebar, Header, KPI row, Charts, Tables | Slots: sidebar, headerActions, kpiGrid, mainContent | Behavior: auto-refresh queries | State: page-level computed | Services: ReportService.getDashboardMetrics | Theme: IMSTheme
+
+---
+
+### K.3 Organization & Setup
+
+#### OrganizationListPage — `/admin/organizations` | OrganizationAdmin | List tenants | AllOrganizations
+#### OrganizationFormPage — `/admin/organizations/new`, `/admin/organizations/:id/edit` | OrganizationAdmin | Create/edit org | OrganizationById
+#### OrganizationSettingsPage — `/settings/organization` | OrganizationAdmin | Tenant settings | OrganizationById
+
+---
+
+### K.4 Stores & Warehouses
+
+#### StoreListPage — `/stores` | OrgAdmin, StoreManager | List stores | AllStores
+#### StoreFormPage — `/stores/new`, `/stores/:id/edit` | OrgAdmin | CRUD store | StoreById, AllWarehouses
+#### StoreDetailPage — `/stores/:id` | OrgAdmin, StoreManager | Store overview | StoreById, SalesOrdersByStore
+
+#### WarehouseListPage — `/warehouses` | OrgAdmin, WarehouseManager | List warehouses | AllWarehouses
+#### WarehouseFormPage — `/warehouses/new`, `/warehouses/:id/edit` | OrgAdmin, WarehouseManager | CRUD warehouse | WarehouseById
+#### WarehouseDetailPage — `/warehouses/:id` | WarehouseManager | Stock summary | WarehouseStockByWarehouse
+
+---
+
+### K.5 Product Catalog
+
+#### UnitOfMeasureListPage — `/catalog/uom` | OrgAdmin, PurchaseManager | UOM list | AllUnitOfMeasures
+#### UnitOfMeasureFormPage — `/catalog/uom/new`, `.../edit` | OrgAdmin | CRUD UOM | —
+
+#### ProductCategoryListPage — `/catalog/categories` | OrgAdmin, PurchaseManager | Category list | AllProductCategories
+#### ProductCategoryFormPage — `/catalog/categories/new`, `.../edit` | OrgAdmin | CRUD category | AllProductCategories
+
+#### ProductListPage — `/catalog/products` | All except Viewer (read) | Search/filter product list | AllProducts, ProductSearch
+#### ProductFormPage — `/catalog/products/new`, `/catalog/products/:id/edit` | OrgAdmin, PurchaseManager, InventoryClerk | Create/edit product | ProductById, AllProductCategories, AllUnitOfMeasures
+#### ProductDetailPage — `/catalog/products/:id` | All authenticated | Product detail + stock tabs | ProductById, WarehouseStockByProduct, AllStockBatches
+
+---
+
+### K.6 Inventory
+
+#### WarehouseStockListPage — `/inventory/stock` | WarehouseManager, InventoryClerk, Accountant, Viewer | Stock levels | WarehouseStockByWarehouse, AllWarehouses
+#### StockBatchListPage — `/inventory/batches` | WarehouseManager, InventoryClerk | Batch/expiry list | AllStockBatches, ExpiringBatches
+
+#### InventoryMovementListPage — `/inventory/movements` | WarehouseManager, Accountant, Viewer | Movement history | InventoryMovementsByDateRange
+#### InventoryAdjustmentListPage — `/inventory/adjustments` | InventoryClerk, WarehouseManager | Adjustment list | AllInventoryAdjustments
+#### InventoryAdjustmentFormPage — `/inventory/adjustments/new`, `.../edit` | InventoryClerk | Create/edit adjustment | AllProducts, WarehouseStockByWarehouse
+
+#### StockAlertListPage — `/inventory/alerts` | WarehouseManager, PurchaseManager | Alert inbox | AllStockAlerts
+
+---
+
+### K.7 Procurement
+
+#### SupplierListPage — `/procurement/suppliers` | PurchaseManager, OrgAdmin | Supplier list | AllSuppliers
+#### SupplierFormPage — `/procurement/suppliers/new`, `.../edit` | PurchaseManager | CRUD supplier | SupplierById
+
+#### PurchaseOrderListPage — `/procurement/purchase-orders` | PurchaseManager, WarehouseManager, Viewer | PO list with status tabs | AllPurchaseOrders, PurchaseOrdersByStatus
+#### PurchaseOrderFormPage — `/procurement/purchase-orders/new`, `.../edit` | PurchaseManager | Create/edit PO | PurchaseOrderById, AllSuppliers, AllProducts
+#### PurchaseOrderDetailPage — `/procurement/purchase-orders/:id` | PurchaseManager, WarehouseManager | PO detail + approve | PurchaseOrderById
+
+#### GoodsReceiptListPage — `/procurement/goods-receipts` | WarehouseManager, PurchaseManager | Receipt list | AllGoodsReceipts
+#### GoodsReceiptFormPage — `/procurement/goods-receipts/new`, `.../edit` | WarehouseManager | Receive goods | GoodsReceiptById, AllPurchaseOrders
+#### GoodsReceiptDetailPage — `/procurement/goods-receipts/:id` | WarehouseManager | Confirm receipt | GoodsReceiptById
+
+---
+
+### K.8 Stock Transfers
+
+#### StockTransferListPage — `/inventory/transfers` | WarehouseManager, InventoryClerk | Transfer list | AllStockTransfers
+#### StockTransferFormPage — `/inventory/transfers/new`, `.../edit` | WarehouseManager | Create/edit transfer | StockTransferById, AllWarehouses, ProductSearch
+#### StockTransferDetailPage — `/inventory/transfers/:id` | WarehouseManager, OrgAdmin | Approve/complete | StockTransferById
+
+---
+
+### K.9 Sales & Returns
+
+#### SalesOrderListPage — `/sales/orders` | SalesStaff, StoreManager, Accountant | Sales list | AllSalesOrders, SalesOrdersByStore
+#### SalesOrderFormPage — `/sales/orders/new`, `.../edit` | SalesStaff | Create sale (POS-lite) | ProductSearch, WarehouseStockByWarehouse
+#### SalesOrderDetailPage — `/sales/orders/:id` | StoreManager | View/confirm/cancel | SalesOrderById
+
+#### SalesReturnListPage — `/sales/returns` | SalesStaff, StoreManager | Returns list | AllSalesReturns
+#### SalesReturnFormPage — `/sales/returns/new`, `.../edit` | SalesStaff | Process return | AllSalesOrders, ProductSearch
+#### SalesReturnDetailPage — `/sales/returns/:id` | StoreManager | Confirm return | —
+
+---
+
+### K.10 Reports
+
+#### StockValuationReportPage — `/reports/stock-valuation` | Accountant, OrgAdmin, Viewer | Valuation report | StockValuationReport
+#### MovementReportPage — `/reports/movements` | Accountant, WarehouseManager | Movement report | MovementReportRows
+#### LowStockReportPage — `/reports/low-stock` | PurchaseManager, WarehouseManager | Low stock report | LowStockItems
+#### ExpiryReportPage — `/reports/expiry` | WarehouseManager | Expiry report | ExpiringBatches
+#### SalesSummaryReportPage — `/reports/sales` | Accountant, StoreManager | Sales summary | AllSalesOrders
+#### PurchaseReportPage — `/reports/purchases` | PurchaseManager, Accountant | PO status report | PurchaseOrdersByStatus
+
+---
+
+### K.11 Admin & Audit
+
+#### UserListPage — `/admin/users` | OrganizationAdmin | User management | AllUserProfiles
+#### UserFormPage — `/admin/users/:id/edit` | OrganizationAdmin | Edit user profile/role | UserProfileByUser
+#### UserInvitePage — `/admin/users/invite` | OrganizationAdmin | Send invitations | AllUserInvitations
+
+#### AuditLogListPage — `/admin/audit-logs` | OrganizationAdmin, Accountant | Audit trail | AllAuditLogs
+
+#### NotificationPreferencesPage — `/settings/notifications` | All authenticated | Template toggles | NotificationTemplate
+
+#### ProfileSettingsPage — `/settings/profile` | All authenticated | User profile edit | UserProfileByUser
+
+---
+
+### K.12 Delete Confirmations (dialogs on list/detail pages — not separate routes)
+
+Every transactional entity delete uses `ConfirmDeleteDialogWidget` calling respective `delete<Entity>` service method:
+Organization, Store, Warehouse, UnitOfMeasure, ProductCategory, Product, Supplier, PurchaseOrder (draft only), GoodsReceipt (draft), StockTransfer (draft/cancel), InventoryAdjustment (draft), SalesOrder (draft/cancel), SalesReturn (draft), StockBatch, UserInvitation (revoke)
+
+---
+
+## L. WIDGETS (`Widget/`)
+
+| Name | category | properties | events | purpose |
+|------|----------|------------|--------|---------|
+| `IMSidebarWidget` | navigation | currentUser, currentRoute | onNavigate | App sidebar with role-based menu |
+| `IMSAppHeaderWidget` | layout | title, organization | onLogout, onProfile | Top header bar |
+| `LoginFormWidget` | auth | — | onLogin, onForgotPassword | Email/password form |
+| `OtpLoginWidget` | auth | email | onSendOtp, onVerifyOtp | OTP login flow |
+| `KPICardWidget` | dashboard | label, value, icon, trend | — | Metric card |
+| `LowStockTableWidget` | dashboard | items (WarehouseStock[]) | onViewProduct, onCreatePO | Low-stock table |
+| `ExpiryAlertWidget` | dashboard | batches (StockBatch[]) | onViewBatch | Expiring items |
+| `RecentMovementsWidget` | dashboard | movements | onViewMovement | Activity feed |
+| `NotificationCenterWidget` | layout | user, organization | onMarkRead, onViewAll | Bell + dropdown |
+| `ProductSearchFieldWidget` | form | organization, value | onSelect | Autocomplete product search |
+| `ProductPickerWidget` | form | organization | onProductSelected | Modal product picker |
+| `SupplierPickerWidget` | form | organization | onSupplierSelected | Supplier autocomplete |
+| `WarehousePickerWidget` | form | organization, store | onWarehouseSelected | Warehouse selector |
+| `LineItemEditorWidget` | form | lines, mode | onAddLine, onRemoveLine, onLineChange | Generic PO/Sale/Transfer lines |
+| `StatusBadgeWidget` | display | status, optionSetType | — | Colored status chip |
+| `StockLevelBadgeWidget` | display | warehouseStock | — | Qty + low-stock color |
+| `BatchSelectorWidget` | form | product, warehouse | onBatchSelected | FIFO batch picker |
+| `DocumentActionBarWidget` | action | document, allowedActions | onSubmit, onApprove, onCancel, onConfirm | Workflow buttons |
+| `ConfirmDeleteDialogWidget` | dialog | entityName, message | onConfirm, onCancel | Delete confirmation |
+| `DateRangeFilterWidget` | filter | startDate, endDate | onChange | Report date filter |
+| `OrganizationSelectorWidget` | admin | — | onSelect | Bootstrap org picker (first-run) |
+| `InviteUserFormWidget` | admin | organization | onInvite | Invitation form |
+| `AuditLogRowWidget` | display | auditLog | — | Audit row renderer |
+| `ReportExportButtonWidget` | report | reportData | onExport | CSV export trigger |
+| `EmptyStateWidget` | display | title, message, actionLabel | onAction | Empty list placeholder |
+| `IMSHeroWidget` | marketing | — | onGetStarted | Landing hero |
+
+---
+
+## M. USER TYPES & ROLES
+
+### M.1 UserRole Model (UserManagement/ + Model/)
+
+See **C.27** — seeded system roles per organization on org creation (OrganizationAdmin, StoreManager, etc.)
+
+### M.2 UserTypes/ (EXACTLY TWO FILES)
+
+#### AnonymousUser.d3e
+| Attribute | Value |
+|-----------|-------|
+| userModel | — (none) |
+| loginSettings | enabled for public pages only |
+| modelAccess | none (pre-auth) |
+| queries[] | none |
+
+**Accessible pages:** LandingPage, LoginPage, ForgotPasswordPage, AcceptInvitationPage
+
+#### BuildACompleteInventoryUser.d3e
+| Attribute | Value |
+|-----------|-------|
+| userModel | BaseUser |
+| loginSettings | email + password, OTP optional, session timeout from Project securitySettings |
+| queries[] | All registered DataQueries (scoped by organization from UserProfile) |
+
+**modelAccess (summary — all scoped by `organization` match on UserProfile):**
+
+| Model | create | update | delete | conditions |
+|-------|--------|--------|--------|------------|
+| Organization | OrgAdmin only | OrgAdmin | — | — |
+| Store | OrgAdmin | OrgAdmin, StoreManager (assigned) | OrgAdmin | update/delete: assigned store scope for StoreManager |
+| Warehouse | OrgAdmin | OrgAdmin, WarehouseManager (assigned) | OrgAdmin | warehouse scope |
+| UnitOfMeasure | OrgAdmin | OrgAdmin | OrgAdmin | — |
+| ProductCategory | OrgAdmin, PurchaseManager | same | OrgAdmin | — |
+| Product | OrgAdmin, PurchaseManager, InventoryClerk | same | OrgAdmin | delete: soft only |
+| WarehouseStock | system only | system only | — | read: all roles per scope |
+| StockBatch | InventoryClerk, WarehouseManager | same | WarehouseManager | — |
+| Supplier | PurchaseManager, OrgAdmin | same | OrgAdmin | — |
+| SupplierContact | PurchaseManager | PurchaseManager | PurchaseManager | — |
+| PurchaseOrder | PurchaseManager | PurchaseManager (Draft/Submitted) | PurchaseManager (Draft) | approve: OrgAdmin, PurchaseManager |
+| PurchaseOrderLine | via PO | via PO | via PO | — |
+| GoodsReceipt | WarehouseManager | WarehouseManager (Draft) | WarehouseManager (Draft) | confirm: WarehouseManager |
+| StockTransfer | WarehouseManager | WarehouseManager | WarehouseManager (Draft) | approve: OrgAdmin, WarehouseManager |
+| InventoryAdjustment | InventoryClerk | InventoryClerk (Draft) | InventoryClerk (Draft) | confirm: InventoryClerk, WarehouseManager |
+| InventoryMovement | — | — | — | read only all scoped roles |
+| SalesOrder | SalesStaff | SalesStaff (Draft) | SalesStaff (Draft) | confirm: SalesStaff, StoreManager |
+| SalesReturn | SalesStaff | SalesStaff | SalesStaff (Draft) | — |
+| StockAlert | system | WarehouseManager, PurchaseManager (ack) | — | read all |
+| AuditLog | system | — | — | read: OrgAdmin, Accountant |
+| UserProfile | OrgAdmin | OrgAdmin, self (limited) | OrgAdmin | — |
+| UserInvitation | OrgAdmin | OrgAdmin | OrgAdmin | — |
+| InAppNotification | system | self (mark read) | — | read: self |
+| NotificationTemplate | OrgAdmin | OrgAdmin | OrgAdmin | — |
+| UserRole | OrgAdmin | OrgAdmin | — | read all |
+
+---
+
+## N. APPLICATION & THEMING
+
+### N.1 Application/BuildACompleteInventoryApplication.d3e
+
+| Attribute | Value |
+|-----------|-------|
+| target | ReactFrontEnd |
+| root Page | LandingPage (unauthenticated) → DashboardPage (authenticated redirect) |
+| defaultTheme | IMSTheme |
+| styles[] | IMSBaseStyle, IMSCardStyle, IMSFormStyle, IMSTableStyle, IMSSidebarStyle, IMSAuthStyle, GlassCardStyle (from UIImprovement reference) |
+
+### N.2 StyleThemes/IMSTheme.d3e
+
+| Property | Value |
+|----------|-------|
+| Primary color | `#1565C0` (inventory blue) |
+| Secondary | `#2E7D32` (stock green) |
+| Accent / warning | `#F57C00` (low-stock orange) |
+| Error | `#C62828` |
+| Background | `#F5F7FA` |
+| Surface | `#FFFFFF` |
+| Text | `#1A1A2E` |
+| Font | Inter / system sans |
+| Border radius | 8px cards, 6px inputs |
+
+### N.3 Styles/
+
+| File | Purpose |
+|------|---------|
+| `IMSBaseStyle.d3e` | Typography, spacing, colors |
+| `IMSCardStyle.d3e` | KPI and content cards |
+| `IMSFormStyle.d3e` | Form fields, labels, validation |
+| `IMSTableStyle.d3e` | Data tables, pagination |
+| `IMSSidebarStyle.d3e` | Sidebar navigation |
+| `IMSAuthStyle.d3e` | Login/invite centered layout |
+| `IMSStatusBadgeStyle.d3e` | Status chip colors per OptionSet |
+| `IMSDashboardChartStyle.d3e` | Chart containers |
+
+---
+
+## O. NOTIFICATION FLOWS
+
+| trigger | channel | template | recipients |
+|---------|---------|----------|------------|
+| User invited | Email | `USER_INVITATION` | Invitee email |
+| OTP login requested | Email/SMS | `OTP_LOGIN` | Requesting user |
+| Stock below reorder level | InApp + Email | `LOW_STOCK_ALERT` | WarehouseManager, PurchaseManager |
+| Stock out (qty = 0) | InApp + Email | `OUT_OF_STOCK_ALERT` | WarehouseManager, PurchaseManager |
+| Batch expiring within 30 days | InApp + Email | `EXPIRY_SOON_ALERT` | WarehouseManager, InventoryClerk |
+| PO submitted for approval | InApp + Email | `PO_APPROVAL_REQUEST` | OrganizationAdmin, PurchaseManager |
+| PO approved | InApp | `PO_APPROVED` | PO creator |
+| Stock transfer submitted | InApp + Email | `TRANSFER_APPROVAL_REQUEST` | OrganizationAdmin, WarehouseManager |
+| Transfer completed | InApp | `TRANSFER_COMPLETED` | Requester |
+| Goods receipt confirmed | InApp | `GOODS_RECEIPT_CONFIRMED` | PurchaseManager |
+| Sales order confirmed | InApp | `SALES_ORDER_CONFIRMED` | StoreManager |
+| Password changed | Email | `PASSWORD_CHANGED` | User |
+| Invitation expired | Email | `INVITATION_EXPIRED` | Inviter (OrgAdmin) |
+
+---
+
+## P. USER TYPE MATRIX
+
+| user type | roles (AppUserRole) | accessible pages | permissions (summary) |
+|-----------|---------------------|------------------|------------------------|
+| AnonymousUser | — | Landing, Login, ForgotPassword, AcceptInvitation | Public auth only |
+| BuildACompleteInventoryUser → OrganizationAdmin | OrganizationAdmin | All pages | Full CRUD all entities, approve PO/transfers, user admin, audit, settings |
+| → StoreManager | StoreManager | Dashboard, Stores (assigned), Sales*, Returns*, Products (read), Reports (sales), Profile | Manage sales/returns for assigned stores, read stock |
+| → WarehouseManager | WarehouseManager | Dashboard, Warehouses (assigned), Stock, Batches, Movements, Transfers, GoodsReceipts, Adjustments, Alerts, Reports (inventory) | Full warehouse ops, approve transfers, confirm receipts |
+| → PurchaseManager | PurchaseManager | Dashboard, Suppliers, POs, Products (read/write), Alerts, Reports (purchase, low-stock) | Procurement lifecycle, no user admin |
+| → InventoryClerk | InventoryClerk | Dashboard, Products, Stock, Batches, Adjustments, Alerts | Stock counts, adjustments, batch entry |
+| → SalesStaff | SalesStaff | Dashboard, SalesOrders, SalesReturns, Products (read), Stock (read) | Create/confirm sales and returns |
+| → Accountant | Accountant | Dashboard, all Reports, Movements (read), Audit (read), Stock (read), Sales (read), PO (read) | Read-heavy + export |
+| → Viewer | Viewer | Dashboard (limited), Products (read), Stock (read), Reports (read) | Read-only all scoped data |
+
+---
+
+## Q. FILE / FOLDER STRUCTURE
+
+```
+C:/Users/Nikhil/Downloads/cursor-sdk 1/cursor-sdk/projects/InventoryManagementSystem/
+├── Project.d3e
+├── Application/
+│   └── BuildACompleteInventoryApplication.d3e
+├── Model/
+│   ├── Organization.d3e
+│   ├── Store.d3e
+│   ├── Warehouse.d3e
+│   ├── UnitOfMeasure.d3e
+│   ├── ProductCategory.d3e
+│   ├── Product.d3e
+│   ├── WarehouseStock.d3e
+│   ├── StockBatch.d3e
+│   ├── Supplier.d3e
+│   ├── SupplierContact.d3e
+│   ├── PurchaseOrder.d3e
+│   ├── PurchaseOrderLine.d3e
+│   ├── GoodsReceipt.d3e
+│   ├── GoodsReceiptLine.d3e
+│   ├── StockTransfer.d3e
+│   ├── StockTransferLine.d3e
+│   ├── InventoryAdjustment.d3e
+│   ├── InventoryAdjustmentLine.d3e
+│   ├── InventoryMovement.d3e
+│   ├── SalesOrder.d3e
+│   ├── SalesOrderLine.d3e
+│   ├── SalesReturn.d3e
+│   ├── SalesReturnLine.d3e
+│   ├── StockAlert.d3e
+│   ├── AuditLog.d3e
+│   ├── UserProfile.d3e
+│   ├── UserRole.d3e
+│   ├── UserInvitation.d3e
+│   ├── InAppNotification.d3e
+│   └── NotificationTemplate.d3e
+├── ModelPatterns/
+│   ├── MasterEntityPattern.d3e
+│   ├── ChildLineItemPattern.d3e
+│   ├── InventoryTransactionPattern.d3e
+│   └── TenantScopedPattern.d3e
+├── Struct/
+│   ├── LoginResult.d3e
+│   ├── DashboardMetrics.d3e
+│   ├── StockValuationRow.d3e
+│   ├── InventoryMovementReportRow.d3e
+│   ├── ProductSearchRequest.d3e
+│   ├── PurchaseOrderSummary.d3e
+│   ├── ApproveDocumentRequest.d3e
+│   └── StockAvailabilityCheck.d3e
+├── OptionSets/
+│   ├── OrganizationStatus.d3e
+│   ├── EntityStatus.d3e
+│   ├── StoreType.d3e
+│   ├── WarehouseType.d3e
+│   ├── UomType.d3e
+│   ├── ProductStatus.d3e
+│   ├── BatchStatus.d3e
+│   ├── PurchaseOrderStatus.d3e
+│   ├── GoodsReceiptStatus.d3e
+│   ├── StockTransferStatus.d3e
+│   ├── AdjustmentReason.d3e
+│   ├── AdjustmentStatus.d3e
+│   ├── MovementType.d3e
+│   ├── MovementDirection.d3e
+│   ├── MovementReferenceType.d3e
+│   ├── SalesOrderStatus.d3e
+│   ├── PaymentStatus.d3e
+│   ├── SalesReturnStatus.d3e
+│   ├── ReturnReason.d3e
+│   ├── StockAlertType.d3e
+│   ├── AlertStatus.d3e
+│   ├── AuditAction.d3e
+│   ├── AppUserRole.d3e
+│   ├── InvitationStatus.d3e
+│   ├── NotificationType.d3e
+│   └── NotificationChannel.d3e
+├── DataQuery/
+│   ├── AllOrganizations.d3e
+│   ├── OrganizationById.d3e
+│   ├── AllStores.d3e
+│   ├── StoreById.d3e
+│   ├── AllWarehouses.d3e
+│   ├── WarehousesByStore.d3e
+│   ├── AllUnitOfMeasures.d3e
+│   ├── AllProductCategories.d3e
+│   ├── AllProducts.d3e
+│   ├── ProductsByCategory.d3e
+│   ├── ProductSearch.d3e
+│   ├── ProductById.d3e
+│   ├── WarehouseStockByWarehouse.d3e
+│   ├── WarehouseStockByProduct.d3e
+│   ├── LowStockItems.d3e
+│   ├── OutOfStockItems.d3e
+│   ├── AllStockBatches.d3e
+│   ├── ExpiringBatches.d3e
+│   ├── AllSuppliers.d3e
+│   ├── SupplierById.d3e
+│   ├── AllPurchaseOrders.d3e
+│   ├── PurchaseOrdersByStatus.d3e
+│   ├── PurchaseOrderById.d3e
+│   ├── AllGoodsReceipts.d3e
+│   ├── GoodsReceiptById.d3e
+│   ├── AllStockTransfers.d3e
+│   ├── StockTransferById.d3e
+│   ├── AllInventoryAdjustments.d3e
+│   ├── AllInventoryMovements.d3e
+│   ├── InventoryMovementsByDateRange.d3e
+│   ├── AllSalesOrders.d3e
+│   ├── SalesOrdersByStore.d3e
+│   ├── SalesOrderById.d3e
+│   ├── AllSalesReturns.d3e
+│   ├── AllStockAlerts.d3e
+│   ├── AllAuditLogs.d3e
+│   ├── AllUserProfiles.d3e
+│   ├── UserProfileByUser.d3e
+│   ├── AllUserInvitations.d3e
+│   ├── AllInAppNotifications.d3e
+│   ├── UnreadNotificationCount.d3e
+│   ├── DashboardMetrics.d3e
+│   ├── StockValuationReport.d3e
+│   └── MovementReportRows.d3e
+├── QueryUsage/
+│   ├── UsagesInDashboardPage.d3e
+│   ├── UsagesInOrganizationListPage.d3e
+│   ├── UsagesInOrganizationFormPage.d3e
+│   ├── UsagesInStoreListPage.d3e
+│   ├── UsagesInStoreFormPage.d3e
+│   ├── UsagesInWarehouseListPage.d3e
+│   ├── UsagesInWarehouseFormPage.d3e
+│   ├── UsagesInUnitOfMeasureListPage.d3e
+│   ├── UsagesInProductCategoryListPage.d3e
+│   ├── UsagesInProductCategoryFormPage.d3e
+│   ├── UsagesInProductListPage.d3e
+│   ├── UsagesInProductFormPage.d3e
+│   ├── UsagesInProductDetailPage.d3e
+│   ├── UsagesInWarehouseStockListPage.d3e
+│   ├── UsagesInStockBatchListPage.d3e
+│   ├── UsagesInSupplierListPage.d3e
+│   ├── UsagesInSupplierFormPage.d3e
+│   ├── UsagesInPurchaseOrderListPage.d3e
+│   ├── UsagesInPurchaseOrderFormPage.d3e
+│   ├── UsagesInPurchaseOrderDetailPage.d3e
+│   ├── UsagesInGoodsReceiptListPage.d3e
+│   ├── UsagesInGoodsReceiptFormPage.d3e
+│   ├── UsagesInStockTransferListPage.d3e
+│   ├── UsagesInStockTransferFormPage.d3e
+│   ├── UsagesInInventoryAdjustmentListPage.d3e
+│   ├── UsagesInInventoryAdjustmentFormPage.d3e
+│   ├── UsagesInInventoryMovementListPage.d3e
+│   ├── UsagesInSalesOrderListPage.d3e
+│   ├── UsagesInSalesOrderFormPage.d3e
+│   ├── UsagesInSalesReturnListPage.d3e
+│   ├── UsagesInSalesReturnFormPage.d3e
+│   ├── UsagesInStockAlertListPage.d3e
+│   ├── UsagesInAuditLogListPage.d3e
+│   ├── UsagesInUserListPage.d3e
+│   ├── UsagesInUserInvitePage.d3e
+│   ├── UsagesInStockValuationReportPage.d3e
+│   ├── UsagesInMovementReportPage.d3e
+│   ├── UsagesInNotificationCenterWidget.d3e
+│   ├── UsagesInIMSidebarWidget.d3e
+│   └── UsagesInProductPickerWidget.d3e
+├── Report/
+│   ├── StockValuationReport.d3e
+│   ├── InventoryMovementReport.d3e
+Continuing the blueprint from where Section Q was cut off.
+The blueprint was cut off mid–Section Q. Below is the **completed remainder** (Q through R). Sections A–P were delivered in the prior message.
+
+---
+
+## Q. FILE / FOLDER STRUCTURE (continued)
+
+```
+├── Report/
+│   ├── StockValuationReport.d3e
+│   ├── InventoryMovementReport.d3e
+│   ├── LowStockReport.d3e
+│   ├── ExpiryReport.d3e
+│   ├── PurchaseOrderStatusReport.d3e
+│   ├── SalesSummaryReport.d3e
+│   ├── SupplierPerformanceReport.d3e
+│   └── ProfitabilitySnapshotReport.d3e
+├── Page/                          (52 pages — auth, dashboard, CRUD, reports, admin)
+├── Widget/                        (25 widgets)
+├── D3EClass/                      (22 @RPCService classes)
+├── ScheduledAction/               (5 cron jobs)
+├── UserTypes/
+│   ├── AnonymousUser.d3e
+│   └── BuildACompleteInventoryUser.d3e
+├── UserManagement/
+│   ├── UserRole.d3e
+│   ├── AnonymousUserType.d3e
+│   └── AuthenticatedUserType.d3e
+├── StyleThemes/IMSTheme.d3e
+├── Styles/                        (8 style files)
+├── Migrator/
+│   ├── M001_InitialSchema.d3e
+│   ├── M002_SeedSystemUserRoles.d3e
+│   └── M003_SeedNotificationTemplates.d3e
+├── D3EConfig/
+│   ├── AppSettings.d3e
+│   └── InventoryThresholds.d3e
+└── WidgetTestData/                (3 preview data files)
+```
+
+**MVP construct counts:** 30 Models · 8 Structs · 26 OptionSets · 44 DataQueries · 40 QueryUsages · 8 Reports · 52 Pages · 25 Widgets · 22 D3EClasses · 5 ScheduledActions · 2 UserTypes
+
+Full tree with every filename is saved at:
+`C:/Users/Nikhil/Downloads/cursor-sdk 1/cursor-sdk/projects/InventoryManagementSystem/BLUEPRINT.md`
+
+---
+
+## R. BUILD ORDER (Phase 1 MVP)
+
+### Phase 1 — Foundation (Weeks 1–2)
+Project, D3EConfig, IMSTheme + Styles, core OptionSets (`EntityStatus`, `AppUserRole`, `OrganizationStatus`), Organization/UserProfile/UserRole/UserInvitation models, both UserTypes, InventoryAuthService, UserManagementService, AuditLogService, auth pages/widgets, Application entry, M001/M002 migrators.
+
+**Exit:** Invite acceptance, OTP/password login, empty dashboard shell.
+
+### Phase 2 — Org & Locations (Weeks 2–3)
+Store, Warehouse, location DataQueries, Organization/Store/Warehouse services + CRUD pages, IMSidebarWidget, IMSAppHeaderWidget, DashboardPage shell.
+
+**Exit:** OrgAdmin creates stores and warehouses; role-based sidebar navigation.
+
+### Phase 3 — Product Catalog (Weeks 3–4)
+UnitOfMeasure, ProductCategory, Product, ProductSearchRequest, catalog DataQueries, UOM/Category/Product services, product CRUD pages, ProductSearchFieldWidget, ProductPickerWidget, image upload.
+
+**Exit:** Full product CRUD with categories, UOM, reorder levels, batch/expiry flags.
+
+### Phase 4 — Inventory Core (Weeks 4–5)
+WarehouseStock, StockBatch, InventoryAdjustment (+lines), InventoryMovement, StockAlert, movement/adjustment OptionSets, stock DataQueries, stock services, adjustment/batch/movement/alert pages, LowStock + Expiry widgets, scheduled alert jobs, notification template seed.
+
+**Exit:** Adjustments update stock; movements logged; low-stock/expiry alerts fire.
+
+### Phase 5 — Procurement (Weeks 5–6)
+Supplier (+contacts), PurchaseOrder (+lines), GoodsReceipt (+lines), PO/GR workflow, Supplier/PO/GR services + pages, LineItemEditorWidget, DocumentActionBarWidget, PO approval notifications, purchase reports.
+
+**Exit:** PO → Goods Receipt → stock increase with PO received-qty tracking.
+
+### Phase 6 — Stock Transfers (Weeks 6–7)
+StockTransfer (+lines), transfer workflow (reserve → approve → complete), transfer pages, transfer notifications.
+
+**Exit:** Inter-warehouse transfers with dual movement entries (TransferOut/TransferIn).
+
+### Phase 7 — Sales & Returns (Weeks 7–8)
+SalesOrder (+lines), SalesReturn (+lines), availability pre-check, FIFO batch deduction, sales/return services + pages, sales/profitability reports.
+
+**Exit:** Confirmed sales deduct stock; returns restock; availability validated pre-sale.
+
+### Phase 8 — Dashboard, Reports & Admin (Weeks 8–9)
+AuditLog, InAppNotification, NotificationTemplate, report structs/queries, NotificationService, ReportService, 8 reports + report pages, full Dashboard KPIs, user admin/audit pages, remaining QueryUsage wiring, WidgetTestData.
+
+**Exit:** Live dashboard, all reports, user invites, audit trail on all mutations.
+
+### Phase 9 — Integration & Hardening (Weeks 9–10)
+RBAC modelAccess validation, tenant isolation on all queries, org-scoped unique constraints, workflow guards (no edit on confirmed docs), delete confirmations everywhere, AuditLog hooks in all services, end-to-end smoke tests (PO→GR, Sale, Transfer, Return), role matrix verification (Section P), DB indexes on (organization, warehouse, product) and status/date fields.
+
+**MVP release checklist:**
+- 30 models with create/update/delete services
+- 52 pages (list + create/edit + delete confirm per entity)
+- 44 DataQueries with QueryUsage wiring
+- 8 reports + dashboard KPIs
+- 5 scheduled jobs, 12 notification flows
+- 8 roles via single `BuildACompleteInventoryUser` UserType
+- Multi-tenant org/store/warehouse hierarchy
+- Batch/expiry tracking + full movement audit trail
+
+---
+
+## Appendix: Key Business Flows
+
+| Flow | Path |
+|------|------|
+| **Purchase-to-Stock** | Supplier → PO (Draft→Approved) → GoodsReceipt Confirm → `WarehouseStock +=` → `StockBatch` (if tracked) → `InventoryMovement (PurchaseReceipt, In)` → PO line received qty updated |
+| **Sale-to-Deduct** | SalesOrder Draft → `StockAvailabilityCheck` → Confirm → `WarehouseStock -=` → FIFO batch deduct → `InventoryMovement (SalesIssue, Out)` |
+| **Transfer** | StockTransfer Draft→Approved→Completed → source reserved then deducted, dest increased → TransferOut + TransferIn movements |
+| **Low-Stock Alert** | `WarehouseStock.OnUpdate` or daily `LowStockAlertJob` → `StockAlert` → InApp + Email via `LOW_STOCK_ALERT` template |
+
+---
+
+The complete blueprint (Sections A–R) is available at the path above. Say if you want implementation to start with **Phase 1 (Foundation)** `.d3e` files next.

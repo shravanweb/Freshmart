@@ -1,0 +1,51 @@
+Style {
+    package 'inventory.management.system'
+    name 'GlassCardStyle'
+    description 'Content card with glass surface'
+    items [
+        {
+            selector 'Container.glassCard'
+            values {
+                glassmorphism {
+                    blurSigma {
+                        dx '12'
+                        dy '12'
+                    }
+                    borderRadius '16'
+                    blendMode 'srcOver'
+                }
+                decoration {
+                    color '@c10/0.9'
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                    borderRadius '16'
+                    boxShadow {
+                        color '0A000000'
+                        offset { dx '0' dy '1' }
+                        blurRadius '3'
+                        spreadRadius '0'
+                    }
+                }
+                padding '24'
+            }
+        }
+        {
+            selector 'Container.glassCardFlat'
+            values {
+                decoration {
+                    color '@c25'
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                    borderRadius '16'
+                }
+                padding '24'
+            }
+        }
+    ]
+}

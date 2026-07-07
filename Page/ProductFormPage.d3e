@@ -1,0 +1,388 @@
+Page {
+    package 'inventory.management.system'
+    name 'ProductFormPage'
+    description 'Create and edit products'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'product'
+            type Product
+            required true
+        }
+        {
+            name 'productData'
+            type ProductItem
+            computed true
+            computation `isEditMode ? Query.getProductItem(ProductItemRequest(product: product)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'isEditMode'
+            type Boolean
+            computed true
+            internal true
+            computation `product != null && product.saveStatus != DBSaveStatus.New`
+        }
+        {
+            name 'sku'
+            type String
+            internal true
+        }
+        {
+            name 'name'
+            type String
+            internal true
+        }
+        {
+            name 'description'
+            type String
+            internal true
+        }
+        {
+            name 'barcode'
+            type String
+            internal true
+        }
+        {
+            name 'purchasePrice'
+            type String
+            internal true
+        }
+        {
+            name 'sellingPrice'
+            type String
+            internal true
+        }
+        {
+            name 'reorderLevel'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            internal true
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `isEditMode ? 'Edit Product' : 'New Product'`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Container {
+                                    name 'cardRef'
+                                    tags [
+                                        'glassCard'
+                                    ]
+                                    data {
+                                        width '720'
+                                    }
+                                    child Column {
+                                        name 'formColumnRef'
+                                        data {
+                                            crossAxisAlignment 'stretch'
+                                        }
+                                        children [
+                                            IMSInputFieldWidget {
+                                                name 'skuFieldRef'
+                                                data {
+                                                    label 'SKU'
+                                                    text `sku`
+                                                    placeHolder 'Product SKU'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer1Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'nameFieldRef'
+                                                data {
+                                                    label 'Name'
+                                                    text `name`
+                                                    placeHolder 'Product name'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer2Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'descriptionFieldRef'
+                                                data {
+                                                    label 'Description'
+                                                    text `description`
+                                                    placeHolder 'Product description'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer3Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'barcodeFieldRef'
+                                                data {
+                                                    label 'Barcode'
+                                                    text `barcode`
+                                                    placeHolder 'Barcode'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer4Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            Container {
+                                                name 'categoryHintRef'
+                                                tags [
+                                                    'formField'
+                                                ]
+                                                child TextView {
+                                                    name 'categoryHintTextRef'
+                                                    data {
+                                                        data `product.category != null ? 'Category: ' + product.category.name : 'Bind AllProductCategories picker in Page'`
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer5Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            Container {
+                                                name 'uomHintRef'
+                                                tags [
+                                                    'formField'
+                                                ]
+                                                child TextView {
+                                                    name 'uomHintTextRef'
+                                                    data {
+                                                        data `product.baseUom != null ? 'Base UOM: ' + product.baseUom.name : 'Bind AllUnitOfMeasures picker in Page'`
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer6Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'purchasePriceFieldRef'
+                                                data {
+                                                    label 'Purchase Price'
+                                                    text `purchasePrice`
+                                                    placeHolder '0.00'
+                                                    keyboardType 'number'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer7Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'sellingPriceFieldRef'
+                                                data {
+                                                    label 'Selling Price'
+                                                    text `sellingPrice`
+                                                    placeHolder '0.00'
+                                                    keyboardType 'number'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer8Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'reorderLevelFieldRef'
+                                                data {
+                                                    label 'Reorder Level'
+                                                    text `reorderLevel`
+                                                    placeHolder '0'
+                                                    keyboardType 'number'
+                                                }
+                                            }
+                                            Row {
+                                                name 'actionsRowRef'
+                                                data {
+                                                    mainAxisAlignment 'end'
+                                                    mainAxisSize 'max'
+                                                    margin '24 0 0 0'
+                                                }
+                                                children [
+                                                    TextButton {
+                                                        name 'cancelRef'
+                                                        tags [
+                                                            'secondary'
+                                                        ]
+                                                        data {
+                                                            label 'Cancel'
+                                                            margin '0 8 0 0'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'saveRef'
+                                                        tags [
+                                                            'primary'
+                                                        ]
+                                                        data {
+                                                            label `isEditMode ? 'Update' : 'Create'`
+                                                            disable `isLoading`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                Product source = product;
+                if (isEditMode && productData != null && productData.items.isNotEmpty) {
+                    source = productData.items.first;
+                }
+                sku = source.sku;
+                name = source.name;
+                description = source.description;
+                barcode = source.barcode;
+                purchasePrice = source.purchasePrice.toString();
+                sellingPrice = source.sellingPrice.toString();
+                reorderLevel = source.reorderLevel.toString();
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                navigator.pushProductListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                isLoading = true;
+                product.organization = organization;
+                product.sku = sku;
+                product.name = name;
+                product.description = description;
+                product.barcode = barcode;
+                // TODO: D3EClass ProductService.createProduct / updateProduct
+                isLoading = false;
+                navigator.pushProductListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

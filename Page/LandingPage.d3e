@@ -1,0 +1,170 @@
+Page {
+    package 'inventory.management.system'
+    name 'LandingPage'
+    description 'Marketing landing page'
+    properties []
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassCardStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Column {
+            name 'landingColumnRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+                vscroll 'true'
+            }
+            children [
+                IMSHeroWidget {
+                    name 'heroRef'
+                }
+                Container {
+                    name 'featuresRef'
+                    tags [
+                        'pageContent'
+                    ]
+                    data {
+                        padding '24 32'
+                    }
+                    child Row {
+                        name 'featuresRowRef'
+                        data {
+                            mainAxisAlignment 'spaceEvenly'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            Container {
+                                name 'feature1Ref'
+                                tags [
+                                    'glassCardFlat'
+                                ]
+                                data {
+                                    padding '24'
+                                    margin '0 8 0 0'
+                                }
+                                child Column {
+                                    name 'f1ColRef'
+                                    children [
+                                        TextView {
+                                            name 'f1TitleRef'
+                                            data {
+                                                data 'Real-time Stock'
+                                                textStyle {
+                                                    color '@c4'
+                                                    fontSize '18'
+                                                    fontWeight 'w600'
+                                                }
+                                            }
+                                        }
+                                        TextView {
+                                            name 'f1DescRef'
+                                            data {
+                                                data 'Track inventory across stores and warehouses with batch and expiry support.'
+                                                margin '8 0 0 0'
+                                                textStyle {
+                                                    color '@c5'
+                                                    fontSize '14'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                            Container {
+                                name 'feature2Ref'
+                                tags [
+                                    'glassCardFlat'
+                                ]
+                                data {
+                                    padding '24'
+                                    margin '0 8 0 8'
+                                }
+                                child Column {
+                                    name 'f2ColRef'
+                                    children [
+                                        TextView {
+                                            name 'f2TitleRef'
+                                            data {
+                                                data 'Procurement'
+                                                textStyle {
+                                                    color '@c4'
+                                                    fontSize '18'
+                                                    fontWeight 'w600'
+                                                }
+                                            }
+                                        }
+                                        TextView {
+                                            name 'f2DescRef'
+                                            data {
+                                                data 'Manage suppliers, purchase orders, and goods receipt workflows.'
+                                                margin '8 0 0 0'
+                                                textStyle {
+                                                    color '@c5'
+                                                    fontSize '14'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                            Container {
+                                name 'feature3Ref'
+                                tags [
+                                    'glassCardFlat'
+                                ]
+                                data {
+                                    padding '24'
+                                    margin '0 0 0 8'
+                                }
+                                child Column {
+                                    name 'f3ColRef'
+                                    children [
+                                        TextView {
+                                            name 'f3TitleRef'
+                                            data {
+                                                data 'Reports & Alerts'
+                                                textStyle {
+                                                    color '@c4'
+                                                    fontSize '18'
+                                                    fontWeight 'w600'
+                                                }
+                                            }
+                                        }
+                                        TextView {
+                                            name 'f3DescRef'
+                                            data {
+                                                data 'Low-stock alerts, valuation reports, and full audit history.'
+                                                margin '8 0 0 0'
+                                                textStyle {
+                                                    color '@c5'
+                                                    fontSize '14'
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onGetStartedHandler'
+            type OnEvent
+            on heroRef
+            event onGetStarted
+            block ```
+                navigator.pushLoginPage();
+            ```
+        }
+    ]
+}

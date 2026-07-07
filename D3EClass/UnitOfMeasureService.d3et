@@ -1,0 +1,25 @@
+@RPCService
+server class UnitOfMeasureService {
+    static UnitOfMeasure createUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
+        if (unitOfMeasure == null) {
+            throw Exception('UnitOfMeasure cannot be null');
+        }
+        Database.save(unitOfMeasure);
+        return unitOfMeasure;
+    }
+
+    static UnitOfMeasure updateUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
+        if (unitOfMeasure == null) {
+            throw Exception('UnitOfMeasure cannot be null');
+        }
+        Database.save(unitOfMeasure);
+        return unitOfMeasure;
+    }
+
+    static void deleteUnitOfMeasure(UnitOfMeasure unitOfMeasure) {
+        if (unitOfMeasure == null) {
+            return;
+        }
+        Database.delete(unitOfMeasure);
+    }
+}

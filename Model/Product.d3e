@@ -1,0 +1,109 @@
+Model {
+    package 'inventory.management.system'
+    name 'Product'
+    master Organization
+    creatable true
+    searchable true
+    display `name`
+    properties [
+        {
+            name 'Category'
+            type ProductCategory
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Sku'
+            type String
+            required true
+        }
+        {
+            name 'Name'
+            type String
+            required true
+        }
+        {
+            name 'Description'
+            type String
+            longText true
+        }
+        {
+            name 'Barcode'
+            type String
+        }
+        {
+            name 'Base Uom'
+            type UnitOfMeasure
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Purchase Price'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Selling Price'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Reorder Level'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Reorder Quantity'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Track Batch'
+            type Boolean
+            defaultValue `false`
+        }
+        {
+            name 'Track Expiry'
+            type Boolean
+            defaultValue `false`
+        }
+        {
+            name 'Shelf Life Days'
+            type Integer
+        }
+        {
+            name 'Image'
+            type DFile
+        }
+        {
+            name 'Warehouse Stocks'
+            type WarehouseStock
+            collection true
+            inverse true
+            inverseProperty product
+        }
+        {
+            name 'Batches'
+            type StockBatch
+            collection true
+            inverse true
+            inverseProperty product
+        }
+        {
+            name 'Status'
+            type ProductStatus
+            required true
+            defaultValue `ProductStatus.Active`
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Updated At'
+            type DateTime
+            readType ReadOnly
+        }
+    ]
+}

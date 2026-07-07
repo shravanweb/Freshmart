@@ -1,0 +1,262 @@
+Page {
+    package 'inventory.management.system'
+    name 'PurchaseReportPage'
+    description 'Purchase order status report'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'selectedStatus'
+            type PurchaseOrderStatus
+            internal true
+        }
+        {
+            name 'reportData'
+            type PurchaseOrdersByStatus
+            computed true
+            computation `organization != null ? Query.getPurchaseOrdersByStatus(PurchaseOrdersByStatusRequest(organization: organization, status: selectedStatus)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'reportItems'
+            type PurchaseOrder
+            collection true
+            computed true
+            computation `reportData != null ? reportData.items : []`
+            internal true
+        }
+        {
+            name 'rowCountLabel'
+            type String
+            computed true
+            computation `reportData != null ? reportData.count.toString() + ' orders' : '0 orders'`
+            internal true
+        }
+        {
+            name 'reportExportRows'
+            type String
+            collection true
+            computed true
+            computation `reportItems.map((row) => row.poNumber + ',' + row.vendor.name + ',' + row.orderDate.toString() + ',' + row.totalAmount.toString() + ',' + row.status.toString()).toList()`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Purchase Report'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'titleRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'pageTitleRef'
+                                                    data {
+                                                        data 'Purchase Order Status Report'
+                                                        textStyle {
+                                                            color '@c4'
+                                                            fontSize '24'
+                                                            fontWeight 'w700'
+                                                        }
+                                                    }
+                                                }
+                                                ReportExportButtonWidget {
+                                                    name 'exportRef'
+                                                    data {
+                                                        reportData `reportExportRows`
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        Container {
+                                            name 'tableSpacerRef'
+                                            data {
+                                                margin '16 0 0 0'
+                                            }
+                                        }
+                                        Container {
+                                            name 'tableCardRef'
+                                            tags [
+                                                'glassCardFlat'
+                                            ]
+                                            child Column {
+                                                name 'tableColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    TextView {
+                                                        name 'tableTitleRef'
+                                                        data {
+                                                            data 'Purchase Orders'
+                                                            margin '0 0 8 0'
+                                                            textStyle {
+                                                                color '@c4'
+                                                                fontSize '18'
+                                                                fontWeight 'w600'
+                                                            }
+                                                        }
+                                                    }
+                                                    TextView {
+                                                        name 'tableCountRef'
+                                                        data {
+                                                            data `rowCountLabel`
+                                                            margin '0 0 16 0'
+                                                            textStyle {
+                                                                color '@c5'
+                                                                fontSize '13'
+                                                            }
+                                                        }
+                                                    }
+                                                    Container {
+                                                        name 'tableRef'
+                                                        tags [
+                                                            'glassPanel'
+                                                        ]
+                                                        data {
+                                                            padding '16'
+                                                        }
+                                                        child TextView {
+                                                            name 'tableHintRef'
+                                                            data {
+                                                                data 'Bind purchase order rows from PurchaseOrdersByStatus query'
+                                                                textStyle {
+                                                                    color '@c5'
+                                                                    fontSize '14'
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+        {
+            name 'onNavigateHandler'
+            type OnEvent
+            on sidebarRef
+            event onNavigate
+            block ```
+                if (route == '/dashboard') {
+                    navigator.pushDashboardPage(user: user, target: 'main', replace: true);
+                } else if (route == '/reports/stock-valuation') {
+                    navigator.pushStockValuationReportPage(user: user, target: 'main', replace: true);
+                }
+            ```
+        }
+    ]
+}

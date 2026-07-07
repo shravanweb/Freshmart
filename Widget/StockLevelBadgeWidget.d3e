@@ -1,0 +1,64 @@
+Widget {
+    package 'inventory.management.system'
+    name 'StockLevelBadgeWidget'
+    description 'Quantity badge with low-stock color'
+    properties [
+        {
+            name 'warehouseStock'
+            type WarehouseStock
+            required true
+        }
+        {
+            name 'quantityLabel'
+            type String
+            computed true
+            computation `warehouseStock.quantityOnHand.toString()`
+            internal true
+        }
+        {
+            name 'isLowStock'
+            type Boolean
+            computed true
+            computation `warehouseStock.product != null && warehouseStock.quantityOnHand <= warehouseStock.product.reorderLevel`
+            internal true
+        }
+    ]
+    build Container {
+        name 'badgeRef'
+        styles [
+            GlassPanelStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '4 10'
+        }
+        child CIf {
+            name 'lowStockIfRef'
+            condition `isLowStock`
+            then TextView {
+                name 'qtyLowRef'
+                data {
+                    data `quantityLabel`
+                    textStyle {
+                        color '@c2'
+                        fontSize '13'
+                        fontWeight 'w600'
+                    }
+                }
+            }
+            else TextView {
+                name 'qtyRef'
+                data {
+                    data `quantityLabel`
+                    textStyle {
+                        color '@c4'
+                        fontSize '13'
+                        fontWeight 'w600'
+                    }
+                }
+            }
+        }
+    }
+}

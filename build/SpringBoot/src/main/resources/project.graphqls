@@ -1,0 +1,4125 @@
+scalar Date
+
+scalar LocalDate
+
+scalar LocalDateTime
+
+scalar LocalTime
+
+scalar OffsetDateTime
+
+scalar ExpressionString
+
+scalar BlockString
+
+scalar Type
+
+scalar Duration
+
+schema
+{
+	query: Query
+	mutation: Mutation
+}
+
+union BaseUserUnionX =  AnonymousUser | User
+
+union ReportBaseConfigUnionX =  ReportBarChartConfig | ReportCardConfig | ReportFunnelChartConfig | ReportGuageConfig | ReportKPIConfig | ReportKeyInfluencerConfig | ReportLineAndAreaChartConfig | ReportLineAndColumnChartConfig | ReportMapConfig | ReportMatrixConfig | ReportMultiRowCardConfig | ReportPieChartConfig | ReportScatterChartConfig | ReportSlicerConfig | ReportTableConfig | ReportWaterfallChartConfig
+
+union ReportFilterUnionX =  ReportNamedConditionFilter | ReportPropertyFilter
+
+union ReportRuleUnionX =  ReportRuleSet | ReportSingleRule
+
+interface DBObject
+{
+	id : Long
+	localId : Long
+}
+
+type DatabaseObject
+{
+	object : DBObject
+}
+
+type DFile
+{
+	name : String
+	id : String
+	size : Long
+}
+
+input DFileEntityInput
+{
+	name : String
+	id : String
+	size : Long
+}
+
+type LoginResult
+{
+	success : Boolean
+	token : String
+	failureMessage : String
+	userObject : UserUnionX
+}
+
+input ObjectRef
+{
+	id : Long
+	type : String
+}
+
+type Query
+{
+	getObject : DatabaseObject
+	getAnonymousUserById ( id: Long ) : AnonymousUser
+	getAuditLogById ( id: Long ) : AuditLog
+	getGoodsReceiptById ( id: Long ) : GoodsReceipt
+	getGoodsReceiptLineById ( id: Long ) : GoodsReceiptLine
+	getInAppNotificationById ( id: Long ) : InAppNotification
+	getInventoryAdjustmentById ( id: Long ) : InventoryAdjustment
+	getInventoryAdjustmentLineById ( id: Long ) : InventoryAdjustmentLine
+	getInventoryMovementById ( id: Long ) : InventoryMovement
+	getNotificationTemplateById ( id: Long ) : NotificationTemplate
+	getOneTimePasswordById ( id: Long ) : OneTimePassword
+	getOrganizationById ( id: Long ) : Organization
+	getProductById ( id: Long ) : Product
+	getProductCategoryById ( id: Long ) : ProductCategory
+	getPurchaseOrderById ( id: Long ) : PurchaseOrder
+	getPurchaseOrderLineById ( id: Long ) : PurchaseOrderLine
+	getPushNotificationById ( id: Long ) : PushNotification
+	getReportById ( id: Long ) : Report
+	getSalesOrderById ( id: Long ) : SalesOrder
+	getSalesOrderLineById ( id: Long ) : SalesOrderLine
+	getSalesReturnById ( id: Long ) : SalesReturn
+	getSalesReturnLineById ( id: Long ) : SalesReturnLine
+	getStockAlertById ( id: Long ) : StockAlert
+	getStockBatchById ( id: Long ) : StockBatch
+	getStockTransferById ( id: Long ) : StockTransfer
+	getStockTransferLineById ( id: Long ) : StockTransferLine
+	getStoreById ( id: Long ) : Store
+	getSupplierContactById ( id: Long ) : SupplierContact
+	getUnitOfMeasureById ( id: Long ) : UnitOfMeasure
+	getUserById ( id: Long ) : User
+	getUserDeviceById ( id: Long ) : UserDevice
+	getUserInvitationById ( id: Long ) : UserInvitation
+	getUserLoginRecordById ( id: Long ) : UserLoginRecord
+	getUserProfileById ( id: Long ) : UserProfile
+	getUserRoleById ( id: Long ) : UserRole
+	getVendorById ( id: Long ) : Vendor
+	getVerificationDataById ( id: Long ) : VerificationData
+	getWarehouseById ( id: Long ) : Warehouse
+	getWarehouseStockById ( id: Long ) : WarehouseStock
+	getAllAuditLogs ( in: AllAuditLogsIn ) : AllAuditLogs
+	getAllGoodsReceipts ( in: AllGoodsReceiptsIn ) : AllGoodsReceipts
+	getAllInAppNotifications ( in: AllInAppNotificationsIn ) : AllInAppNotifications
+	getAllInventoryAdjustments ( in: AllInventoryAdjustmentsIn ) : AllInventoryAdjustments
+	getAllInventoryMovements ( in: AllInventoryMovementsIn ) : AllInventoryMovements
+	getAllOrganizations : AllOrganizations
+	getAllProductCategories ( in: AllProductCategoriesIn ) : AllProductCategories
+	getAllProducts ( in: AllProductsIn ) : AllProducts
+	getAllPurchaseOrders ( in: AllPurchaseOrdersIn ) : AllPurchaseOrders
+	getAllSalesOrders ( in: AllSalesOrdersIn ) : AllSalesOrders
+	getAllSalesReturns ( in: AllSalesReturnsIn ) : AllSalesReturns
+	getAllStockAlerts ( in: AllStockAlertsIn ) : AllStockAlerts
+	getAllStockBatches ( in: AllStockBatchesIn ) : AllStockBatches
+	getAllStockTransfers ( in: AllStockTransfersIn ) : AllStockTransfers
+	getAllStores ( in: AllStoresIn ) : AllStores
+	getAllSuppliers ( in: AllSuppliersIn ) : AllSuppliers
+	getAllUnitOfMeasures ( in: AllUnitOfMeasuresIn ) : AllUnitOfMeasures
+	getAllUserInvitations ( in: AllUserInvitationsIn ) : AllUserInvitations
+	getAllUserProfiles ( in: AllUserProfilesIn ) : AllUserProfiles
+	getAllWarehouses ( in: AllWarehousesIn ) : AllWarehouses
+	getDashboardMetrics ( in: DashboardMetricsIn ) : DashboardMetrics
+	getExpiringBatches ( in: ExpiringBatchesIn ) : ExpiringBatches
+	getGoodsReceiptItem ( in: GoodsReceiptItemIn ) : GoodsReceiptItem
+	getInventoryMovementsByDateRange ( in: InventoryMovementsByDateRangeIn ) : InventoryMovementsByDateRange
+	getLowStockItems ( in: LowStockItemsIn ) : LowStockItems
+	getMovementReportRows ( in: MovementReportRowsIn ) : MovementReportRows
+	getOrganizationItem ( in: OrganizationItemIn ) : OrganizationItem
+	getOutOfStockItems ( in: OutOfStockItemsIn ) : OutOfStockItems
+	getProductItem ( in: ProductItemIn ) : ProductItem
+	getProductSearch ( in: ProductSearchIn ) : ProductSearch
+	getProductsByCategory ( in: ProductsByCategoryIn ) : ProductsByCategory
+	getPurchaseOrderItem ( in: PurchaseOrderItemIn ) : PurchaseOrderItem
+	getPurchaseOrdersByStatus ( in: PurchaseOrdersByStatusIn ) : PurchaseOrdersByStatus
+	getSalesOrderItem ( in: SalesOrderItemIn ) : SalesOrderItem
+	getSalesOrdersByStore ( in: SalesOrdersByStoreIn ) : SalesOrdersByStore
+	getStockTransferItem ( in: StockTransferItemIn ) : StockTransferItem
+	getStockValuationReport ( in: StockValuationReportIn ) : StockValuationReport
+	getStoreItem ( in: StoreItemIn ) : StoreItem
+	getSupplierItem ( in: SupplierItemIn ) : SupplierItem
+	getUnreadNotificationCount ( in: UnreadNotificationCountIn ) : UnreadNotificationCount
+	getUserProfileByUser ( in: UserProfileByUserIn ) : UserProfileByUser
+	getWarehouseStockByProduct ( in: WarehouseStockByProductIn ) : WarehouseStockByProduct
+	getWarehouseStockByWarehouse ( in: WarehouseStockByWarehouseIn ) : WarehouseStockByWarehouse
+	getWarehousesByStore ( in: WarehousesByStoreIn ) : WarehousesByStore
+	loginInventoryManagementSystemUserWithEmailAndPassword ( email: String password: String ) : LoginResult
+	loginWithOTP ( token: String code: String ) : LoginResult
+	registerInventoryManagementSystemUser ( displayName: String email: String password: String appRole: AppUserRole ) : LoginResult
+	createStaffUser ( displayName: String email: String password: String appRole: AppUserRole ) : LoginResult
+	sendInventoryManagementSystemPasswordResetOtp ( email: String ) : LoginResult
+	resetInventoryManagementSystemPasswordWithOtp ( token: String code: String newPassword: String ) : LoginResult
+}
+
+type Mutation
+{
+	createAnonymousUser ( input: AnonymousUserEntityInput ) : MutateAnonymousUserResult
+	updateAnonymousUser ( input: AnonymousUserEntityInput ) : MutateAnonymousUserResult
+	deleteAnonymousUser ( input: Long ) : MutateAnonymousUserResult
+	createGoodsReceipt ( input: GoodsReceiptEntityInput ) : MutateGoodsReceiptResult
+	updateGoodsReceipt ( input: GoodsReceiptEntityInput ) : MutateGoodsReceiptResult
+	deleteGoodsReceipt ( input: Long ) : MutateGoodsReceiptResult
+	createGoodsReceiptLine ( input: GoodsReceiptLineEntityInput ) : MutateGoodsReceiptLineResult
+	updateGoodsReceiptLine ( input: GoodsReceiptLineEntityInput ) : MutateGoodsReceiptLineResult
+	deleteGoodsReceiptLine ( input: Long ) : MutateGoodsReceiptLineResult
+	updateInAppNotification ( input: InAppNotificationEntityInput ) : MutateInAppNotificationResult
+	createInventoryAdjustment ( input: InventoryAdjustmentEntityInput ) : MutateInventoryAdjustmentResult
+	updateInventoryAdjustment ( input: InventoryAdjustmentEntityInput ) : MutateInventoryAdjustmentResult
+	deleteInventoryAdjustment ( input: Long ) : MutateInventoryAdjustmentResult
+	createInventoryAdjustmentLine ( input: InventoryAdjustmentLineEntityInput ) : MutateInventoryAdjustmentLineResult
+	updateInventoryAdjustmentLine ( input: InventoryAdjustmentLineEntityInput ) : MutateInventoryAdjustmentLineResult
+	deleteInventoryAdjustmentLine ( input: Long ) : MutateInventoryAdjustmentLineResult
+	createNotificationTemplate ( input: NotificationTemplateEntityInput ) : MutateNotificationTemplateResult
+	updateNotificationTemplate ( input: NotificationTemplateEntityInput ) : MutateNotificationTemplateResult
+	deleteNotificationTemplate ( input: Long ) : MutateNotificationTemplateResult
+	createOrganization ( input: OrganizationEntityInput ) : MutateOrganizationResult
+	updateOrganization ( input: OrganizationEntityInput ) : MutateOrganizationResult
+	createProduct ( input: ProductEntityInput ) : MutateProductResult
+	updateProduct ( input: ProductEntityInput ) : MutateProductResult
+	deleteProduct ( input: Long ) : MutateProductResult
+	createProductCategory ( input: ProductCategoryEntityInput ) : MutateProductCategoryResult
+	updateProductCategory ( input: ProductCategoryEntityInput ) : MutateProductCategoryResult
+	deleteProductCategory ( input: Long ) : MutateProductCategoryResult
+	createPurchaseOrder ( input: PurchaseOrderEntityInput ) : MutatePurchaseOrderResult
+	updatePurchaseOrder ( input: PurchaseOrderEntityInput ) : MutatePurchaseOrderResult
+	deletePurchaseOrder ( input: Long ) : MutatePurchaseOrderResult
+	createPurchaseOrderLine ( input: PurchaseOrderLineEntityInput ) : MutatePurchaseOrderLineResult
+	updatePurchaseOrderLine ( input: PurchaseOrderLineEntityInput ) : MutatePurchaseOrderLineResult
+	deletePurchaseOrderLine ( input: Long ) : MutatePurchaseOrderLineResult
+	createSalesOrder ( input: SalesOrderEntityInput ) : MutateSalesOrderResult
+	updateSalesOrder ( input: SalesOrderEntityInput ) : MutateSalesOrderResult
+	deleteSalesOrder ( input: Long ) : MutateSalesOrderResult
+	createSalesOrderLine ( input: SalesOrderLineEntityInput ) : MutateSalesOrderLineResult
+	updateSalesOrderLine ( input: SalesOrderLineEntityInput ) : MutateSalesOrderLineResult
+	deleteSalesOrderLine ( input: Long ) : MutateSalesOrderLineResult
+	createSalesReturn ( input: SalesReturnEntityInput ) : MutateSalesReturnResult
+	updateSalesReturn ( input: SalesReturnEntityInput ) : MutateSalesReturnResult
+	deleteSalesReturn ( input: Long ) : MutateSalesReturnResult
+	createSalesReturnLine ( input: SalesReturnLineEntityInput ) : MutateSalesReturnLineResult
+	updateSalesReturnLine ( input: SalesReturnLineEntityInput ) : MutateSalesReturnLineResult
+	deleteSalesReturnLine ( input: Long ) : MutateSalesReturnLineResult
+	updateStockAlert ( input: StockAlertEntityInput ) : MutateStockAlertResult
+	createStockBatch ( input: StockBatchEntityInput ) : MutateStockBatchResult
+	updateStockBatch ( input: StockBatchEntityInput ) : MutateStockBatchResult
+	deleteStockBatch ( input: Long ) : MutateStockBatchResult
+	createStockTransfer ( input: StockTransferEntityInput ) : MutateStockTransferResult
+	updateStockTransfer ( input: StockTransferEntityInput ) : MutateStockTransferResult
+	deleteStockTransfer ( input: Long ) : MutateStockTransferResult
+	createStockTransferLine ( input: StockTransferLineEntityInput ) : MutateStockTransferLineResult
+	updateStockTransferLine ( input: StockTransferLineEntityInput ) : MutateStockTransferLineResult
+	deleteStockTransferLine ( input: Long ) : MutateStockTransferLineResult
+	createStore ( input: StoreEntityInput ) : MutateStoreResult
+	updateStore ( input: StoreEntityInput ) : MutateStoreResult
+	deleteStore ( input: Long ) : MutateStoreResult
+	createSupplierContact ( input: SupplierContactEntityInput ) : MutateSupplierContactResult
+	updateSupplierContact ( input: SupplierContactEntityInput ) : MutateSupplierContactResult
+	deleteSupplierContact ( input: Long ) : MutateSupplierContactResult
+	createUnitOfMeasure ( input: UnitOfMeasureEntityInput ) : MutateUnitOfMeasureResult
+	updateUnitOfMeasure ( input: UnitOfMeasureEntityInput ) : MutateUnitOfMeasureResult
+	deleteUnitOfMeasure ( input: Long ) : MutateUnitOfMeasureResult
+	updateUser ( input: UserEntityInput ) : MutateUserResult
+	createUserInvitation ( input: UserInvitationEntityInput ) : MutateUserInvitationResult
+	updateUserInvitation ( input: UserInvitationEntityInput ) : MutateUserInvitationResult
+	deleteUserInvitation ( input: Long ) : MutateUserInvitationResult
+	createUserProfile ( input: UserProfileEntityInput ) : MutateUserProfileResult
+	updateUserProfile ( input: UserProfileEntityInput ) : MutateUserProfileResult
+	deleteUserProfile ( input: Long ) : MutateUserProfileResult
+	createUserRole ( input: UserRoleEntityInput ) : MutateUserRoleResult
+	updateUserRole ( input: UserRoleEntityInput ) : MutateUserRoleResult
+	createVendor ( input: VendorEntityInput ) : MutateVendorResult
+	updateVendor ( input: VendorEntityInput ) : MutateVendorResult
+	deleteVendor ( input: Long ) : MutateVendorResult
+	createWarehouse ( input: WarehouseEntityInput ) : MutateWarehouseResult
+	updateWarehouse ( input: WarehouseEntityInput ) : MutateWarehouseResult
+	deleteWarehouse ( input: Long ) : MutateWarehouseResult
+	createWarehouseStock ( input: WarehouseStockEntityInput ) : MutateWarehouseStockResult
+	updateWarehouseStock ( input: WarehouseStockEntityInput ) : MutateWarehouseStockResult
+	generateOtpWithInventoryManagementSystemUserEmail ( input: String ) : MutateOneTimePasswordResult
+	changePassword ( input: String ) : MutateChangePasswordResult
+}
+
+type MutateAnonymousUserResult
+{
+	status : MutateResultStatus
+	value : AnonymousUser
+	errors : [String]
+}
+
+type MutateGoodsReceiptResult
+{
+	status : MutateResultStatus
+	value : GoodsReceipt
+	errors : [String]
+}
+
+type MutateGoodsReceiptLineResult
+{
+	status : MutateResultStatus
+	value : GoodsReceiptLine
+	errors : [String]
+}
+
+type MutateInAppNotificationResult
+{
+	status : MutateResultStatus
+	value : InAppNotification
+	errors : [String]
+}
+
+type MutateInventoryAdjustmentResult
+{
+	status : MutateResultStatus
+	value : InventoryAdjustment
+	errors : [String]
+}
+
+type MutateInventoryAdjustmentLineResult
+{
+	status : MutateResultStatus
+	value : InventoryAdjustmentLine
+	errors : [String]
+}
+
+type MutateNotificationTemplateResult
+{
+	status : MutateResultStatus
+	value : NotificationTemplate
+	errors : [String]
+}
+
+type MutateOneTimePasswordResult
+{
+	status : MutateResultStatus
+	value : OneTimePassword
+	errors : [String]
+}
+
+type MutateOrganizationResult
+{
+	status : MutateResultStatus
+	value : Organization
+	errors : [String]
+}
+
+type MutateProductResult
+{
+	status : MutateResultStatus
+	value : Product
+	errors : [String]
+}
+
+type MutateProductCategoryResult
+{
+	status : MutateResultStatus
+	value : ProductCategory
+	errors : [String]
+}
+
+type MutatePurchaseOrderResult
+{
+	status : MutateResultStatus
+	value : PurchaseOrder
+	errors : [String]
+}
+
+type MutatePurchaseOrderLineResult
+{
+	status : MutateResultStatus
+	value : PurchaseOrderLine
+	errors : [String]
+}
+
+type MutateSalesOrderResult
+{
+	status : MutateResultStatus
+	value : SalesOrder
+	errors : [String]
+}
+
+type MutateSalesOrderLineResult
+{
+	status : MutateResultStatus
+	value : SalesOrderLine
+	errors : [String]
+}
+
+type MutateSalesReturnResult
+{
+	status : MutateResultStatus
+	value : SalesReturn
+	errors : [String]
+}
+
+type MutateSalesReturnLineResult
+{
+	status : MutateResultStatus
+	value : SalesReturnLine
+	errors : [String]
+}
+
+type MutateStockAlertResult
+{
+	status : MutateResultStatus
+	value : StockAlert
+	errors : [String]
+}
+
+type MutateStockBatchResult
+{
+	status : MutateResultStatus
+	value : StockBatch
+	errors : [String]
+}
+
+type MutateStockTransferResult
+{
+	status : MutateResultStatus
+	value : StockTransfer
+	errors : [String]
+}
+
+type MutateStockTransferLineResult
+{
+	status : MutateResultStatus
+	value : StockTransferLine
+	errors : [String]
+}
+
+type MutateStoreResult
+{
+	status : MutateResultStatus
+	value : Store
+	errors : [String]
+}
+
+type MutateSupplierContactResult
+{
+	status : MutateResultStatus
+	value : SupplierContact
+	errors : [String]
+}
+
+type MutateUnitOfMeasureResult
+{
+	status : MutateResultStatus
+	value : UnitOfMeasure
+	errors : [String]
+}
+
+type MutateUserResult
+{
+	status : MutateResultStatus
+	value : User
+	errors : [String]
+}
+
+type MutateUserInvitationResult
+{
+	status : MutateResultStatus
+	value : UserInvitation
+	errors : [String]
+}
+
+type MutateUserProfileResult
+{
+	status : MutateResultStatus
+	value : UserProfile
+	errors : [String]
+}
+
+type MutateUserRoleResult
+{
+	status : MutateResultStatus
+	value : UserRole
+	errors : [String]
+}
+
+type MutateVendorResult
+{
+	status : MutateResultStatus
+	value : Vendor
+	errors : [String]
+}
+
+type MutateWarehouseResult
+{
+	status : MutateResultStatus
+	value : Warehouse
+	errors : [String]
+}
+
+type MutateWarehouseStockResult
+{
+	status : MutateResultStatus
+	value : WarehouseStock
+	errors : [String]
+}
+
+type MutateChangePasswordResult
+{
+	status : MutateResultStatus
+	value : String
+	errors : [String]
+}
+
+type Subscription
+{
+	onAnonymousUserChangeEvent : AnonymousUserChangeEvent
+	onAnonymousUserChangeEventById ( ids: [Long] ) : AnonymousUserChangeEvent
+	onAuditLogChangeEvent : AuditLogChangeEvent
+	onAuditLogChangeEventById ( ids: [Long] ) : AuditLogChangeEvent
+	onBaseUserChangeEvent : BaseUserChangeEvent
+	onBaseUserChangeEventById ( ids: [Long] ) : BaseUserChangeEvent
+	onBaseUserDevicesChange ( id: Long ) : UserDeviceChangeEvent
+	onBaseUserSessionChangeEvent : BaseUserSessionChangeEvent
+	onBaseUserSessionChangeEventById ( ids: [Long] ) : BaseUserSessionChangeEvent
+	onGoodsReceiptChangeEvent : GoodsReceiptChangeEvent
+	onGoodsReceiptChangeEventById ( ids: [Long] ) : GoodsReceiptChangeEvent
+	onGoodsReceiptLinesChange ( id: Long ) : GoodsReceiptLineChangeEvent
+	onGoodsReceiptLineChangeEvent : GoodsReceiptLineChangeEvent
+	onGoodsReceiptLineChangeEventById ( ids: [Long] ) : GoodsReceiptLineChangeEvent
+	onInAppNotificationChangeEvent : InAppNotificationChangeEvent
+	onInAppNotificationChangeEventById ( ids: [Long] ) : InAppNotificationChangeEvent
+	onInventoryAdjustmentChangeEvent : InventoryAdjustmentChangeEvent
+	onInventoryAdjustmentChangeEventById ( ids: [Long] ) : InventoryAdjustmentChangeEvent
+	onInventoryAdjustmentLinesChange ( id: Long ) : InventoryAdjustmentLineChangeEvent
+	onInventoryAdjustmentLineChangeEvent : InventoryAdjustmentLineChangeEvent
+	onInventoryAdjustmentLineChangeEventById ( ids: [Long] ) : InventoryAdjustmentLineChangeEvent
+	onInventoryMovementChangeEvent : InventoryMovementChangeEvent
+	onInventoryMovementChangeEventById ( ids: [Long] ) : InventoryMovementChangeEvent
+	onNotificationTemplateChangeEvent : NotificationTemplateChangeEvent
+	onNotificationTemplateChangeEventById ( ids: [Long] ) : NotificationTemplateChangeEvent
+	onOneTimePasswordChangeEvent : OneTimePasswordChangeEvent
+	onOneTimePasswordChangeEventById ( ids: [Long] ) : OneTimePasswordChangeEvent
+	onOrganizationChangeEvent : OrganizationChangeEvent
+	onOrganizationChangeEventById ( ids: [Long] ) : OrganizationChangeEvent
+	onProductChangeEvent : ProductChangeEvent
+	onProductChangeEventById ( ids: [Long] ) : ProductChangeEvent
+	onProductWarehouseStocksChange ( id: Long ) : WarehouseStockChangeEvent
+	onProductBatchesChange ( id: Long ) : StockBatchChangeEvent
+	onProductCategoryChangeEvent : ProductCategoryChangeEvent
+	onProductCategoryChangeEventById ( ids: [Long] ) : ProductCategoryChangeEvent
+	onProductCategoryChildCategoriesChange ( id: Long ) : ProductCategoryChangeEvent
+	onProductCategoryProductsChange ( id: Long ) : ProductChangeEvent
+	onPurchaseOrderChangeEvent : PurchaseOrderChangeEvent
+	onPurchaseOrderChangeEventById ( ids: [Long] ) : PurchaseOrderChangeEvent
+	onPurchaseOrderLinesChange ( id: Long ) : PurchaseOrderLineChangeEvent
+	onPurchaseOrderLineChangeEvent : PurchaseOrderLineChangeEvent
+	onPurchaseOrderLineChangeEventById ( ids: [Long] ) : PurchaseOrderLineChangeEvent
+	onPushNotificationChangeEvent : PushNotificationChangeEvent
+	onPushNotificationChangeEventById ( ids: [Long] ) : PushNotificationChangeEvent
+	onReportChangeEvent : ReportChangeEvent
+	onReportChangeEventById ( ids: [Long] ) : ReportChangeEvent
+	onSalesOrderChangeEvent : SalesOrderChangeEvent
+	onSalesOrderChangeEventById ( ids: [Long] ) : SalesOrderChangeEvent
+	onSalesOrderLinesChange ( id: Long ) : SalesOrderLineChangeEvent
+	onSalesOrderLineChangeEvent : SalesOrderLineChangeEvent
+	onSalesOrderLineChangeEventById ( ids: [Long] ) : SalesOrderLineChangeEvent
+	onSalesReturnChangeEvent : SalesReturnChangeEvent
+	onSalesReturnChangeEventById ( ids: [Long] ) : SalesReturnChangeEvent
+	onSalesReturnLinesChange ( id: Long ) : SalesReturnLineChangeEvent
+	onSalesReturnLineChangeEvent : SalesReturnLineChangeEvent
+	onSalesReturnLineChangeEventById ( ids: [Long] ) : SalesReturnLineChangeEvent
+	onStockAlertChangeEvent : StockAlertChangeEvent
+	onStockAlertChangeEventById ( ids: [Long] ) : StockAlertChangeEvent
+	onStockBatchChangeEvent : StockBatchChangeEvent
+	onStockBatchChangeEventById ( ids: [Long] ) : StockBatchChangeEvent
+	onStockTransferChangeEvent : StockTransferChangeEvent
+	onStockTransferChangeEventById ( ids: [Long] ) : StockTransferChangeEvent
+	onStockTransferLinesChange ( id: Long ) : StockTransferLineChangeEvent
+	onStockTransferLineChangeEvent : StockTransferLineChangeEvent
+	onStockTransferLineChangeEventById ( ids: [Long] ) : StockTransferLineChangeEvent
+	onStoreChangeEvent : StoreChangeEvent
+	onStoreChangeEventById ( ids: [Long] ) : StoreChangeEvent
+	onStoreWarehousesChange ( id: Long ) : WarehouseChangeEvent
+	onSupplierContactChangeEvent : SupplierContactChangeEvent
+	onSupplierContactChangeEventById ( ids: [Long] ) : SupplierContactChangeEvent
+	onUnitOfMeasureChangeEvent : UnitOfMeasureChangeEvent
+	onUnitOfMeasureChangeEventById ( ids: [Long] ) : UnitOfMeasureChangeEvent
+	onUserChangeEvent : UserChangeEvent
+	onUserChangeEventById ( ids: [Long] ) : UserChangeEvent
+	onUserDeviceChangeEvent : UserDeviceChangeEvent
+	onUserDeviceChangeEventById ( ids: [Long] ) : UserDeviceChangeEvent
+	onUserInvitationChangeEvent : UserInvitationChangeEvent
+	onUserInvitationChangeEventById ( ids: [Long] ) : UserInvitationChangeEvent
+	onUserLoginRecordChangeEvent : UserLoginRecordChangeEvent
+	onUserLoginRecordChangeEventById ( ids: [Long] ) : UserLoginRecordChangeEvent
+	onUserProfileChangeEvent : UserProfileChangeEvent
+	onUserProfileChangeEventById ( ids: [Long] ) : UserProfileChangeEvent
+	onUserRoleChangeEvent : UserRoleChangeEvent
+	onUserRoleChangeEventById ( ids: [Long] ) : UserRoleChangeEvent
+	onVendorChangeEvent : VendorChangeEvent
+	onVendorChangeEventById ( ids: [Long] ) : VendorChangeEvent
+	onVendorContactsChange ( id: Long ) : SupplierContactChangeEvent
+	onVerificationDataChangeEvent : VerificationDataChangeEvent
+	onVerificationDataChangeEventById ( ids: [Long] ) : VerificationDataChangeEvent
+	onWarehouseChangeEvent : WarehouseChangeEvent
+	onWarehouseChangeEventById ( ids: [Long] ) : WarehouseChangeEvent
+	onWarehouseStockChangeEvent : WarehouseStockChangeEvent
+	onWarehouseStockChangeEventById ( ids: [Long] ) : WarehouseStockChangeEvent
+}
+
+type AnonymousUserChangeEvent
+{
+	model : AnonymousUser
+	changeType : ChangeEventType
+}
+
+type AuditLogChangeEvent
+{
+	model : AuditLog
+	changeType : ChangeEventType
+}
+
+type BaseUserChangeEvent
+{
+	model : BaseUserUnionX
+	changeType : ChangeEventType
+}
+
+type BaseUserSessionChangeEvent
+{
+	model : BaseUserSession
+	changeType : ChangeEventType
+}
+
+type GoodsReceiptChangeEvent
+{
+	model : GoodsReceipt
+	changeType : ChangeEventType
+}
+
+type GoodsReceiptLineChangeEvent
+{
+	model : GoodsReceiptLine
+	changeType : ChangeEventType
+}
+
+type InAppNotificationChangeEvent
+{
+	model : InAppNotification
+	changeType : ChangeEventType
+}
+
+type InventoryAdjustmentChangeEvent
+{
+	model : InventoryAdjustment
+	changeType : ChangeEventType
+}
+
+type InventoryAdjustmentLineChangeEvent
+{
+	model : InventoryAdjustmentLine
+	changeType : ChangeEventType
+}
+
+type InventoryMovementChangeEvent
+{
+	model : InventoryMovement
+	changeType : ChangeEventType
+}
+
+type NotificationTemplateChangeEvent
+{
+	model : NotificationTemplate
+	changeType : ChangeEventType
+}
+
+type OneTimePasswordChangeEvent
+{
+	model : OneTimePassword
+	changeType : ChangeEventType
+}
+
+type OrganizationChangeEvent
+{
+	model : Organization
+	changeType : ChangeEventType
+}
+
+type ProductChangeEvent
+{
+	model : Product
+	changeType : ChangeEventType
+}
+
+type ProductCategoryChangeEvent
+{
+	model : ProductCategory
+	changeType : ChangeEventType
+}
+
+type PurchaseOrderChangeEvent
+{
+	model : PurchaseOrder
+	changeType : ChangeEventType
+}
+
+type PurchaseOrderLineChangeEvent
+{
+	model : PurchaseOrderLine
+	changeType : ChangeEventType
+}
+
+type PushNotificationChangeEvent
+{
+	model : PushNotification
+	changeType : ChangeEventType
+}
+
+type ReportChangeEvent
+{
+	model : Report
+	changeType : ChangeEventType
+}
+
+type SalesOrderChangeEvent
+{
+	model : SalesOrder
+	changeType : ChangeEventType
+}
+
+type SalesOrderLineChangeEvent
+{
+	model : SalesOrderLine
+	changeType : ChangeEventType
+}
+
+type SalesReturnChangeEvent
+{
+	model : SalesReturn
+	changeType : ChangeEventType
+}
+
+type SalesReturnLineChangeEvent
+{
+	model : SalesReturnLine
+	changeType : ChangeEventType
+}
+
+type StockAlertChangeEvent
+{
+	model : StockAlert
+	changeType : ChangeEventType
+}
+
+type StockBatchChangeEvent
+{
+	model : StockBatch
+	changeType : ChangeEventType
+}
+
+type StockTransferChangeEvent
+{
+	model : StockTransfer
+	changeType : ChangeEventType
+}
+
+type StockTransferLineChangeEvent
+{
+	model : StockTransferLine
+	changeType : ChangeEventType
+}
+
+type StoreChangeEvent
+{
+	model : Store
+	changeType : ChangeEventType
+}
+
+type SupplierContactChangeEvent
+{
+	model : SupplierContact
+	changeType : ChangeEventType
+}
+
+type UnitOfMeasureChangeEvent
+{
+	model : UnitOfMeasure
+	changeType : ChangeEventType
+}
+
+type UserChangeEvent
+{
+	model : User
+	changeType : ChangeEventType
+}
+
+type UserDeviceChangeEvent
+{
+	model : UserDevice
+	changeType : ChangeEventType
+}
+
+type UserInvitationChangeEvent
+{
+	model : UserInvitation
+	changeType : ChangeEventType
+}
+
+type UserLoginRecordChangeEvent
+{
+	model : UserLoginRecord
+	changeType : ChangeEventType
+}
+
+type UserProfileChangeEvent
+{
+	model : UserProfile
+	changeType : ChangeEventType
+}
+
+type UserRoleChangeEvent
+{
+	model : UserRole
+	changeType : ChangeEventType
+}
+
+type VendorChangeEvent
+{
+	model : Vendor
+	changeType : ChangeEventType
+}
+
+type VerificationDataChangeEvent
+{
+	model : VerificationData
+	changeType : ChangeEventType
+}
+
+type WarehouseChangeEvent
+{
+	model : Warehouse
+	changeType : ChangeEventType
+}
+
+type WarehouseStockChangeEvent
+{
+	model : WarehouseStock
+	changeType : ChangeEventType
+}
+
+type AllAuditLogsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllAuditLogsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllDevicesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	users : [BaseUserUnionX]
+}
+
+input AllDevicesRequestEntityInput
+{
+	id : Long
+	users : [ObjectRef]
+}
+
+type AllGoodsReceiptsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllGoodsReceiptsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllInAppNotificationsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	user : User
+}
+
+input AllInAppNotificationsRequestEntityInput
+{
+	id : Long
+	organization : Long
+	user : Long
+}
+
+type AllInventoryAdjustmentsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllInventoryAdjustmentsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllInventoryMovementsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllInventoryMovementsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllProductCategoriesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllProductCategoriesRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllProductsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllProductsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllPurchaseOrdersRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllPurchaseOrdersRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllSalesOrdersRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllSalesOrdersRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllSalesReturnsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllSalesReturnsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllStockAlertsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllStockAlertsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllStockBatchesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllStockBatchesRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllStockTransfersRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllStockTransfersRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllStoresRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllStoresRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllSuppliersRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllSuppliersRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllUnitOfMeasuresRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllUnitOfMeasuresRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllUserInvitationsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllUserInvitationsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllUserProfilesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllUserProfilesRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AllWarehousesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input AllWarehousesRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type AnonymousUser
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	isActive : Boolean
+	deviceToken : String
+	devices : UserDevice
+}
+
+input AnonymousUserEntityInput
+{
+	id : Long
+	isActive : Boolean
+	deviceToken : String
+}
+
+type AuditLog
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	entityType : String
+	entityId : String
+	action : AuditAction
+	performedBy : User
+	performedAt : LocalDateTime
+	oldValues : String
+	newValues : String
+	ipAddress : String
+	userAgent : String
+	organization : Organization
+}
+
+input AuditLogEntityInput
+{
+	id : Long
+	entityType : String
+	entityId : String
+	action : AuditAction
+	performedBy : Long
+	performedAt : LocalDateTime
+	oldValues : String
+	newValues : String
+	ipAddress : String
+	userAgent : String
+	organization : Long
+}
+
+type Avatar
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	image : D3EImage
+	createFrom : String
+}
+
+input AvatarEntityInput
+{
+	id : Long
+	image : D3EImageEntityInput
+	createFrom : String
+}
+
+input BaseUserEntityInputUnionX
+{
+	type : String
+	valueAnonymousUser : AnonymousUserEntityInput
+	valueUser : UserEntityInput
+}
+
+input BaseUserEntityInput
+{
+	id : Long
+	isActive : Boolean
+	deviceToken : String
+}
+
+type BaseUserSession
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	userSessionId : String
+}
+
+input BaseUserSessionEntityInputUnionX
+{
+	type : String
+}
+
+input BaseUserSessionEntityInput
+{
+	id : Long
+	userSessionId : String
+}
+
+type ChangePasswordRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	newPassword : String
+}
+
+input ChangePasswordRequestEntityInput
+{
+	id : Long
+	newPassword : String
+}
+
+type D3EImage
+{
+	size : Long
+	width : Long
+	height : Long
+	file : DFile
+}
+
+input D3EImageEntityInput
+{
+	id : Long
+	size : Long
+	width : Long
+	height : Long
+	file : DFileEntityInput
+}
+
+type DashboardMetricsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input DashboardMetricsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type EmailMessage
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+	bcc : [String]
+	cc : [String]
+	subject : String
+	html : Boolean
+	inlineAttachments : [DFile]
+	attachments : [DFile]
+}
+
+input EmailMessageEntityInput
+{
+	id : Long
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+	bcc : [String]
+	cc : [String]
+	subject : String
+	html : Boolean
+	inlineAttachments : [DFileEntityInput]
+	attachments : [DFileEntityInput]
+}
+
+type ExpiringBatchesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	daysAhead : Long
+}
+
+input ExpiringBatchesRequestEntityInput
+{
+	id : Long
+	organization : Long
+	daysAhead : Long
+}
+
+type GoodsReceipt
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	receiptNumber : String
+	purchaseOrder : PurchaseOrder
+	vendor : Vendor
+	warehouse : Warehouse
+	receiptDate : LocalDate
+	status : GoodsReceiptStatus
+	notes : String
+	receivedBy : User
+	createdAt : LocalDateTime
+	lines : [GoodsReceiptLine]
+	organization : Organization
+}
+
+input GoodsReceiptEntityInput
+{
+	id : Long
+	purchaseOrder : Long
+	vendor : Long
+	warehouse : Long
+	receiptDate : LocalDate
+	status : GoodsReceiptStatus
+	notes : String
+	organization : Long
+}
+
+type GoodsReceiptItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	goodsReceipt : GoodsReceipt
+}
+
+input GoodsReceiptItemRequestEntityInput
+{
+	id : Long
+	goodsReceipt : Long
+}
+
+type GoodsReceiptLine
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+	receivedQuantity : Float
+	unitCost : Float
+	batchNumber : String
+	expiryDate : LocalDate
+	purchaseOrderLine : PurchaseOrderLine
+	goodsReceipt : GoodsReceipt
+}
+
+input GoodsReceiptLineEntityInput
+{
+	id : Long
+	product : Long
+	receivedQuantity : Float
+	unitCost : Float
+	batchNumber : String
+	expiryDate : LocalDate
+	purchaseOrderLine : Long
+	goodsReceipt : Long
+}
+
+type InAppNotification
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	recipient : User
+	title : String
+	message : String
+	notificationType : NotificationType
+	referenceType : String
+	referenceId : String
+	isRead : Boolean
+	createdAt : LocalDateTime
+	organization : Organization
+}
+
+input InAppNotificationEntityInput
+{
+	id : Long
+	recipient : Long
+	title : String
+	message : String
+	notificationType : NotificationType
+	referenceType : String
+	referenceId : String
+	isRead : Boolean
+	organization : Long
+}
+
+type InventoryAdjustment
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	adjustmentNumber : String
+	warehouse : Warehouse
+	adjustmentDate : LocalDate
+	reason : AdjustmentReason
+	status : AdjustmentStatus
+	notes : String
+	adjustedBy : User
+	lines : [InventoryAdjustmentLine]
+	organization : Organization
+}
+
+input InventoryAdjustmentEntityInput
+{
+	id : Long
+	adjustmentNumber : String
+	warehouse : Long
+	adjustmentDate : LocalDate
+	reason : AdjustmentReason
+	status : AdjustmentStatus
+	notes : String
+	organization : Long
+}
+
+type InventoryAdjustmentLine
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+	quantityBefore : Float
+	quantityChange : Float
+	quantityAfter : Float
+	batchNumber : String
+	unitCost : Float
+	inventoryAdjustment : InventoryAdjustment
+}
+
+input InventoryAdjustmentLineEntityInput
+{
+	id : Long
+	product : Long
+	quantityChange : Float
+	batchNumber : String
+	unitCost : Float
+	inventoryAdjustment : Long
+}
+
+type InventoryMovement
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	movementNumber : String
+	warehouse : Warehouse
+	product : Product
+	movementType : MovementType
+	quantity : Float
+	direction : MovementDirection
+	referenceType : MovementReferenceType
+	referenceId : String
+	batchNumber : String
+	unitCost : Float
+	balanceAfter : Float
+	movementDate : LocalDateTime
+	performedBy : User
+	notes : String
+	organization : Organization
+}
+
+input InventoryMovementEntityInput
+{
+	id : Long
+	movementNumber : String
+	warehouse : Long
+	product : Long
+	movementType : MovementType
+	quantity : Float
+	direction : MovementDirection
+	referenceType : MovementReferenceType
+	referenceId : String
+	batchNumber : String
+	unitCost : Float
+	balanceAfter : Float
+	movementDate : LocalDateTime
+	performedBy : Long
+	notes : String
+	organization : Long
+}
+
+type InventoryMovementsByDateRangeRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	startDate : LocalDateTime
+	endDate : LocalDateTime
+}
+
+input InventoryMovementsByDateRangeRequestEntityInput
+{
+	id : Long
+	organization : Long
+	startDate : LocalDateTime
+	endDate : LocalDateTime
+}
+
+type LowStockItemsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input LowStockItemsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type MovementReportRowsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	startDate : LocalDateTime
+	endDate : LocalDateTime
+	warehouse : Warehouse
+}
+
+input MovementReportRowsRequestEntityInput
+{
+	id : Long
+	organization : Long
+	startDate : LocalDateTime
+	endDate : LocalDateTime
+	warehouse : Long
+}
+
+type NotificationTemplate
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	templateCode : String
+	channel : NotificationChannel
+	subject : String
+	bodyTemplate : String
+	status : EntityStatus
+	organization : Organization
+}
+
+input NotificationTemplateEntityInput
+{
+	id : Long
+	templateCode : String
+	channel : NotificationChannel
+	subject : String
+	bodyTemplate : String
+	status : EntityStatus
+	organization : Long
+}
+
+type OneTimePassword
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	input : String
+	inputType : String
+	userType : String
+	success : Boolean
+	errorMsg : String
+	token : String
+	expiry : LocalDateTime
+}
+
+input OneTimePasswordEntityInput
+{
+	id : Long
+	input : String
+	inputType : String
+	userType : String
+}
+
+type Organization
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	code : String
+	legalName : String
+	taxId : String
+	email : String
+	phone : String
+	address : String
+	logo : DFile
+	currency : String
+	timezone : String
+	status : OrganizationStatus
+	createdAt : LocalDateTime
+	updatedAt : LocalDateTime
+	createdBy : User
+}
+
+input OrganizationEntityInput
+{
+	id : Long
+	name : String
+	code : String
+	legalName : String
+	taxId : String
+	email : String
+	phone : String
+	address : String
+	logo : DFileEntityInput
+	currency : String
+	timezone : String
+	status : OrganizationStatus
+}
+
+type OrganizationItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input OrganizationItemRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type OutOfStockItemsRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+}
+
+input OutOfStockItemsRequestEntityInput
+{
+	id : Long
+	organization : Long
+}
+
+type Product
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	category : ProductCategory
+	sku : String
+	name : String
+	description : String
+	barcode : String
+	baseUom : UnitOfMeasure
+	purchasePrice : Float
+	sellingPrice : Float
+	reorderLevel : Float
+	reorderQuantity : Float
+	trackBatch : Boolean
+	trackExpiry : Boolean
+	shelfLifeDays : Long
+	image : DFile
+	warehouseStocks : [WarehouseStock]
+	batches : [StockBatch]
+	status : ProductStatus
+	createdAt : LocalDateTime
+	updatedAt : LocalDateTime
+	organization : Organization
+}
+
+input ProductEntityInput
+{
+	id : Long
+	category : Long
+	sku : String
+	name : String
+	description : String
+	barcode : String
+	baseUom : Long
+	purchasePrice : Float
+	sellingPrice : Float
+	reorderLevel : Float
+	reorderQuantity : Float
+	trackBatch : Boolean
+	trackExpiry : Boolean
+	shelfLifeDays : Long
+	image : DFileEntityInput
+	status : ProductStatus
+	organization : Long
+}
+
+type ProductCategory
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	parentCategory : ProductCategory
+	childCategories : [ProductCategory]
+	products : [Product]
+	name : String
+	code : String
+	description : String
+	status : EntityStatus
+	organization : Organization
+}
+
+input ProductCategoryEntityInput
+{
+	id : Long
+	parentCategory : Long
+	name : String
+	code : String
+	description : String
+	status : EntityStatus
+	organization : Long
+}
+
+type ProductItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+}
+
+input ProductItemRequestEntityInput
+{
+	id : Long
+	product : Long
+}
+
+type ProductSearchRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	searchTerm : String
+	category : ProductCategory
+	status : ProductStatus
+}
+
+input ProductSearchRequestEntityInput
+{
+	id : Long
+	organization : Long
+	searchTerm : String
+	category : Long
+	status : ProductStatus
+}
+
+type ProductsByCategoryRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	category : ProductCategory
+}
+
+input ProductsByCategoryRequestEntityInput
+{
+	id : Long
+	organization : Long
+	category : Long
+}
+
+type PurchaseOrder
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	poNumber : String
+	vendor : Vendor
+	warehouse : Warehouse
+	orderDate : LocalDate
+	expectedDeliveryDate : LocalDate
+	status : PurchaseOrderStatus
+	subtotal : Float
+	taxAmount : Float
+	totalAmount : Float
+	notes : String
+	createdBy : User
+	approvedBy : User
+	approvedAt : LocalDateTime
+	createdAt : LocalDateTime
+	lines : [PurchaseOrderLine]
+	organization : Organization
+}
+
+input PurchaseOrderEntityInput
+{
+	id : Long
+	poNumber : String
+	vendor : Long
+	warehouse : Long
+	orderDate : LocalDate
+	expectedDeliveryDate : LocalDate
+	status : PurchaseOrderStatus
+	taxAmount : Float
+	notes : String
+	organization : Long
+}
+
+type PurchaseOrderItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	purchaseOrder : PurchaseOrder
+}
+
+input PurchaseOrderItemRequestEntityInput
+{
+	id : Long
+	purchaseOrder : Long
+}
+
+type PurchaseOrderLine
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	lineNumber : Long
+	product : Product
+	orderedQuantity : Float
+	receivedQuantity : Float
+	unitPrice : Float
+	lineTotal : Float
+	uom : UnitOfMeasure
+	purchaseOrder : PurchaseOrder
+}
+
+input PurchaseOrderLineEntityInput
+{
+	id : Long
+	lineNumber : Long
+	product : Long
+	orderedQuantity : Float
+	unitPrice : Float
+	uom : Long
+	purchaseOrder : Long
+}
+
+type PurchaseOrdersByStatusRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	status : PurchaseOrderStatus
+}
+
+input PurchaseOrdersByStatusRequestEntityInput
+{
+	id : Long
+	organization : Long
+	status : PurchaseOrderStatus
+}
+
+type PushNotification
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	users : [BaseUserUnionX]
+	skipThisDevice : Boolean
+	deviceToken : String
+	title : String
+	body : String
+	path : String
+	data : [String]
+	failed : Boolean
+	failedDevices : [UserDevice]
+}
+
+input PushNotificationEntityInput
+{
+	id : Long
+	users : [ObjectRef]
+	skipThisDevice : Boolean
+	deviceToken : String
+	title : String
+	body : String
+	path : String
+	data : [String]
+	failed : Boolean
+	failedDevices : [Long]
+}
+
+type Report
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	model : String
+	name : String
+	cells : ReportCell
+	config : ReportBaseConfigUnionX
+	filters : [ReportFilterUnionX]
+	criteria : DBObject
+	flatReportRule : [ReportRuleUnionX]
+}
+
+input ReportEntityInput
+{
+	id : Long
+	model : String
+	name : String
+	cells : ReportCellEntityInput
+	config : ReportBaseConfigEntityInputUnionX
+	filters : [ReportFilterEntityInputUnionX]
+	criteria : ReportRuleSetEntityInput
+}
+
+type ReportBarChartConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	type : ReportBarChartType
+	xAxes : [ReportField]
+	yAxes : [ReportField]
+	legend : ReportField
+	smallMultiples : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportBarChartConfigEntityInput
+{
+	id : Long
+	type : ReportBarChartType
+	xAxes : [ReportFieldEntityInput]
+	yAxes : [ReportFieldEntityInput]
+	legend : ReportFieldEntityInput
+	smallMultiples : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+input ReportBaseConfigEntityInputUnionX
+{
+	type : String
+	valueReportBarChartConfig : ReportBarChartConfigEntityInput
+	valueReportCardConfig : ReportCardConfigEntityInput
+	valueReportFunnelChartConfig : ReportFunnelChartConfigEntityInput
+	valueReportGuageConfig : ReportGuageConfigEntityInput
+	valueReportKPIConfig : ReportKPIConfigEntityInput
+	valueReportKeyInfluencerConfig : ReportKeyInfluencerConfigEntityInput
+	valueReportLineAndAreaChartConfig : ReportLineAndAreaChartConfigEntityInput
+	valueReportLineAndColumnChartConfig : ReportLineAndColumnChartConfigEntityInput
+	valueReportMapConfig : ReportMapConfigEntityInput
+	valueReportMatrixConfig : ReportMatrixConfigEntityInput
+	valueReportMultiRowCardConfig : ReportMultiRowCardConfigEntityInput
+	valueReportPieChartConfig : ReportPieChartConfigEntityInput
+	valueReportScatterChartConfig : ReportScatterChartConfigEntityInput
+	valueReportSlicerConfig : ReportSlicerConfigEntityInput
+	valueReportTableConfig : ReportTableConfigEntityInput
+	valueReportWaterfallChartConfig : ReportWaterfallChartConfigEntityInput
+}
+
+input ReportBaseConfigEntityInput
+{
+	id : Long
+}
+
+type ReportCardConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	value : ReportField
+}
+
+input ReportCardConfigEntityInput
+{
+	id : Long
+	value : ReportFieldEntityInput
+}
+
+type ReportCell
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	type : ReportCellType
+	x : Long
+	y : Long
+	style : ReportCellStyle
+	value : String
+}
+
+input ReportCellEntityInput
+{
+	id : Long
+	type : ReportCellType
+	x : Long
+	y : Long
+	style : ReportCellStyleEntityInput
+	value : String
+}
+
+type ReportCellStyle
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	width : Long
+	font : String
+	fontSize : Long
+	textColor : String
+	bgColor : String
+	vAllign : ReportCellAllign
+	hAllign : ReportCellAllign
+}
+
+input ReportCellStyleEntityInput
+{
+	id : Long
+	width : Long
+	font : String
+	fontSize : Long
+	textColor : String
+	bgColor : String
+	vAllign : ReportCellAllign
+	hAllign : ReportCellAllign
+}
+
+type ReportConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	identity : String
+	values : [ReportConfigOption]
+}
+
+input ReportConfigEntityInput
+{
+	id : Long
+	identity : String
+	values : [ReportConfigOptionEntityInput]
+}
+
+type ReportConfigOption
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	identity : String
+	value : String
+}
+
+input ReportConfigOptionEntityInput
+{
+	id : Long
+	identity : String
+	value : String
+}
+
+type ReportData
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	sections : [ReportDataSection]
+	rows : [ReportDataRow]
+}
+
+input ReportDataEntityInput
+{
+	id : Long
+	sections : [ReportDataSectionEntityInput]
+	rows : [ReportDataRowEntityInput]
+}
+
+type ReportDataRow
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	row : [String]
+}
+
+input ReportDataRowEntityInput
+{
+	id : Long
+	row : [String]
+}
+
+type ReportDataSection
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	header : String
+	columns : [String]
+}
+
+input ReportDataSectionEntityInput
+{
+	id : Long
+	header : String
+	columns : [String]
+}
+
+type ReportField
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	field : String
+	aggregate : ReportAggregateType
+}
+
+input ReportFieldEntityInput
+{
+	id : Long
+	name : String
+	field : String
+	aggregate : ReportAggregateType
+}
+
+input ReportFilterEntityInputUnionX
+{
+	type : String
+	valueReportNamedConditionFilter : ReportNamedConditionFilterEntityInput
+	valueReportPropertyFilter : ReportPropertyFilterEntityInput
+}
+
+input ReportFilterEntityInput
+{
+	id : Long
+}
+
+type ReportFunnelChartConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	categoryFields : [ReportField]
+	values : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportFunnelChartConfigEntityInput
+{
+	id : Long
+	categoryFields : [ReportFieldEntityInput]
+	values : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type ReportGuageConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	value : [ReportField]
+	min : [ReportField]
+	max : [ReportField]
+	target : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportGuageConfigEntityInput
+{
+	id : Long
+	value : [ReportFieldEntityInput]
+	min : [ReportFieldEntityInput]
+	max : [ReportFieldEntityInput]
+	target : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type ReportKPIConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	value : ReportField
+	target : [ReportField]
+	trend : ReportField
+}
+
+input ReportKPIConfigEntityInput
+{
+	id : Long
+	value : ReportFieldEntityInput
+	target : [ReportFieldEntityInput]
+	trend : ReportFieldEntityInput
+}
+
+type ReportKeyInfluencerConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	analyze : ReportField
+	eexplainBy : [ReportField]
+	expandBy : [ReportField]
+}
+
+input ReportKeyInfluencerConfigEntityInput
+{
+	id : Long
+	analyze : ReportFieldEntityInput
+	eexplainBy : [ReportFieldEntityInput]
+	expandBy : [ReportFieldEntityInput]
+}
+
+type ReportLineAndAreaChartConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	type : ReportLineAndAreaChartType
+	xAxes : [ReportField]
+	yAxes : [ReportField]
+	secondaryYAxes : [ReportField]
+	legend : [ReportField]
+	smallMultiples : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportLineAndAreaChartConfigEntityInput
+{
+	id : Long
+	type : ReportLineAndAreaChartType
+	xAxes : [ReportFieldEntityInput]
+	yAxes : [ReportFieldEntityInput]
+	secondaryYAxes : [ReportFieldEntityInput]
+	legend : [ReportFieldEntityInput]
+	smallMultiples : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type ReportLineAndColumnChartConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	type : ReportLineAndColumnChartType
+	xAxes : [ReportField]
+	columnYAxes : [ReportField]
+	lineYAxes : [ReportField]
+	columnLegend : [ReportField]
+	smallMultiples : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportLineAndColumnChartConfigEntityInput
+{
+	id : Long
+	type : ReportLineAndColumnChartType
+	xAxes : [ReportFieldEntityInput]
+	columnYAxes : [ReportFieldEntityInput]
+	lineYAxes : [ReportFieldEntityInput]
+	columnLegend : [ReportFieldEntityInput]
+	smallMultiples : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type ReportMapConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	type : ReportMapType
+	location : [ReportField]
+	legend : [ReportField]
+	latitude : ReportField
+	longitude : ReportField
+	size : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportMapConfigEntityInput
+{
+	id : Long
+	type : ReportMapType
+	location : [ReportFieldEntityInput]
+	legend : [ReportFieldEntityInput]
+	latitude : ReportFieldEntityInput
+	longitude : ReportFieldEntityInput
+	size : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type ReportMatrixConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	columns : [ReportField]
+	rows : [ReportField]
+	values : [ReportField]
+}
+
+input ReportMatrixConfigEntityInput
+{
+	id : Long
+	columns : [ReportFieldEntityInput]
+	rows : [ReportFieldEntityInput]
+	values : [ReportFieldEntityInput]
+}
+
+type ReportModel
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	properties : [ReportProperty]
+}
+
+input ReportModelEntityInput
+{
+	id : Long
+	name : String
+	properties : [ReportPropertyEntityInput]
+}
+
+type ReportMultiRowCardConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	values : [ReportField]
+}
+
+input ReportMultiRowCardConfigEntityInput
+{
+	id : Long
+	values : [ReportFieldEntityInput]
+}
+
+type ReportNamedCondition
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	condition : ReportRuleUnionX
+}
+
+input ReportNamedConditionEntityInput
+{
+	id : Long
+	name : String
+	condition : ReportRuleEntityInputUnionX
+}
+
+type ReportNamedConditionFilter
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	conditions : [ReportNamedCondition]
+}
+
+input ReportNamedConditionFilterEntityInput
+{
+	id : Long
+	name : String
+	conditions : [Long]
+}
+
+type ReportPieChartConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	type : ReportPieChartType
+	legend : [ReportField]
+	values : [ReportField]
+	details : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportPieChartConfigEntityInput
+{
+	id : Long
+	type : ReportPieChartType
+	legend : [ReportFieldEntityInput]
+	values : [ReportFieldEntityInput]
+	details : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type ReportProperty
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	property : String
+	type : String
+	child : Boolean
+	collection : Boolean
+	isEnum : Boolean
+	isReference : Boolean
+}
+
+input ReportPropertyEntityInput
+{
+	id : Long
+	name : String
+	property : String
+	type : String
+	child : Boolean
+	collection : Boolean
+	isEnum : Boolean
+	isReference : Boolean
+}
+
+type ReportPropertyFilter
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	property : String
+	type : String
+	isEnum : Boolean
+	isReference : Boolean
+	allowMultiple : Boolean
+	applyRange : Boolean
+}
+
+input ReportPropertyFilterEntityInput
+{
+	id : Long
+	name : String
+	property : String
+	type : String
+	isEnum : Boolean
+	isReference : Boolean
+	allowMultiple : Boolean
+	applyRange : Boolean
+}
+
+input ReportRuleEntityInputUnionX
+{
+	type : String
+	valueReportRuleSet : ReportRuleSetEntityInput
+	valueReportSingleRule : ReportSingleRuleEntityInput
+}
+
+input ReportRuleEntityInput
+{
+	id : Long
+	parent : ObjectRef
+}
+
+type ReportRuleSet
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	all : Boolean
+	rules : [DBObject]
+	parent : ReportRuleUnionX
+}
+
+input ReportRuleSetEntityInput
+{
+	id : Long
+	all : Boolean
+	rules : [ReportRuleEntityInputUnionX]
+	parent : ObjectRef
+}
+
+type ReportScatterChartConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	values : [ReportField]
+	xAxes : [ReportField]
+	yAxes : [ReportField]
+	size : [ReportField]
+	legends : [ReportField]
+	playAxis : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportScatterChartConfigEntityInput
+{
+	id : Long
+	values : [ReportFieldEntityInput]
+	xAxes : [ReportFieldEntityInput]
+	yAxes : [ReportFieldEntityInput]
+	size : [ReportFieldEntityInput]
+	legends : [ReportFieldEntityInput]
+	playAxis : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type ReportSingleRule
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	field : String
+	type : String
+	operator : ReportRuleOperator
+	value1 : String
+	value2 : String
+	filter : ReportFilterUnionX
+	fieldValue1 : String
+	fieldValue2 : String
+	fieldFrom : ReportFieldFromType
+	parent : ReportRuleUnionX
+}
+
+input ReportSingleRuleEntityInput
+{
+	id : Long
+	field : String
+	type : String
+	operator : ReportRuleOperator
+	value1 : String
+	value2 : String
+	filter : ObjectRef
+	fieldValue1 : String
+	fieldValue2 : String
+	fieldFrom : ReportFieldFromType
+	parent : ObjectRef
+}
+
+type ReportSlicerConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	fields : [ReportField]
+}
+
+input ReportSlicerConfigEntityInput
+{
+	id : Long
+	fields : [ReportFieldEntityInput]
+}
+
+type ReportTableConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	columns : [ReportField]
+}
+
+input ReportTableConfigEntityInput
+{
+	id : Long
+	columns : [ReportFieldEntityInput]
+}
+
+type ReportWaterfallChartConfig
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	category : [ReportField]
+	breakdownFields : [ReportField]
+	yAxes : [ReportField]
+	tooltips : [ReportField]
+}
+
+input ReportWaterfallChartConfigEntityInput
+{
+	id : Long
+	category : [ReportFieldEntityInput]
+	breakdownFields : [ReportFieldEntityInput]
+	yAxes : [ReportFieldEntityInput]
+	tooltips : [ReportFieldEntityInput]
+}
+
+type SMSMessage
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+	dltTemplateId : String
+}
+
+input SMSMessageEntityInput
+{
+	id : Long
+	from : String
+	to : [String]
+	body : String
+	createdOn : LocalDateTime
+	dltTemplateId : String
+}
+
+type SalesOrder
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	store : Store
+	warehouse : Warehouse
+	orderNumber : String
+	orderDate : LocalDateTime
+	customerName : String
+	customerPhone : String
+	status : SalesOrderStatus
+	subtotal : Float
+	discountAmount : Float
+	taxAmount : Float
+	totalAmount : Float
+	paymentStatus : PaymentStatus
+	soldBy : User
+	lines : [SalesOrderLine]
+	organization : Organization
+}
+
+input SalesOrderEntityInput
+{
+	id : Long
+	store : Long
+	warehouse : Long
+	orderNumber : String
+	orderDate : LocalDateTime
+	customerName : String
+	customerPhone : String
+	status : SalesOrderStatus
+	discountAmount : Float
+	taxAmount : Float
+	paymentStatus : PaymentStatus
+	organization : Long
+}
+
+type SalesOrderItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	salesOrder : SalesOrder
+}
+
+input SalesOrderItemRequestEntityInput
+{
+	id : Long
+	salesOrder : Long
+}
+
+type SalesOrderLine
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+	quantity : Float
+	unitPrice : Float
+	discount : Float
+	lineTotal : Float
+	batchNumber : String
+	salesOrder : SalesOrder
+}
+
+input SalesOrderLineEntityInput
+{
+	id : Long
+	product : Long
+	quantity : Float
+	unitPrice : Float
+	discount : Float
+	batchNumber : String
+	salesOrder : Long
+}
+
+type SalesOrdersByStoreRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	store : Store
+}
+
+input SalesOrdersByStoreRequestEntityInput
+{
+	id : Long
+	store : Long
+}
+
+type SalesReturn
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	salesOrder : SalesOrder
+	store : Store
+	warehouse : Warehouse
+	returnNumber : String
+	returnDate : LocalDateTime
+	status : SalesReturnStatus
+	reason : ReturnReason
+	refundAmount : Float
+	processedBy : User
+	lines : [SalesReturnLine]
+	organization : Organization
+}
+
+input SalesReturnEntityInput
+{
+	id : Long
+	salesOrder : Long
+	store : Long
+	warehouse : Long
+	returnNumber : String
+	returnDate : LocalDateTime
+	status : SalesReturnStatus
+	reason : ReturnReason
+	organization : Long
+}
+
+type SalesReturnLine
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+	quantity : Float
+	unitPrice : Float
+	lineTotal : Float
+	batchNumber : String
+	salesReturn : SalesReturn
+}
+
+input SalesReturnLineEntityInput
+{
+	id : Long
+	product : Long
+	quantity : Float
+	unitPrice : Float
+	batchNumber : String
+	salesReturn : Long
+}
+
+type StockAlert
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	warehouse : Warehouse
+	product : Product
+	alertType : StockAlertType
+	currentQuantity : Float
+	threshold : Float
+	expiryDate : LocalDate
+	status : AlertStatus
+	acknowledgedBy : User
+	acknowledgedAt : LocalDateTime
+	createdAt : LocalDateTime
+	organization : Organization
+}
+
+input StockAlertEntityInput
+{
+	id : Long
+	warehouse : Long
+	product : Long
+	alertType : StockAlertType
+	currentQuantity : Float
+	threshold : Float
+	expiryDate : LocalDate
+	status : AlertStatus
+	acknowledgedBy : Long
+	acknowledgedAt : LocalDateTime
+	organization : Long
+}
+
+type StockBatch
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+	warehouse : Warehouse
+	batchNumber : String
+	quantityOnHand : Float
+	manufacturingDate : LocalDate
+	expiryDate : LocalDate
+	unitCost : Float
+	status : BatchStatus
+	createdAt : LocalDateTime
+	organization : Organization
+}
+
+input StockBatchEntityInput
+{
+	id : Long
+	product : Long
+	warehouse : Long
+	batchNumber : String
+	quantityOnHand : Float
+	manufacturingDate : LocalDate
+	expiryDate : LocalDate
+	unitCost : Float
+	status : BatchStatus
+	organization : Long
+}
+
+type StockTransfer
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	transferNumber : String
+	sourceWarehouse : Warehouse
+	destinationWarehouse : Warehouse
+	transferDate : LocalDate
+	status : StockTransferStatus
+	notes : String
+	requestedBy : User
+	approvedBy : User
+	shippedAt : LocalDateTime
+	receivedAt : LocalDateTime
+	lines : [StockTransferLine]
+	organization : Organization
+}
+
+input StockTransferEntityInput
+{
+	id : Long
+	sourceWarehouse : Long
+	destinationWarehouse : Long
+	transferDate : LocalDate
+	status : StockTransferStatus
+	notes : String
+	organization : Long
+}
+
+type StockTransferItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	stockTransfer : StockTransfer
+}
+
+input StockTransferItemRequestEntityInput
+{
+	id : Long
+	stockTransfer : Long
+}
+
+type StockTransferLine
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+	quantity : Float
+	batchNumber : String
+	uom : UnitOfMeasure
+	stockTransfer : StockTransfer
+}
+
+input StockTransferLineEntityInput
+{
+	id : Long
+	product : Long
+	quantity : Float
+	batchNumber : String
+	uom : Long
+	stockTransfer : Long
+}
+
+type StockValuationReportRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	warehouse : Warehouse
+}
+
+input StockValuationReportRequestEntityInput
+{
+	id : Long
+	organization : Long
+	warehouse : Long
+}
+
+type Store
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	code : String
+	storeType : StoreType
+	address : String
+	phone : String
+	email : String
+	manager : User
+	defaultWarehouse : Warehouse
+	warehouses : [Warehouse]
+	status : EntityStatus
+	createdAt : LocalDateTime
+	updatedAt : LocalDateTime
+	organization : Organization
+}
+
+input StoreEntityInput
+{
+	id : Long
+	name : String
+	code : String
+	storeType : StoreType
+	address : String
+	phone : String
+	email : String
+	manager : Long
+	defaultWarehouse : Long
+	status : EntityStatus
+	organization : Long
+}
+
+type StoreItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	store : Store
+}
+
+input StoreItemRequestEntityInput
+{
+	id : Long
+	store : Long
+}
+
+type SupplierContact
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	email : String
+	phone : String
+	isPrimary : Boolean
+	vendor : Vendor
+}
+
+input SupplierContactEntityInput
+{
+	id : Long
+	name : String
+	email : String
+	phone : String
+	isPrimary : Boolean
+	vendor : Long
+}
+
+type SupplierItemRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	vendor : Vendor
+}
+
+input SupplierItemRequestEntityInput
+{
+	id : Long
+	vendor : Long
+}
+
+type UnitOfMeasure
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	symbol : String
+	uomType : UomType
+	baseFactor : Float
+	status : EntityStatus
+	organization : Organization
+}
+
+input UnitOfMeasureEntityInput
+{
+	id : Long
+	name : String
+	symbol : String
+	uomType : UomType
+	baseFactor : Float
+	status : EntityStatus
+	organization : Long
+}
+
+type UnreadNotificationCountRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	organization : Organization
+	user : User
+}
+
+input UnreadNotificationCountRequestEntityInput
+{
+	id : Long
+	organization : Long
+	user : Long
+}
+
+type User
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	email : String
+	password : String
+	role : AppUserRole
+	status : EntityStatus
+	organization : Organization
+	isActive : Boolean
+	deviceToken : String
+	devices : UserDevice
+}
+
+input UserEntityInput
+{
+	id : Long
+	email : String
+	password : String
+	role : AppUserRole
+	status : EntityStatus
+	organization : Long
+	isActive : Boolean
+	deviceToken : String
+}
+
+type UserDevice
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	user : BaseUserUnionX
+	deviceToken : String
+}
+
+input UserDeviceEntityInput
+{
+	id : Long
+	user : ObjectRef
+	deviceToken : String
+}
+
+type UserDevicesRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	user : BaseUserUnionX
+	token : String
+}
+
+input UserDevicesRequestEntityInput
+{
+	id : Long
+	user : ObjectRef
+	token : String
+}
+
+type UserInvitation
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	email : String
+	appRole : AppUserRole
+	invitedBy : User
+	token : String
+	status : InvitationStatus
+	expiresAt : LocalDateTime
+	acceptedAt : LocalDateTime
+	organization : Organization
+}
+
+input UserInvitationEntityInput
+{
+	id : Long
+	email : String
+	appRole : AppUserRole
+	invitedBy : Long
+	token : String
+	status : InvitationStatus
+	expiresAt : LocalDateTime
+	acceptedAt : LocalDateTime
+	organization : Long
+}
+
+type UserLoginRecord
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	user : BaseUserUnionX
+	timeStamp : LocalDateTime
+	iPAddress : String
+	browser : String
+	device : String
+	location : String
+	success : Boolean
+	failureReason : String
+}
+
+input UserLoginRecordEntityInput
+{
+	id : Long
+	user : ObjectRef
+	timeStamp : LocalDateTime
+	iPAddress : String
+	browser : String
+	device : String
+	location : String
+	success : Boolean
+	failureReason : String
+}
+
+type UserProfile
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	user : User
+	displayName : String
+	phone : String
+	avatar : DFile
+	appRole : AppUserRole
+	assignedStores : [Store]
+	assignedWarehouses : [Warehouse]
+	status : EntityStatus
+	lastLoginAt : LocalDateTime
+	organization : Organization
+}
+
+input UserProfileEntityInput
+{
+	id : Long
+	user : Long
+	displayName : String
+	phone : String
+	avatar : DFileEntityInput
+	appRole : AppUserRole
+	assignedStores : [Long]
+	assignedWarehouses : [Long]
+	status : EntityStatus
+	organization : Long
+}
+
+type UserProfileByUserRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	user : User
+}
+
+input UserProfileByUserRequestEntityInput
+{
+	id : Long
+	user : Long
+}
+
+type UserRole
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	roleCode : AppUserRole
+	description : String
+	isSystem : Boolean
+	permissions : String
+	organization : Organization
+}
+
+input UserRoleEntityInput
+{
+	id : Long
+	name : String
+	roleCode : AppUserRole
+	description : String
+	isSystem : Boolean
+	permissions : String
+	organization : Long
+}
+
+type Vendor
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	name : String
+	code : String
+	contactPerson : String
+	email : String
+	phone : String
+	address : String
+	paymentTerms : String
+	taxId : String
+	rating : Long
+	contacts : [SupplierContact]
+	status : EntityStatus
+	createdAt : LocalDateTime
+	organization : Organization
+}
+
+input VendorEntityInput
+{
+	id : Long
+	name : String
+	code : String
+	contactPerson : String
+	email : String
+	phone : String
+	address : String
+	paymentTerms : String
+	taxId : String
+	rating : Long
+	status : EntityStatus
+	organization : Long
+}
+
+type VerificationData
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	method : String
+	context : String
+	subject : String
+	body : String
+}
+
+input VerificationDataEntityInput
+{
+	id : Long
+	method : String
+	context : String
+	subject : String
+	body : String
+}
+
+type VerificationDataByTokenRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	token : String
+}
+
+input VerificationDataByTokenRequestEntityInput
+{
+	id : Long
+	token : String
+}
+
+type Warehouse
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	store : Store
+	name : String
+	code : String
+	warehouseType : WarehouseType
+	address : String
+	isDefault : Boolean
+	status : EntityStatus
+	createdAt : LocalDateTime
+	updatedAt : LocalDateTime
+	organization : Organization
+}
+
+input WarehouseEntityInput
+{
+	id : Long
+	store : Long
+	name : String
+	code : String
+	warehouseType : WarehouseType
+	address : String
+	isDefault : Boolean
+	status : EntityStatus
+	organization : Long
+}
+
+type WarehouseStock
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	warehouse : Warehouse
+	product : Product
+	quantityOnHand : Float
+	quantityReserved : Float
+	quantityAvailable : Float
+	averageCost : Float
+	stockValue : Float
+	lastMovementAt : LocalDateTime
+	lowStockNotifiedAt : LocalDateTime
+	organization : Organization
+}
+
+input WarehouseStockEntityInput
+{
+	id : Long
+	warehouse : Long
+	product : Long
+	quantityOnHand : Float
+	quantityReserved : Float
+	averageCost : Float
+	lowStockNotifiedAt : LocalDateTime
+	organization : Long
+}
+
+type WarehouseStockByProductRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	product : Product
+}
+
+input WarehouseStockByProductRequestEntityInput
+{
+	id : Long
+	product : Long
+}
+
+type WarehouseStockByWarehouseRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	warehouse : Warehouse
+}
+
+input WarehouseStockByWarehouseRequestEntityInput
+{
+	id : Long
+	warehouse : Long
+}
+
+type WarehousesByStoreRequest
+	implements DBObject
+{
+	id : Long
+	localId : Long
+	store : Store
+}
+
+input WarehousesByStoreRequestEntityInput
+{
+	id : Long
+	store : Long
+}
+
+input AllAuditLogsIn
+{
+	organization : Long
+}
+
+type AllAuditLogs
+{
+	items : [AuditLog]
+}
+
+input AllGoodsReceiptsIn
+{
+	organization : Long
+}
+
+type AllGoodsReceipts
+{
+	items : [GoodsReceipt]
+}
+
+input AllInAppNotificationsIn
+{
+	organization : Long
+	user : Long
+}
+
+type AllInAppNotifications
+{
+	items : [InAppNotification]
+}
+
+input AllInventoryAdjustmentsIn
+{
+	organization : Long
+}
+
+type AllInventoryAdjustments
+{
+	items : [InventoryAdjustment]
+}
+
+input AllInventoryMovementsIn
+{
+	organization : Long
+}
+
+type AllInventoryMovements
+{
+	items : [InventoryMovement]
+}
+
+type AllOrganizations
+{
+	items : [Organization]
+}
+
+input AllProductCategoriesIn
+{
+	organization : Long
+}
+
+type AllProductCategories
+{
+	items : [ProductCategory]
+}
+
+input AllProductsIn
+{
+	organization : Long
+}
+
+type AllProducts
+{
+	items : [Product]
+}
+
+input AllPurchaseOrdersIn
+{
+	organization : Long
+}
+
+type AllPurchaseOrders
+{
+	items : [PurchaseOrder]
+}
+
+input AllSalesOrdersIn
+{
+	organization : Long
+}
+
+type AllSalesOrders
+{
+	items : [SalesOrder]
+}
+
+input AllSalesReturnsIn
+{
+	organization : Long
+}
+
+type AllSalesReturns
+{
+	items : [SalesReturn]
+}
+
+input AllStockAlertsIn
+{
+	organization : Long
+}
+
+type AllStockAlerts
+{
+	items : [StockAlert]
+}
+
+input AllStockBatchesIn
+{
+	organization : Long
+}
+
+type AllStockBatches
+{
+	items : [StockBatch]
+}
+
+input AllStockTransfersIn
+{
+	organization : Long
+}
+
+type AllStockTransfers
+{
+	items : [StockTransfer]
+}
+
+input AllStoresIn
+{
+	organization : Long
+}
+
+type AllStores
+{
+	items : [Store]
+}
+
+input AllSuppliersIn
+{
+	organization : Long
+}
+
+type AllSuppliers
+{
+	items : [Vendor]
+}
+
+input AllUnitOfMeasuresIn
+{
+	organization : Long
+}
+
+type AllUnitOfMeasures
+{
+	items : [UnitOfMeasure]
+}
+
+input AllUserInvitationsIn
+{
+	organization : Long
+}
+
+type AllUserInvitations
+{
+	items : [UserInvitation]
+}
+
+input AllUserProfilesIn
+{
+	organization : Long
+}
+
+type AllUserProfiles
+{
+	items : [UserProfile]
+}
+
+input AllWarehousesIn
+{
+	organization : Long
+}
+
+type AllWarehouses
+{
+	items : [Warehouse]
+}
+
+input DashboardMetricsIn
+{
+	organization : Long
+}
+
+type DashboardMetrics
+{
+	items : [WarehouseStock]
+}
+
+input ExpiringBatchesIn
+{
+	organization : Long
+	daysAhead : Long
+}
+
+type ExpiringBatches
+{
+	items : [StockBatch]
+}
+
+input GoodsReceiptItemIn
+{
+	goodsReceipt : Long
+}
+
+type GoodsReceiptItem
+{
+	items : [GoodsReceipt]
+}
+
+input InventoryMovementsByDateRangeIn
+{
+	organization : Long
+	startDate : LocalDateTime
+	endDate : LocalDateTime
+}
+
+type InventoryMovementsByDateRange
+{
+	items : [InventoryMovement]
+}
+
+input LowStockItemsIn
+{
+	organization : Long
+}
+
+type LowStockItems
+{
+	items : [WarehouseStock]
+}
+
+input MovementReportRowsIn
+{
+	organization : Long
+	startDate : LocalDateTime
+	endDate : LocalDateTime
+	warehouse : Long
+}
+
+type MovementReportRows
+{
+	items : [InventoryMovement]
+}
+
+input OrganizationItemIn
+{
+	organization : Long
+}
+
+type OrganizationItem
+{
+	items : [Organization]
+}
+
+input OutOfStockItemsIn
+{
+	organization : Long
+}
+
+type OutOfStockItems
+{
+	items : [WarehouseStock]
+}
+
+input ProductItemIn
+{
+	product : Long
+}
+
+type ProductItem
+{
+	items : [Product]
+}
+
+input ProductSearchIn
+{
+	organization : Long
+	searchTerm : String
+	category : Long
+	status : ProductStatus
+}
+
+type ProductSearch
+{
+	items : [Product]
+}
+
+input ProductsByCategoryIn
+{
+	organization : Long
+	category : Long
+}
+
+type ProductsByCategory
+{
+	items : [Product]
+}
+
+input PurchaseOrderItemIn
+{
+	purchaseOrder : Long
+}
+
+type PurchaseOrderItem
+{
+	items : [PurchaseOrder]
+}
+
+input PurchaseOrdersByStatusIn
+{
+	organization : Long
+	status : PurchaseOrderStatus
+}
+
+type PurchaseOrdersByStatus
+{
+	items : [PurchaseOrder]
+}
+
+input SalesOrderItemIn
+{
+	salesOrder : Long
+}
+
+type SalesOrderItem
+{
+	items : [SalesOrder]
+}
+
+input SalesOrdersByStoreIn
+{
+	store : Long
+}
+
+type SalesOrdersByStore
+{
+	items : [SalesOrder]
+}
+
+input StockTransferItemIn
+{
+	stockTransfer : Long
+}
+
+type StockTransferItem
+{
+	items : [StockTransfer]
+}
+
+input StockValuationReportIn
+{
+	organization : Long
+	warehouse : Long
+}
+
+type StockValuationReport
+{
+	items : [WarehouseStock]
+}
+
+input StoreItemIn
+{
+	store : Long
+}
+
+type StoreItem
+{
+	items : [Store]
+}
+
+input SupplierItemIn
+{
+	vendor : Long
+}
+
+type SupplierItem
+{
+	items : [Vendor]
+}
+
+input UnreadNotificationCountIn
+{
+	organization : Long
+	user : Long
+}
+
+type UnreadNotificationCount
+{
+	items : [InAppNotification]
+}
+
+input UserProfileByUserIn
+{
+	user : Long
+}
+
+type UserProfileByUser
+{
+	items : [UserProfile]
+}
+
+input WarehouseStockByProductIn
+{
+	product : Long
+}
+
+type WarehouseStockByProduct
+{
+	items : [WarehouseStock]
+}
+
+input WarehouseStockByWarehouseIn
+{
+	warehouse : Long
+}
+
+type WarehouseStockByWarehouse
+{
+	items : [WarehouseStock]
+}
+
+input WarehousesByStoreIn
+{
+	store : Long
+}
+
+type WarehousesByStore
+{
+	items : [Warehouse]
+}
+
+enum MutateResultStatus {
+	ServerError
+	Success
+	AuthFail
+	ValidationFail
+	BadRequest
+}
+
+enum AuditAction {
+	Create
+	Update
+	Delete
+	Approve
+	Cancel
+	Login
+	Export
+}
+
+enum GoodsReceiptStatus {
+	Draft
+	Confirmed
+	Cancelled
+}
+
+enum NotificationType {
+	LowStock
+	Expiry
+	PurchaseApproval
+	TransferApproval
+	System
+}
+
+enum AdjustmentReason {
+	PhysicalCount
+	Damage
+	Theft
+	Expiry
+	SystemCorrection
+	OpeningBalance
+}
+
+enum AdjustmentStatus {
+	Draft
+	Confirmed
+	Cancelled
+}
+
+enum MovementType {
+	PurchaseReceipt
+	SalesIssue
+	TransferOut
+	TransferIn
+	Adjustment
+	ReturnIn
+	ReturnOut
+	OpeningBalance
+}
+
+enum MovementDirection {
+	In
+	Out
+}
+
+enum MovementReferenceType {
+	PurchaseOrder
+	GoodsReceipt
+	StockTransfer
+	SalesOrder
+	SalesReturn
+	InventoryAdjustment
+}
+
+enum NotificationChannel {
+	Email
+	InApp
+	SMS
+}
+
+enum EntityStatus {
+	Active
+	Inactive
+	Archived
+}
+
+enum OrganizationStatus {
+	Active
+	Suspended
+	Archived
+}
+
+enum ProductStatus {
+	Active
+	Inactive
+	Discontinued
+}
+
+enum PurchaseOrderStatus {
+	Draft
+	Submitted
+	Approved
+	PartiallyReceived
+	Received
+	Cancelled
+}
+
+enum ReportBarChartType {
+	Stacked
+	StackedColumn
+	Clustered
+	ClusteredColumn
+	HundredPercentStacked
+	HundredPercentStackedColumn
+	StackedArea
+	HundredPercentStackedArea
+	RibbonChart
+}
+
+enum ReportCellType {
+	Data
+	ColumnHeader
+	ColumnFooter
+	RowHeader
+	RowFooter
+	GroupHeader
+	GroupFooter
+	ReportHeader
+	ReportFooter
+}
+
+enum ReportCellAllign {
+	Center
+	Start
+	End
+}
+
+enum ReportAggregateType {
+	None
+	Array
+	Sum
+	Average
+	Percent
+	Count
+	Min
+	Max
+	StringAgg
+}
+
+enum ReportLineAndAreaChartType {
+	Line
+	Area
+}
+
+enum ReportLineAndColumnChartType {
+	Stacked
+	Clustered
+}
+
+enum ReportMapType {
+	Map
+	FilledMap
+}
+
+enum ReportPieChartType {
+	Pie
+	Donut
+}
+
+enum ReportRuleOperator {
+	Equal
+	NotEqual
+	Between
+	IsIn
+	IsNotIn
+	GreaterThan
+	LessThan
+	GreaterThanorEqual
+	LessThanorEqual
+	Contains
+	NotContains
+	StartsWith
+	EndsWith
+	IsSet
+	IsNotSet
+	Match
+	NotMatch
+	Is
+	IsNot
+	IsWithin
+}
+
+enum ReportFieldFromType {
+	Filter
+	Value
+	Property
+}
+
+enum SalesOrderStatus {
+	Draft
+	Confirmed
+	Completed
+	Cancelled
+}
+
+enum PaymentStatus {
+	Unpaid
+	PartiallyPaid
+	Paid
+	Refunded
+}
+
+enum SalesReturnStatus {
+	Draft
+	Confirmed
+	Completed
+	Cancelled
+}
+
+enum ReturnReason {
+	Defective
+	WrongItem
+	CustomerChangedMind
+	Expired
+	Other
+}
+
+enum StockAlertType {
+	LowStock
+	OutOfStock
+	ExpirySoon
+}
+
+enum AlertStatus {
+	Open
+	Acknowledged
+	Resolved
+	Dismissed
+}
+
+enum BatchStatus {
+	Active
+	Depleted
+	Expired
+	Quarantined
+}
+
+enum StockTransferStatus {
+	Draft
+	Submitted
+	Approved
+	InTransit
+	Completed
+	Cancelled
+}
+
+enum StoreType {
+	Supermarket
+	Grocery
+	Retail
+	MiniMart
+	Wholesale
+	Warehouse
+}
+
+enum UomType {
+	Base
+	Derived
+}
+
+enum AppUserRole {
+	OrganizationAdmin
+	StoreManager
+	WarehouseManager
+	PurchaseManager
+	InventoryClerk
+	SalesStaff
+	Accountant
+	Viewer
+}
+
+enum InvitationStatus {
+	Pending
+	Accepted
+	Expired
+	Revoked
+}
+
+enum WarehouseType {
+	Main
+	Store
+	ColdStorage
+	Distribution
+}
+
+enum ChangeEventType {
+	Insert
+	Update
+	Delete
+}
+
+enum SubscriptionChangeType {
+	All
+	Insert
+	Update
+	Delete
+}

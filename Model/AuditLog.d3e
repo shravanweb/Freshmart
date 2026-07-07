@@ -1,0 +1,54 @@
+Model {
+    package 'inventory.management.system'
+    name 'AuditLog'
+    master Organization
+    creatable true
+    searchable true
+    display `entityType + ' - ' + action.name`
+    properties [
+        {
+            name 'Entity Type'
+            type String
+            required true
+        }
+        {
+            name 'Entity Id'
+            type String
+            required true
+        }
+        {
+            name 'Action'
+            type AuditAction
+            required true
+        }
+        {
+            name 'Performed By'
+            type User
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Performed At'
+            type DateTime
+            required true
+        }
+        {
+            name 'Old Values'
+            type String
+            longText true
+        }
+        {
+            name 'New Values'
+            type String
+            longText true
+        }
+        {
+            name 'Ip Address'
+            type String
+        }
+        {
+            name 'User Agent'
+            type String
+        }
+    ]
+}

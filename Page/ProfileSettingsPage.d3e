@@ -1,0 +1,363 @@
+Page {
+    package 'inventory.management.system'
+    name 'ProfileSettingsPage'
+    description 'User profile settings'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'activeSection'
+            type String
+            internal true
+            defaultValue `'profile'`
+        }
+        {
+            name 'displayName'
+            type String
+            internal true
+        }
+        {
+            name 'phone'
+            type String
+            internal true
+        }
+        {
+            name 'emailLabel'
+            type String
+            computed true
+            computation `user.email`
+            internal true
+        }
+        {
+            name 'roleLabel'
+            type String
+            computed true
+            computation `userProfile != null ? userProfile.appRole.toString() : ''`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Profile'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Row {
+                                    name 'settingsRowRef'
+                                    data {
+                                        mainAxisSize 'max'
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Container {
+                                            name 'leftNavRef'
+                                            tags [
+                                                'glassSidebar'
+                                            ]
+                                            data {
+                                                width '220'
+                                            }
+                                            child Column {
+                                                name 'navColRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    TextView {
+                                                        name 'settingsTitleRef'
+                                                        data {
+                                                            data 'Settings'
+                                                            margin '0 0 16 0'
+                                                            textStyle {
+                                                                color '@c4'
+                                                                fontSize '16'
+                                                                fontWeight 'w700'
+                                                            }
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'profileNavRef'
+                                                        tags [
+                                                            'navActive'
+                                                        ]
+                                                        data {
+                                                            label 'Profile'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'orgNavRef'
+                                                        data {
+                                                            label 'Organization'
+                                                            margin '8 0 0 0'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'notificationsNavRef'
+                                                        data {
+                                                            label 'Notifications'
+                                                            margin '8 0 0 0'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'securityNavRef'
+                                                        data {
+                                                            label 'Security'
+                                                            margin '8 0 0 0'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                        Container {
+                                            name 'rightFormRef'
+                                            tags [
+                                                'glassPanel'
+                                            ]
+                                            data {
+                                                expand 'true'
+                                                padding '32'
+                                                margin '0 0 0 24'
+                                            }
+                                            child Column {
+                                                name 'formColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    TextView {
+                                                        name 'formTitleRef'
+                                                        data {
+                                                            data `activeSection == 'profile' ? 'Profile Settings' : activeSection`
+                                                            margin '0 0 24 0'
+                                                            textStyle {
+                                                                color '@c4'
+                                                                fontSize '22'
+                                                                fontWeight 'w700'
+                                                            }
+                                                        }
+                                                    }
+                                                    IMSInputFieldWidget {
+                                                        name 'displayNameRef'
+                                                        data {
+                                                            label 'Display Name'
+                                                            text `displayName`
+                                                            placeHolder 'Your display name'
+                                                        }
+                                                    }
+                                                    Container {
+                                                        name 'spacer1Ref'
+                                                        data {
+                                                            margin '0 0 16 0'
+                                                        }
+                                                    }
+                                                    IMSInputFieldWidget {
+                                                        name 'emailRef'
+                                                        data {
+                                                            label 'Email'
+                                                            text `emailLabel`
+                                                            placeHolder 'Email address'
+                                                        }
+                                                    }
+                                                    Container {
+                                                        name 'spacer2Ref'
+                                                        data {
+                                                            margin '0 0 16 0'
+                                                        }
+                                                    }
+                                                    IMSInputFieldWidget {
+                                                        name 'phoneRef'
+                                                        data {
+                                                            label 'Phone'
+                                                            text `phone`
+                                                            placeHolder 'Phone number'
+                                                            keyboardType 'phone'
+                                                        }
+                                                    }
+                                                    TextView {
+                                                        name 'roleRef'
+                                                        data {
+                                                            data `'Role: ' + roleLabel`
+                                                            margin '16 0 0 0'
+                                                            textStyle {
+                                                                color '@c5'
+                                                                fontSize '14'
+                                                            }
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'saveRef'
+                                                        tags [
+                                                            'primary'
+                                                        ]
+                                                        data {
+                                                            label 'Save Profile'
+                                                            margin '24 0 0 0'
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                if (userProfile != null) {
+                    displayName = userProfile.displayName;
+                    phone = userProfile.phone != null ? userProfile.phone : '';
+                }
+            ```
+        }
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onNavigateHandler'
+            type OnEvent
+            on sidebarRef
+            event onNavigate
+            block ```
+                if (route == '/dashboard') {
+                    navigator.pushDashboardPage(user: user, target: 'main', replace: true);
+                }
+            ```
+        }
+        {
+            name 'onOrgNavHandler'
+            type OnEvent
+            on orgNavRef
+            event onPressed
+            block ```
+                navigator.pushOrganizationSettingsPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onNotificationsNavHandler'
+            type OnEvent
+            on notificationsNavRef
+            event onPressed
+            block ```
+                navigator.pushNotificationPreferencesPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSecurityNavHandler'
+            type OnEvent
+            on securityNavRef
+            event onPressed
+            block ```
+                navigator.pushChangePasswordPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                if (userProfile != null) {
+                    userProfile.displayName = displayName;
+                    userProfile.phone = phone;
+                }
+            ```
+        }
+    ]
+}

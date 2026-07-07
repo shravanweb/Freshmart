@@ -1,0 +1,21 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'ReturnReason'
+    options [
+        {
+            name 'Defective'
+        }
+        {
+            name 'WrongItem'
+        }
+        {
+            name 'CustomerChangedMind'
+        }
+        {
+            name 'Expired'
+        }
+        {
+            name 'Other'
+        }
+    ]
+}

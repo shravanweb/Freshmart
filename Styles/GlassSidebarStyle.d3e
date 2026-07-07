@@ -1,0 +1,107 @@
+Style {
+    package 'inventory.management.system'
+    name 'GlassSidebarStyle'
+    description 'App shell sidebar navigation'
+    items [
+        {
+            selector 'Container.glassSidebar'
+            values {
+                glassmorphism {
+                    blurSigma {
+                        dx '10'
+                        dy '10'
+                    }
+                    borderRadius '0'
+                    blendMode 'srcOver'
+                }
+                decoration {
+                    color '@c10/0.92'
+                    border {
+                        color '@c6'
+                        width '0 1 0 0'
+                        style 'solid'
+                    }
+                }
+                width '260'
+                height '100%'
+                padding '16 12'
+            }
+        }
+        {
+            selector 'Container.sidebarSolid'
+            values {
+                decoration {
+                    color '@c9'
+                    border {
+                        color '@c6'
+                        width '0 1 0 0'
+                        style 'solid'
+                    }
+                }
+                width '260'
+                height '100%'
+                padding '12'
+            }
+        }
+        {
+            selector 'TextView.sidebarBrandTitle'
+            values {
+                textStyle {
+                    color '@c4'
+                    fontSize '16'
+                    fontWeight 'w700'
+                }
+            }
+        }
+        {
+            selector 'TextView.sidebarBrandSubtitle'
+            values {
+                textStyle {
+                    color '@c5'
+                    fontSize '12'
+                }
+                margin '2 0 0 0'
+            }
+        }
+        {
+            selector 'TextView.sidebarSectionLabel'
+            values {
+                textStyle {
+                    color 'FF94A3B8'
+                    fontSize '10'
+                    fontWeight 'w600'
+                }
+                margin '8 12 4 12'
+            }
+        }
+        {
+            selector 'TextButton.navItem'
+            values {
+                height '36'
+                padding '8 12'
+                decoration {
+                    borderRadius '12'
+                }
+                textStyle {
+                    color '@c5'
+                    fontSize '14'
+                    fontWeight 'w500'
+                }
+            }
+        }
+        {
+            selector 'TextButton.navActive'
+            values {
+                decoration {
+                    color '@c15'
+                    borderRadius '12'
+                }
+                textStyle {
+                    color 'FFB45309'
+                    fontSize '14'
+                    fontWeight 'w600'
+                }
+            }
+        }
+    ]
+}

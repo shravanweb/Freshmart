@@ -1,0 +1,98 @@
+Widget {
+    package 'inventory.management.system'
+    name 'ExpiryAlertWidget'
+    description 'Expiring batches alert list'
+    properties [
+        {
+            name 'batches'
+            type StockBatch
+            collection true
+        }
+        {
+            name 'batchCount'
+            type String
+            computed true
+            computation `batches != null ? batches.length.toString() : '0'`
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+        ]
+        tags [
+            'glassCardFlat'
+        ]
+        child Column {
+            name 'sectionColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                Row {
+                    name 'headerRowRef'
+                    data {
+                        mainAxisAlignment 'spaceBetween'
+                        crossAxisAlignment 'center'
+                        mainAxisSize 'max'
+                    }
+                    children [
+                        TextView {
+                            name 'titleRef'
+                            data {
+                                data 'Expiring Soon'
+                                textStyle {
+                                    color '@c4'
+                                    fontSize '18'
+                                    fontWeight 'w600'
+                                }
+                            }
+                        }
+                        TextView {
+                            name 'countRef'
+                            data {
+                                data `batchCount + ' batches'`
+                                textStyle {
+                                    color '@c5'
+                                    fontSize '13'
+                                }
+                            }
+                        }
+                    ]
+                }
+                Container {
+                    name 'listRef'
+                    tags [
+                        'glassPanel'
+                    ]
+                    data {
+                        margin '16 0 0 0'
+                        padding '16'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data 'Bind expiring batch rows from ExpiringBatches query'
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    events [
+        {
+            name 'onViewBatch'
+            params [
+                {
+                    name 'batch'
+                    type StockBatch
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+Model {
+    package 'inventory.management.system'
+    name 'User'
+    parent BaseUser
+    master Organization
+    creatable true
+    searchable true
+    display `email`
+    properties [
+        {
+            name 'Email'
+            type String
+            required true
+            unique true
+        }
+        {
+            name 'Password'
+            type String
+            required true
+            unique true
+        }
+        {
+            name 'Role'
+            type AppUserRole
+            required true
+            defaultValue `AppUserRole.Viewer`
+        }
+        {
+            name 'Status'
+            type EntityStatus
+            required true
+            defaultValue `EntityStatus.Active`
+        }
+    ]
+}

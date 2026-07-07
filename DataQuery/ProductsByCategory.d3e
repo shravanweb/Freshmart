@@ -1,0 +1,21 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'ProductsByCategory'
+    query `Product.all
+    .where((row) => row.organization == inputs.organization && row.category == inputs.category)
+    .orderBy((row) => row.name, asc: true)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'category'
+            type ProductCategory
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

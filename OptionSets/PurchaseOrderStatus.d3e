@@ -1,0 +1,24 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'PurchaseOrderStatus'
+    options [
+        {
+            name 'Draft'
+        }
+        {
+            name 'Submitted'
+        }
+        {
+            name 'Approved'
+        }
+        {
+            name 'PartiallyReceived'
+        }
+        {
+            name 'Received'
+        }
+        {
+            name 'Cancelled'
+        }
+    ]
+}

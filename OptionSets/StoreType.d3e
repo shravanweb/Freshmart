@@ -1,0 +1,24 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'StoreType'
+    options [
+        {
+            name 'Supermarket'
+        }
+        {
+            name 'Grocery'
+        }
+        {
+            name 'Retail'
+        }
+        {
+            name 'MiniMart'
+        }
+        {
+            name 'Wholesale'
+        }
+        {
+            name 'Warehouse'
+        }
+    ]
+}

@@ -1,0 +1,186 @@
+Widget {
+    package 'inventory.management.system'
+    name 'LoginFormWidget'
+    description 'Email and password login form'
+    properties [
+        {
+            name 'email'
+            type String
+        }
+        {
+            name 'password'
+            type String
+        }
+        {
+            name 'errorMessage'
+            type String
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'glassCard'
+        ]
+        data {
+            width '400'
+        }
+        child Column {
+            name 'formColumnRef'
+            data {
+                mainAxisSize 'min'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                TextView {
+                    name 'titleRef'
+                    data {
+                        data ''
+                        textAlign 'center'
+                        margin '0 0 8 0'
+                        textStyle {
+                            color '@c4'
+                            fontSize '22'
+                            fontWeight 'w700'
+                        }
+                    }
+                }
+                TextView {
+                    name 'subtitleRef'
+                    data {
+                        data 'Sign in to BuildACompleteInventory'
+                        textAlign 'center'
+                        margin '0 0 24 0'
+                        textStyle {
+                            color '@c5'
+                            fontSize '14'
+                        }
+                    }
+                }
+                IMSInputFieldWidget {
+                    name 'emailFieldRef'
+                    data {
+                        label 'Email'
+                        text `email`
+                        placeHolder 'you@company.com'
+                        keyboardType 'emailAddress'
+                    }
+                }
+                Container {
+                    name 'spacerRef'
+                    data {
+                        margin '0 0 16 0'
+                    }
+                }
+                IMSInputFieldWidget {
+                    name 'passwordFieldRef'
+                    data {
+                        label 'Password'
+                        text `password`
+                        placeHolder 'Enter password'
+                        obscureText 'true'
+                    }
+                }
+                CIf {
+                    name 'errorIfRef'
+                    condition `errorMessage != null && errorMessage.isNotEmpty`
+                    then TextView {
+                        name 'errorRef'
+                        data {
+                            data `errorMessage`
+                            margin '16 0 0 0'
+                            textStyle {
+                                color '@c7'
+                                fontSize '13'
+                            }
+                        }
+                    }
+                }
+                TextButton {
+                    name 'submitRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Sign In'
+                        disable `isLoading`
+                        margin '24 0 0 0'
+                    }
+                }
+                TextButton {
+                    name 'forgotRef'
+                    data {
+                        label 'Forgot password?'
+                        margin '16 0 0 0'
+                    }
+                }
+                TextButton {
+                    name 'signupRef'
+                    data {
+                        label 'Don''t have an account? Sign up'
+                        margin '8 0 0 0'
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSubmitPressedHandler'
+            type OnEvent
+            on submitRef
+            event onPressed
+            block ```
+                onLogin(email, password);
+            ```
+        }
+        {
+            name 'onForgotPressedHandler'
+            type OnEvent
+            on forgotRef
+            event onPressed
+            block ```
+                onForgotPassword();
+            ```
+        }
+        {
+            name 'onSignupPressedHandler'
+            type OnEvent
+            on signupRef
+            event onPressed
+            block ```
+                onSignup();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onLogin'
+            params [
+                {
+                    name 'email'
+                    type String
+                }
+                {
+                    name 'password'
+                    type String
+                }
+            ]
+        }
+        {
+            name 'onForgotPassword'
+        }
+        {
+            name 'onSignup'
+        }
+    ]
+}

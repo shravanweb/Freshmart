@@ -1,0 +1,16 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'AllSuppliers'
+    query `Vendor.all
+    .where((row) => row.organization == inputs.organization)
+    .orderBy((row) => row.name, asc: true)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

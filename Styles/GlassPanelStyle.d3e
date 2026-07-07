@@ -1,0 +1,28 @@
+Style {
+    package 'inventory.management.system'
+    name 'GlassPanelStyle'
+    description 'Frosted glass panel'
+    items [
+        {
+            selector 'Container.glassPanel'
+            values {
+                glassmorphism {
+                    blurSigma {
+                        dx '10'
+                        dy '10'
+                    }
+                    borderRadius '16'
+                    blendMode 'srcOver'
+                }
+                decoration {
+                    color '@c10/0.85'
+                    border {
+                        color '@c14/0.9'
+                        width '1'
+                        style 'solid'
+                    }
+                }
+            }
+        }
+    ]
+}

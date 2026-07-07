@@ -1,0 +1,60 @@
+@RPCService
+server class InventoryAdjustmentService {
+    static InventoryAdjustment createInventoryAdjustment(InventoryAdjustment inventoryAdjustment) {
+        if (inventoryAdjustment == null) {
+            throw Exception('InventoryAdjustment cannot be null');
+        }
+        inventoryAdjustment.status = AdjustmentStatus.Draft;
+        Database.save(inventoryAdjustment);
+        return inventoryAdjustment;
+    }
+
+    static InventoryAdjustment updateInventoryAdjustment(InventoryAdjustment inventoryAdjustment) {
+        if (inventoryAdjustment == null) {
+            throw Exception('InventoryAdjustment cannot be null');
+        }
+        Database.save(inventoryAdjustment);
+        return inventoryAdjustment;
+    }
+
+    static void deleteInventoryAdjustment(InventoryAdjustment inventoryAdjustment) {
+        if (inventoryAdjustment == null) {
+            return;
+        }
+        Database.delete(inventoryAdjustment);
+    }
+
+    static InventoryAdjustment confirmInventoryAdjustment(InventoryAdjustment inventoryAdjustment) {
+        if (inventoryAdjustment == null) {
+            throw Exception('InventoryAdjustment cannot be null');
+        }
+        inventoryAdjustment.status = AdjustmentStatus.Confirmed;
+        Database.save(inventoryAdjustment);
+        return inventoryAdjustment;
+    }
+
+    static InventoryAdjustmentLine createInventoryAdjustmentLine(InventoryAdjustmentLine inventoryAdjustmentLine) {
+        if (inventoryAdjustmentLine == null) {
+            throw Exception('InventoryAdjustmentLine cannot be null');
+        }
+        inventoryAdjustmentLine.quantityAfter = inventoryAdjustmentLine.quantityBefore + inventoryAdjustmentLine.quantityChange;
+        Database.save(inventoryAdjustmentLine);
+        return inventoryAdjustmentLine;
+    }
+
+    static InventoryAdjustmentLine updateInventoryAdjustmentLine(InventoryAdjustmentLine inventoryAdjustmentLine) {
+        if (inventoryAdjustmentLine == null) {
+            throw Exception('InventoryAdjustmentLine cannot be null');
+        }
+        inventoryAdjustmentLine.quantityAfter = inventoryAdjustmentLine.quantityBefore + inventoryAdjustmentLine.quantityChange;
+        Database.save(inventoryAdjustmentLine);
+        return inventoryAdjustmentLine;
+    }
+
+    static void deleteInventoryAdjustmentLine(InventoryAdjustmentLine inventoryAdjustmentLine) {
+        if (inventoryAdjustmentLine == null) {
+            return;
+        }
+        Database.delete(inventoryAdjustmentLine);
+    }
+}

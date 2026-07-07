@@ -1,0 +1,111 @@
+Widget {
+    package 'inventory.management.system'
+    name 'NotificationCenterWidget'
+    description 'Notification bell with unread count'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'unreadCount'
+            type Integer
+            defaultValue `0`
+        }
+        {
+            name 'notifications'
+            type InAppNotification
+            collection true
+        }
+        {
+            name 'badgeLabel'
+            type String
+            computed true
+            computation `unreadCount > 0 ? unreadCount.toString() : ''`
+            internal true
+        }
+    ]
+    build Container {
+        name 'bellRef'
+        styles [
+GlassPanelStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '8 12'
+        }
+        child Row {
+            name 'bellRowRef'
+            data {
+                mainAxisSize 'min'
+                crossAxisAlignment 'center'
+            }
+            children [
+                IconView {
+                    name 'iconRef'
+                    data {
+                        icon 'MaterialIcons.notifications'
+                        size '22'
+                        color '@c4'
+                    }
+                }
+                CIf {
+                    name 'badgeIfRef'
+                    condition `unreadCount > 0`
+                    then TextView {
+                        name 'badgeRef'
+                        data {
+                            data `badgeLabel`
+                            margin '0 0 0 8'
+                            textStyle {
+                                color '@c1'
+                                fontSize '12'
+                                fontWeight 'w700'
+                            }
+                        }
+                    }
+                }
+                TextButton {
+                    name 'viewAllRef'
+                    data {
+                        label `user.email + ' · ' + notifications.length.toString() + ' in ' + organization.name`
+                        margin '0 0 0 12'
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onViewAllHandler'
+            type OnEvent
+            on viewAllRef
+            event onPressed
+            block ```
+                onViewAll();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onMarkRead'
+            params [
+                {
+                    name 'notification'
+                    type InAppNotification
+                }
+            ]
+        }
+        {
+            name 'onViewAll'
+        }
+    ]
+}

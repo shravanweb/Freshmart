@@ -1,0 +1,16 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'AllAuditLogs'
+    query `AuditLog.all
+    .where((row) => row.organization == inputs.organization)
+    .orderBy((row) => row.performedAt, asc: false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

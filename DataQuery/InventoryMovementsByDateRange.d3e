@@ -1,0 +1,28 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'InventoryMovementsByDateRange'
+    query `InventoryMovement.all
+    .where((row) => row.organization == inputs.organization
+      && row.movementDate >= inputs.startDate
+      && row.movementDate <= inputs.endDate)
+    .orderBy((row) => row.movementDate, asc: false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'startDate'
+            type DateTime
+            required true
+        }
+        {
+            name 'endDate'
+            type DateTime
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

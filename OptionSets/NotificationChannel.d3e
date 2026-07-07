@@ -1,0 +1,15 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'NotificationChannel'
+    options [
+        {
+            name 'Email'
+        }
+        {
+            name 'InApp'
+        }
+        {
+            name 'SMS'
+        }
+    ]
+}

@@ -1,0 +1,306 @@
+Widget {
+    package 'inventory.management.system'
+    name 'IMSidebarWidget'
+    description 'App sidebar with role-based navigation'
+    properties [
+        {
+            name 'currentUser'
+            type User
+            required true
+        }
+        {
+            name 'currentRoute'
+            type String
+            internal true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+        }
+        {
+            name 'displayName'
+            type String
+            computed true
+            computation `userProfile != null ? userProfile.displayName : currentUser.email`
+            internal true
+        }
+    ]
+    build Container {
+        name 'sidebarRef'
+        styles [
+GlassSidebarStyle
+        ]
+        tags [
+            'sidebarSolid'
+        ]
+        child Column {
+            name 'sidebarColumnRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                Container {
+                    name 'brandRef'
+                    data {
+                        padding '20 16'
+                    }
+                    child Column {
+                        name 'brandColumnRef'
+                        children [
+                            TextView {
+                                name 'brandTitleRef'
+                                tags [
+                                    'sidebarBrandTitle'
+                                ]
+                                data {
+                                    data 'BuildACompleteInventory'
+                                }
+                            }
+                            TextView {
+                                name 'brandSubtitleRef'
+                                tags [
+                                    'sidebarBrandSubtitle'
+                                ]
+                                data {
+                                    data 'Inventory Management'
+                                }
+                            }
+                        ]
+                    }
+                }
+                Container {
+                    name 'navRef'
+                    data {
+                        padding '8 12'
+                    }
+                    child Column {
+                        name 'navColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                        }
+                        children [
+                            TextView {
+                                name 'mainSectionRef'
+                                tags [
+                                    'sidebarSectionLabel'
+                                ]
+                                data {
+                                    data 'Overview'
+                                }
+                            }
+                            CIf {
+                                name 'dashboardActiveIfRef'
+                                condition `currentRoute == '/dashboard'`
+                                then TextButton {
+                                    name 'dashboardNavActiveRef'
+                                    tags [
+                                        'navActive'
+                                    ]
+                                    data {
+                                        label 'Dashboard'
+                                    }
+                                }
+                                else TextButton {
+                                    name 'dashboardNavRef'
+                                    tags [
+                                        'navItem'
+                                    ]
+                                    data {
+                                        label 'Dashboard'
+                                    }
+                                }
+                            }
+                            TextView {
+                                name 'catalogSectionRef'
+                                tags [
+                                    'sidebarSectionLabel'
+                                ]
+                                data {
+                                    data 'Catalog'
+                                }
+                            }
+                            TextButton {
+                                name 'productsNavRef'
+                                tags [
+                                    'navItem'
+                                ]
+                                data {
+                                    label 'Products'
+                                }
+                            }
+                            TextButton {
+                                name 'categoriesNavRef'
+                                tags [
+                                    'navItem'
+                                ]
+                                data {
+                                    label 'Categories'
+                                }
+                            }
+                            TextView {
+                                name 'inventorySectionRef'
+                                tags [
+                                    'sidebarSectionLabel'
+                                ]
+                                data {
+                                    data 'Inventory'
+                                }
+                            }
+                            TextButton {
+                                name 'stockNavRef'
+                                tags [
+                                    'navItem'
+                                ]
+                                data {
+                                    label 'Stock Levels'
+                                }
+                            }
+                            TextButton {
+                                name 'transfersNavRef'
+                                tags [
+                                    'navItem'
+                                ]
+                                data {
+                                    label 'Transfers'
+                                }
+                            }
+                            TextView {
+                                name 'reportsSectionRef'
+                                tags [
+                                    'sidebarSectionLabel'
+                                ]
+                                data {
+                                    data 'Reports'
+                                }
+                            }
+                            TextButton {
+                                name 'reportsNavRef'
+                                tags [
+                                    'navItem'
+                                ]
+                                data {
+                                    label 'Stock Valuation'
+                                }
+                            }
+                        ]
+                    }
+                }
+                Container {
+                    name 'footerRef'
+                    data {
+                        padding '16'
+                    }
+                    child Column {
+                        name 'footerColumnRef'
+                        children [
+                            TextView {
+                                name 'userNameRef'
+                                data {
+                                    data `displayName`
+                                    textStyle {
+                                        color '@c4'
+                                        fontSize '14'
+                                        fontWeight 'w600'
+                                    }
+                                }
+                            }
+                            TextButton {
+                                name 'logoutRef'
+                                data {
+                                    label 'Logout'
+                                    margin '12 0 0 0'
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onDashboardNavHandler'
+            type OnEvent
+            on dashboardNavRef
+            event onPressed
+            block ```
+                onNavigate('/dashboard');
+            ```
+        }
+        {
+            name 'onDashboardNavActiveHandler'
+            type OnEvent
+            on dashboardNavActiveRef
+            event onPressed
+            block ```
+                onNavigate('/dashboard');
+            ```
+        }
+        {
+            name 'onProductsNavHandler'
+            type OnEvent
+            on productsNavRef
+            event onPressed
+            block ```
+                onNavigate('/catalog/products');
+            ```
+        }
+        {
+            name 'onCategoriesNavHandler'
+            type OnEvent
+            on categoriesNavRef
+            event onPressed
+            block ```
+                onNavigate('/catalog/categories');
+            ```
+        }
+        {
+            name 'onStockNavHandler'
+            type OnEvent
+            on stockNavRef
+            event onPressed
+            block ```
+                onNavigate('/inventory/stock');
+            ```
+        }
+        {
+            name 'onTransfersNavHandler'
+            type OnEvent
+            on transfersNavRef
+            event onPressed
+            block ```
+                onNavigate('/inventory/transfers');
+            ```
+        }
+        {
+            name 'onReportsNavHandler'
+            type OnEvent
+            on reportsNavRef
+            event onPressed
+            block ```
+                onNavigate('/reports/stock-valuation');
+            ```
+        }
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on logoutRef
+            event onPressed
+            block ```
+                onNavigate('/login');
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onNavigate'
+            params [
+                {
+                    name 'route'
+                    type String
+                }
+            ]
+        }
+    ]
+}

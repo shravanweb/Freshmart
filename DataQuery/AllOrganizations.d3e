@@ -1,0 +1,10 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'AllOrganizations'
+    query `Organization.all
+    .orderBy((row) => row.name, asc: true)`
+    inputs [
+    ]
+    enableSync true
+    needCount true
+}

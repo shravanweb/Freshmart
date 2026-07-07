@@ -1,0 +1,23 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'ExpiringBatches'
+    query `StockBatch.all
+    .where((row) => row.organization == inputs.organization
+      && row.expiryDate != null
+      && row.expiryDate <= DateTime.now().add(Duration(days: inputs.daysAhead)).date)
+    .orderBy((row) => row.expiryDate, asc: true)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'daysAhead'
+            type Integer
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

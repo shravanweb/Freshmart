@@ -1,0 +1,18 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'AlertStatus'
+    options [
+        {
+            name 'Open'
+        }
+        {
+            name 'Acknowledged'
+        }
+        {
+            name 'Resolved'
+        }
+        {
+            name 'Dismissed'
+        }
+    ]
+}

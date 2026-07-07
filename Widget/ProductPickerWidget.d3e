@@ -1,0 +1,114 @@
+Widget {
+    package 'inventory.management.system'
+    name 'ProductPickerWidget'
+    description 'Modal product picker with search'
+    properties [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'searchTerm'
+            type String
+            internal true
+        }
+        {
+            name 'selectedProduct'
+            type Product
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'glassCard'
+        ]
+        child Column {
+            name 'pickerColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                TextView {
+                    name 'titleRef'
+                    data {
+                        data `searchTerm != null && searchTerm.isNotEmpty ? 'Select Product: ' + searchTerm : 'Select Product'`
+                        margin '0 0 16 0'
+                        textStyle {
+                            color '@c4'
+                            fontSize '18'
+                            fontWeight 'w600'
+                        }
+                    }
+                }
+                ProductSearchFieldWidget {
+                    name 'searchFieldRef'
+                    data {
+                        organization `organization`
+                    }
+                }
+                Container {
+                    name 'resultsRef'
+                    tags [
+                        'glassPanel'
+                    ]
+                    data {
+                        margin '16 0 0 0'
+                        padding '16'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data 'Bind ProductSearch query results in Page'
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+                TextButton {
+                    name 'selectRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Select'
+                        margin '16 0 0 0'
+                        disable `selectedProduct == null`
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSelectHandler'
+            type OnEvent
+            on selectRef
+            event onPressed
+            block ```
+                if (selectedProduct != null) {
+                    onProductSelected(selectedProduct);
+                }
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onProductSelected'
+            params [
+                {
+                    name 'product'
+                    type Product
+                }
+            ]
+        }
+    ]
+}

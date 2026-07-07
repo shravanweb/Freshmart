@@ -1,0 +1,16 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'AllInventoryMovements'
+    query `InventoryMovement.all
+    .where((row) => row.organization == inputs.organization)
+    .orderBy((row) => row.movementDate, asc: false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

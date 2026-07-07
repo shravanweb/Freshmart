@@ -1,0 +1,39 @@
+Page {
+    package 'inventory.management.system'
+    name 'NotFoundPage'
+    description '404 not found page'
+    properties []
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassCardStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        data {
+            alignment 'center'
+        }
+        child EmptyStateWidget {
+            name 'emptyRef'
+            data {
+                title 'Page Not Found'
+                message 'The page you are looking for does not exist.'
+                actionLabel 'Go Home'
+            }
+        }
+    }
+    eventHandlers [
+        {
+            name 'onActionHandler'
+            type OnEvent
+            on emptyRef
+            event onAction
+            block ```
+                navigator.pushLandingPage();
+            ```
+        }
+    ]
+}

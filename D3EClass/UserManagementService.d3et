@@ -1,0 +1,94 @@
+@RPCService
+server class UserManagementService {
+    static User createUser(User user) {
+        if (user == null) {
+            throw Exception('User cannot be null');
+        }
+        Database.save(user);
+        return user;
+    }
+
+    static User updateUser(User user) {
+        if (user == null) {
+            throw Exception('User cannot be null');
+        }
+        Database.save(user);
+        return user;
+    }
+
+    static void deleteUser(User user) {
+        if (user == null) {
+            return;
+        }
+        Database.delete(user);
+    }
+
+    static UserProfile createUserProfile(UserProfile userProfile) {
+        if (userProfile == null) {
+            throw Exception('UserProfile cannot be null');
+        }
+        Database.save(userProfile);
+        return userProfile;
+    }
+
+    static UserProfile updateUserProfile(UserProfile userProfile) {
+        if (userProfile == null) {
+            throw Exception('UserProfile cannot be null');
+        }
+        Database.save(userProfile);
+        return userProfile;
+    }
+
+    static void deleteUserProfile(UserProfile userProfile) {
+        if (userProfile == null) {
+            return;
+        }
+        Database.delete(userProfile);
+    }
+
+    static UserInvitation createUserInvitation(UserInvitation userInvitation) {
+        if (userInvitation == null) {
+            throw Exception('UserInvitation cannot be null');
+        }
+        Database.save(userInvitation);
+        return userInvitation;
+    }
+
+    static UserInvitation updateUserInvitation(UserInvitation userInvitation) {
+        if (userInvitation == null) {
+            throw Exception('UserInvitation cannot be null');
+        }
+        Database.save(userInvitation);
+        return userInvitation;
+    }
+
+    static void deleteUserInvitation(UserInvitation userInvitation) {
+        if (userInvitation == null) {
+            return;
+        }
+        Database.delete(userInvitation);
+    }
+
+    static UserRole createUserRole(UserRole userRole) {
+        if (userRole == null) {
+            throw Exception('UserRole cannot be null');
+        }
+        Database.save(userRole);
+        return userRole;
+    }
+
+    static UserRole updateUserRole(UserRole userRole) {
+        if (userRole == null) {
+            throw Exception('UserRole cannot be null');
+        }
+        Database.save(userRole);
+        return userRole;
+    }
+
+    static void deleteUserRole(UserRole userRole) {
+        if (userRole == null) {
+            return;
+        }
+        Database.delete(userRole);
+    }
+}

@@ -1,0 +1,24 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'MovementReferenceType'
+    options [
+        {
+            name 'PurchaseOrder'
+        }
+        {
+            name 'GoodsReceipt'
+        }
+        {
+            name 'StockTransfer'
+        }
+        {
+            name 'SalesOrder'
+        }
+        {
+            name 'SalesReturn'
+        }
+        {
+            name 'InventoryAdjustment'
+        }
+    ]
+}

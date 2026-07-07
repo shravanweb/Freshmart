@@ -1,0 +1,14 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'loginInventoryManagementSystemUserWithEmailAndPassword'
+        'LoginPage'
+        'eventHandlers_onLoginHandler_block'
+    ]
+    struct LoginResult
+    usage [
+        '*'
+        'userObject.*'
+    ]
+}

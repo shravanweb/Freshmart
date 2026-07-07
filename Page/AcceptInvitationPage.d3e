@@ -1,0 +1,153 @@
+Page {
+    package 'inventory.management.system'
+    name 'AcceptInvitationPage'
+    description 'Accept user invitation'
+    properties [
+        {
+            name 'token'
+            type String
+            required true
+        }
+        {
+            name 'displayName'
+            type String
+            internal true
+        }
+        {
+            name 'password'
+            type String
+            internal true
+        }
+        {
+            name 'confirmPassword'
+            type String
+            internal true
+        }
+        {
+            name 'errorMessage'
+            type String
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassCardStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        data {
+            alignment 'center'
+            padding '32'
+        }
+        child Container {
+            name 'cardRef'
+            tags [
+                'glassCard'
+            ]
+            data {
+                width '480'
+            }
+            child Column {
+                name 'formColumnRef'
+                data {
+                    crossAxisAlignment 'stretch'
+                }
+                children [
+                    TextView {
+                        name 'titleRef'
+                        data {
+                            data 'Accept Invitation'
+                            textAlign 'center'
+                            margin '0 0 8 0'
+                            textStyle {
+                                color '@c4'
+                                fontSize '22'
+                                fontWeight 'w700'
+                            }
+                        }
+                    }
+                    TextView {
+                        name 'subtitleRef'
+                        data {
+                            data `token.isNotEmpty ? 'Invitation token: ' + token : 'Create your account to join the organization'`
+                            textAlign 'center'
+                            margin '0 0 24 0'
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                    IMSInputFieldWidget {
+                        name 'nameFieldRef'
+                        data {
+                            label 'Display Name'
+                            text `displayName`
+                            placeHolder 'Your name'
+                        }
+                    }
+                    Container {
+                        name 'spacer1Ref'
+                        data {
+                            margin '0 0 16 0'
+                        }
+                    }
+                    IMSInputFieldWidget {
+                        name 'passwordFieldRef'
+                        data {
+                            label 'Password'
+                            text `password`
+                            placeHolder 'Create password'
+                            obscureText 'true'
+                        }
+                    }
+                    Container {
+                        name 'spacer2Ref'
+                        data {
+                            margin '0 0 16 0'
+                        }
+                    }
+                    IMSInputFieldWidget {
+                        name 'confirmFieldRef'
+                        data {
+                            label 'Confirm Password'
+                            text `confirmPassword`
+                            placeHolder 'Confirm password'
+                            obscureText 'true'
+                        }
+                    }
+                    TextButton {
+                        name 'acceptRef'
+                        tags [
+                            'primary'
+                        ]
+                        data {
+                            label 'Accept & Sign In'
+                            margin '24 0 0 0'
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    eventHandlers [
+        {
+            name 'onAcceptHandler'
+            type OnEvent
+            on acceptRef
+            event onPressed
+            block ```
+                if (password != confirmPassword) {
+                    errorMessage = 'Passwords do not match';
+                    return;
+                }
+                navigator.pushLoginPage();
+            ```
+        }
+    ]
+}

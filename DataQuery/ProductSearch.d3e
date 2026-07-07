@@ -1,0 +1,34 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'ProductSearch'
+    query `Product.all
+    .where((row) => row.organization == inputs.organization
+      && (inputs.category == null || row.category == inputs.category)
+      && (inputs.status == null || row.status == inputs.status)
+      && (inputs.searchTerm == null || inputs.searchTerm == ''
+        || row.name.contains(inputs.searchTerm)
+        || row.sku.contains(inputs.searchTerm)
+        || (row.barcode != null && row.barcode.contains(inputs.searchTerm))))
+    .orderBy((row) => row.name, asc: true)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'searchTerm'
+            type String
+        }
+        {
+            name 'category'
+            type ProductCategory
+        }
+        {
+            name 'status'
+            type ProductStatus
+        }
+    ]
+    enableSync true
+    needCount true
+}

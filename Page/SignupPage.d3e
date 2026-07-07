@@ -1,0 +1,126 @@
+Page {
+    package 'inventory.management.system'
+    name 'SignupPage'
+    description 'New user registration'
+    properties [
+        {
+            name 'displayName'
+            type String
+            internal true
+        }
+        {
+            name 'email'
+            type String
+            internal true
+        }
+        {
+            name 'password'
+            type String
+            internal true
+        }
+        {
+            name 'confirmPassword'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            defaultValue `false`
+            internal true
+        }
+        {
+            name 'errorMessage'
+            type String
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassCardStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        data {
+            alignment 'center'
+        }
+        child Column {
+            name 'centerColumnRef'
+            data {
+                mainAxisSize 'max'
+                mainAxisAlignment 'center'
+                crossAxisAlignment 'center'
+            }
+            children [
+                SignupFormWidget {
+                    name 'signupFormRef'
+                    data {
+                        displayName `displayName`
+                        email `email`
+                        password `password`
+                        confirmPassword `confirmPassword`
+                        errorMessage `errorMessage`
+                        isLoading `isLoading`
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSignupHandler'
+            type OnEvent
+            on signupFormRef
+            event onSignup
+            block ```
+                errorMessage = '';
+                if (displayName == null || displayName.trim().isEmpty) {
+                    errorMessage = 'Please enter your name.';
+                    return;
+                }
+                if (email == null || email.trim().isEmpty) {
+                    errorMessage = 'Please enter your email.';
+                    return;
+                }
+                if (password == null || password.length < 6) {
+                    errorMessage = 'Password must be at least 6 characters.';
+                    return;
+                }
+                if (password != confirmPassword) {
+                    errorMessage = 'Passwords do not match.';
+                    return;
+                }
+                isLoading = true;
+                try {
+                    LoginResult result = Query.registerInventoryManagementSystemUser(
+                        displayName: displayName.trim(),
+                        email: email.toLowerCase(),
+                        password: password
+                    ).await;
+                    if (result.success) {
+                        navigator.pushDashboardPage(user: result.userObject as User, target: 'main', replace: true);
+                    } else {
+                        errorMessage = result.failureMessage;
+                    }
+                } catch (e) {
+                    errorMessage = 'Sign up failed: ' + e.toString();
+                }
+                isLoading = false;
+            ```
+        }
+        {
+            name 'onGoToLoginHandler'
+            type OnEvent
+            on signupFormRef
+            event onGoToLogin
+            block ```
+                navigator.pushLoginPage();
+            ```
+        }
+    ]
+}

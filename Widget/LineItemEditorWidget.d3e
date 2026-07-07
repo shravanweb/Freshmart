@@ -1,0 +1,121 @@
+Widget {
+    package 'inventory.management.system'
+    name 'LineItemEditorWidget'
+    description 'Generic line item editor for PO, sales, transfers'
+    properties [
+        {
+            name 'mode'
+            type String
+            defaultValue `'edit'`
+        }
+        {
+            name 'lineCount'
+            type Integer
+            defaultValue `0`
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+            GlassPanelStyle
+        ]
+        tags [
+            'glassCardFlat'
+        ]
+        child Column {
+            name 'editorColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                Row {
+                    name 'headerRowRef'
+                    data {
+                        mainAxisAlignment 'spaceBetween'
+                        crossAxisAlignment 'center'
+                        mainAxisSize 'max'
+                    }
+                    children [
+                        TextView {
+                            name 'titleRef'
+                            data {
+                                data `mode + ' · ' + lineCount.toString() + ' lines'`
+                                textStyle {
+                                    color '@c4'
+                                    fontSize '18'
+                                    fontWeight 'w600'
+                                }
+                            }
+                        }
+                        TextButton {
+                            name 'addLineRef'
+                            tags [
+                                'primary'
+                            ]
+                            data {
+                                label 'Add Line'
+                            }
+                        }
+                    ]
+                }
+                Container {
+                    name 'linesRef'
+                    tags [
+                        'glassPanel'
+                    ]
+                    data {
+                        margin '16 0 0 0'
+                        padding '16'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data `mode + ' mode — bind line collection from parent document`
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onAddLineHandler'
+            type OnEvent
+            on addLineRef
+            event onPressed
+            block ```
+                onAddLine();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onAddLine'
+        }
+        {
+            name 'onRemoveLine'
+            params [
+                {
+                    name 'lineIndex'
+                    type Integer
+                }
+            ]
+        }
+        {
+            name 'onLineChange'
+            params [
+                {
+                    name 'lineIndex'
+                    type Integer
+                }
+            ]
+        }
+    ]
+}

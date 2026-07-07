@@ -1,0 +1,18 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'SalesReturnStatus'
+    options [
+        {
+            name 'Draft'
+        }
+        {
+            name 'Confirmed'
+        }
+        {
+            name 'Completed'
+        }
+        {
+            name 'Cancelled'
+        }
+    ]
+}

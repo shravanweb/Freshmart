@@ -1,0 +1,1111 @@
+.InputField {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  /* Layout */
+  height: var(--input-height, 36px);
+  padding-right: var(--input-padding-right, 16px);
+  padding-bottom: var(--input-padding-bottom, 12px);
+  padding-left: var(--input-padding-left, 16px);
+  padding-top: var(--input-padding-top, 12px);
+  border-radius: var(--input-radius, 4px);
+  /* Colors */
+  background-color: var(--input-bg, transparent);
+  border: var(--input-border-width, 1px) solid
+    var(--input-inactive-color, #bfbfbf);
+
+  /* Typography */
+  color: var(--input-color, inherit);
+  font-size: var(--input-font-size, inherit);
+  font-weight: var(--input-font-weight, inherit);
+  font-family: var(--input-font-family, inherit);
+
+  /* Behavior */
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.InputField:focus {
+  border-color: var(--input-active-color, #14acff);
+}
+
+.InputField::placeholder {
+  color: var(--input-placeholder-color, #999);
+}
+
+.InputField:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.PrintingPreviewView {
+  width: 100vw;
+  /* 100% of the viewport width */
+  height: 100vh;
+  /* 100% of the viewport height */
+  position: fixed;
+  /* Fixed position to cover the whole viewport */
+  top: 0;
+  left: 0;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  display: flex;
+  overflow: hidden;
+}
+
+ui-row > textarea {
+  flex-grow: 1;
+}
+
+ui-column > textarea {
+  align-self: stretch;
+}
+
+ui-column > ui-wrap {
+  align-self: stretch;
+}
+
+textarea {
+  border-color: #bfbfbf;
+  border-width: 1px;
+  border-style: solid;
+  outline: none;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.tinymce {
+  border: 0px none;
+  width: 100%;
+  height: 100%;
+}
+
+input:focus-visible {
+  border-color: #14acff;
+}
+
+input::placeholder {
+  color: rgba(0, 0, 0, 0.376);
+}
+
+*[data-hide] {
+  display: none !important;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+ui-overlay-root {
+  height: 100%;
+}
+
+.w-screen {
+  width: 100vw;
+}
+.h-screen {
+  height: 100vh;
+}
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
+.ma-e {
+  justify-content: end;
+}
+
+.ma-s {
+  justify-content: start;
+}
+
+.ma-c {
+  justify-content: center;
+}
+
+.ma-sa {
+  justify-content: space-around;
+}
+
+.ma-sb {
+  justify-content: space-between;
+}
+
+.ma-se {
+  justify-content: space-evenly;
+}
+
+.jc-fe {
+  justify-content: flex-end;
+}
+
+.cr-s {
+  align-items: flex-start;
+}
+
+.cr-e {
+  align-items: flex-end;
+}
+
+.cr-c {
+  align-items: center;
+}
+
+.cr-st {
+  align-items: stretch;
+}
+
+.cr-b {
+  align-items: baseline;
+}
+/* ui-row > .expanded {
+  flex-grow: 1;
+}
+ui-column > .expanded {
+  flex-grow: 1;
+} */
+ui-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkbox {
+  background-color: #bfbfbf;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.button {
+  cursor: pointer;
+}
+
+ui-overlay-root > ui-page-router {
+  height: 100%;
+}
+
+ui-overlay-root > ui-page-router > * {
+  height: 100%;
+}
+
+ui-page-router {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+ui-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+ui-container > ui-column {
+  align-self: stretch;
+}
+
+ui-column > table {
+  align-self: stretch;
+}
+
+ui-column > ui-scroll {
+  align-self: stretch;
+}
+
+ui-column > ui-list-view {
+  align-self: stretch;
+}
+
+.RootPage {
+  align-self: stretch;
+}
+
+ui-layout-aware {
+  display: flex;
+  align-self: stretch;
+  align-items: stretch;
+}
+ui-column.max {
+  height: 100%;
+}
+ui-column.min {
+  height: fit-content;
+}
+ui-container > ui-column.max {
+  height: 100%;
+}
+
+ui-page-router {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+ui-page-router > * {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;   
+}
+
+ui-popup {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  display: flex;
+  z-index: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+ui-popup.Top {
+  align-items: start;
+}
+
+ui-popup.Bottom {
+  align-items: end;
+}
+
+ui-popup.Center {
+  align-items: center;
+}
+
+ui-popup.Left {
+  justify-content: start;
+}
+
+ui-popup.Right {
+  justify-content: end;
+}
+
+ui-popup.Positioned {
+  display: block;
+}
+
+ui-popup-content {
+  background-color: white;
+  height: fit-content;
+  width: fit-content;
+}
+
+/* ui-row > ui-column.max {
+  align-self: stretch;
+} */
+ui-container > .v {
+  flex-grow: 1;
+}
+
+ui-center > .h {
+  width: 100%;
+}
+
+ui-container > input {
+  height: inherit;
+}
+
+ui-container > .h {
+  align-self: stretch;
+}
+
+ui-row > * {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+ui-column > * {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+ui-container > * {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+ui-container > ui-row {
+  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+ui-column.v > * {
+  flex-shrink: 0;
+}
+
+ui-detector {
+  display: flex;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.Button > ui-center {
+  flex-grow: 1;
+}
+
+.RootPage {
+  align-items: start;
+}
+
+label {
+  display: block;
+  white-space: pre-line;
+}
+
+ui-popup-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #2223;
+  position: fixed;
+}
+
+ui-popup.Center {
+  position: initial;
+}
+
+ui-popup.Top {
+  position: initial;
+}
+
+ui-popup.Right {
+  position: initial;
+}
+
+ui-popup.Bottom {
+  position: initial;
+}
+
+ui-popup.Left {
+  position: initial;
+}
+
+ui-popup-wrapper.Center {
+  align-items: center;
+  justify-content: center;
+}
+
+ui-popup-wrapper.Top {
+  align-items: center;
+  justify-content: start;
+}
+
+ui-popup-wrapper.Right {
+  align-items: end;
+  justify-content: center;
+}
+
+ui-popup-wrapper.Button {
+  align-items: center;
+  justify-content: end;
+}
+
+ui-popup-wrapper.Left {
+  align-items: start;
+  justify-content: center;
+}
+
+ui-overlay-entry.show {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+}
+
+ui-overlay-entry > * {
+  pointer-events: all;
+}
+
+ui-icon {
+  font-size: 24px;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+label {
+  word-wrap: anywhere;
+  cursor: inherit;
+}
+
+table {
+  border-spacing: 0px;
+  table-layout: fixed;
+}
+
+ui-row > input {
+  flex-grow: 1;
+}
+
+ui-column > input {
+  align-self: stretch;
+}
+
+ui-container > ui-layout-aware {
+  width: 100%;
+  height: 100%;
+}
+
+ui-list-view.sv {
+  overflow-y: auto;
+}
+
+ui-list-view.sh {
+  overflow-x: auto;
+}
+
+ui-column.v > ui-list-view.sv {
+  flex-shrink: inherit;
+}
+
+ui-row.h > ui-list-view.sh {
+  flex-shrink: inherit;
+}
+
+ui-positioned {
+  position: absolute;
+}
+
+ui-loader {
+  border: 4px solid #f3f3f3;
+  /* Light grey */
+  border-top: 4px solid #3498db;
+  /* Blue */
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  animation: spin 2s linear infinite;
+}
+
+/*Colum props */
+/* =========================================================
+   COLUMN
+========================================================= */
+
+ui-column {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+/* =========================================================
+   MAIN AXIS ALIGNMENT
+========================================================= */
+
+ui-column.ma-start {
+  justify-content: flex-start;
+}
+
+ui-column.ma-center {
+  justify-content: center;
+}
+
+ui-column.ma-end {
+  justify-content: flex-end;
+}
+
+ui-column.ma-space-between {
+  justify-content: space-between;
+}
+
+ui-column.ma-space-around {
+  justify-content: space-around;
+}
+
+ui-column.ma-space-evenly {
+  justify-content: space-evenly;
+}
+
+/* =========================================================
+   CROSS AXIS ALIGNMENT
+========================================================= */
+
+ui-column.ca-start {
+  align-items: flex-start;
+}
+
+ui-column.ca-center {
+  align-items: center;
+}
+
+ui-column.ca-end {
+  align-items: flex-end;
+}
+
+ui-column.ca-stretch {
+  align-items: stretch;
+}
+
+ui-column.ca-baseline {
+  align-items: baseline;
+}
+
+/* =========================================================
+   MAIN AXIS SIZE
+========================================================= */
+
+ui-column.max {
+  height: 100%;
+}
+
+ui-column.min {
+  height: fit-content;
+}
+
+/* =========================================================
+   TEXT DIRECTION
+========================================================= */
+
+ui-column.ltr {
+  direction: ltr;
+}
+
+ui-column.rtl {
+  direction: rtl;
+}
+
+/* =========================================================
+   VERTICAL DIRECTION
+========================================================= */
+
+ui-column.v-down {
+  flex-direction: column;
+}
+
+ui-column.v-up {
+  flex-direction: column-reverse;
+}
+
+/* =========================================================
+   TEXT BASELINE
+========================================================= */
+
+ui-column.baseline-alphabetic {
+  text-rendering: optimizeLegibility;
+}
+
+ui-column.baseline-ideographic {
+  font-variant-east-asian: full-width;
+}
+
+/* =========================================================
+   ROW
+========================================================= */
+
+ui-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+/* =========================================================
+   MAIN AXIS ALIGNMENT
+========================================================= */
+
+ui-row.ma-start {
+  justify-content: flex-start;
+}
+
+ui-row.ma-center {
+  justify-content: center;
+}
+
+ui-row.ma-end {
+  justify-content: flex-end;
+}
+
+ui-row.ma-space-between {
+  justify-content: space-between;
+}
+
+ui-row.ma-space-around {
+  justify-content: space-around;
+}
+
+ui-row.ma-space-evenly {
+  justify-content: space-evenly;
+}
+
+/* =========================================================
+   CROSS AXIS ALIGNMENT
+========================================================= */
+
+ui-row.ca-start {
+  align-items: flex-start;
+}
+
+ui-row.ca-center {
+  align-items: center;
+}
+
+ui-row.ca-end {
+  align-items: flex-end;
+}
+
+ui-row.ca-stretch {
+  align-items: stretch;
+}
+
+ui-row.ca-baseline {
+  align-items: baseline;
+}
+
+/* =========================================================
+   MAIN AXIS SIZE
+========================================================= */
+
+ui-row.max {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+ui-row.min {
+  width: fit-content;
+}
+
+/* =========================================================
+   TEXT DIRECTION
+========================================================= */
+
+ui-row.ltr {
+  direction: ltr;
+}
+
+ui-row.rtl {
+  direction: rtl;
+}
+
+/* =========================================================
+   VERTICAL DIRECTION
+========================================================= */
+
+ui-row.v-down {
+  flex-direction: row;
+}
+
+ui-row.v-up {
+  flex-direction: row-reverse;
+}
+
+/* =========================================================
+   TEXT BASELINE
+========================================================= */
+
+ui-row.baseline-alphabetic {
+  text-rendering: optimizeLegibility;
+}
+
+ui-row.baseline-ideographic {
+  font-variant-east-asian: full-width;
+}
+
+/* =========================================================
+   STACK
+========================================================= */
+
+ui-stack {
+  display: grid;
+  position: relative;
+}
+
+/* =========================================================
+   NORMAL STACK CHILDREN
+========================================================= */
+
+ui-stack > * {
+  grid-area: 1 / 1 / 2 / 2;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* =========================================================
+   POSITIONED CHILDREN
+========================================================= */
+
+ui-stack > .positioned {
+  position: absolute;
+}
+
+/* =========================================================
+   POSITION HELPERS
+========================================================= */
+
+.top {
+  top: 0;
+}
+
+.bottom {
+  bottom: 0;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
+/* =========================================================
+   ALIGNMENT DIRECTIONAL
+========================================================= */
+
+ui-stack.ad-top-start > * {
+  justify-self: start;
+  align-self: start;
+}
+
+ui-stack.ad-top-center > * {
+  justify-self: center;
+  align-self: start;
+}
+
+ui-stack.ad-top-end > * {
+  justify-self: end;
+  align-self: start;
+}
+
+ui-stack.ad-center-start > * {
+  justify-self: start;
+  align-self: center;
+}
+
+ui-stack.ad-center > * {
+  justify-self: center;
+  align-self: center;
+}
+
+ui-stack.ad-center-end > * {
+  justify-self: end;
+  align-self: center;
+}
+
+ui-stack.ad-bottom-start > * {
+  justify-self: start;
+  align-self: end;
+}
+
+ui-stack.ad-bottom-center > * {
+  justify-self: center;
+  align-self: end;
+}
+
+ui-stack.ad-bottom-end > * {
+  justify-self: end;
+  align-self: end;
+}
+
+/* =========================================================
+   TEXT DIRECTION
+========================================================= */
+
+ui-stack.ltr {
+  direction: ltr;
+}
+
+ui-stack.rtl {
+  direction: rtl;
+}
+
+/* =========================================================
+   STACK FIT
+========================================================= */
+
+ui-stack.fit-loose {
+  width: fit-content;
+  height: fit-content;
+}
+
+ui-stack.fit-expand {
+  width: 100%;
+  height: 100%;
+}
+
+ui-stack.fit-passthrough {
+  width: auto;
+  height: auto;
+}
+
+/* =========================================================
+   OVERFLOW
+========================================================= */
+
+ui-stack.overflow-visible {
+  overflow: visible;
+}
+
+ui-stack.overflow-clip {
+  overflow: hidden;
+}
+
+/* =========================================================
+   CLIP BEHAVIOR
+========================================================= */
+
+ui-stack.clip-none {
+  overflow: visible;
+}
+
+ui-stack.clip-hard-edge {
+  overflow: hidden;
+}
+
+ui-stack.clip-anti-alias {
+  overflow: hidden;
+  clip-path: inset(0);
+}
+
+ui-stack.clip-anti-alias-save-layer {
+  overflow: hidden;
+  clip-path: inset(0);
+  isolation: isolate;
+}
+
+ui-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   DIRECTION
+========================================================= */
+
+ui-wrap.vertical {
+  flex-direction: column;
+}
+
+ui-wrap.horizontal {
+  flex-direction: row;
+}
+
+/* =========================================================
+   MAIN ALIGNMENT
+========================================================= */
+
+ui-wrap.start {
+  justify-content: flex-start;
+}
+
+ui-wrap.center {
+  justify-content: center;
+}
+
+ui-wrap.end {
+  justify-content: flex-end;
+}
+
+ui-wrap.spaceBetween {
+  justify-content: space-between;
+}
+
+ui-wrap.spaceAround {
+  justify-content: space-around;
+}
+
+ui-wrap.spaceEvenly {
+  justify-content: space-evenly;
+}
+
+/* =========================================================
+   SPACING
+========================================================= */
+
+ui-wrap.spacing4 {
+  gap: 4px;
+}
+
+ui-wrap.spacing8 {
+  gap: 8px;
+}
+
+ui-wrap.spacing12 {
+  gap: 12px;
+}
+
+ui-wrap.spacing16 {
+  gap: 16px;
+}
+
+ui-wrap.spacing24 {
+  gap: 24px;
+}
+
+/* =========================================================
+   RUN ALIGNMENT
+========================================================= */
+
+ui-wrap.runStart {
+  align-content: flex-start;
+}
+
+ui-wrap.runCenter {
+  align-content: center;
+}
+
+ui-wrap.runEnd {
+  align-content: flex-end;
+}
+
+ui-wrap.runSpaceBetween {
+  align-content: space-between;
+}
+
+ui-wrap.runSpaceAround {
+  align-content: space-around;
+}
+
+ui-wrap.runSpaceEvenly {
+  align-content: space-evenly;
+}
+
+/* =========================================================
+   RUN SPACING
+========================================================= */
+
+ui-wrap.runSpacing4 {
+  row-gap: 4px;
+}
+
+ui-wrap.runSpacing8 {
+  row-gap: 8px;
+}
+
+ui-wrap.runSpacing12 {
+  row-gap: 12px;
+}
+
+ui-wrap.runSpacing16 {
+  row-gap: 16px;
+}
+
+ui-wrap.runSpacing24 {
+  row-gap: 24px;
+}
+
+/* =========================================================
+   CROSS AXIS ALIGNMENT
+========================================================= */
+
+ui-wrap.crossStart {
+  align-items: flex-start;
+}
+
+ui-wrap.crossCenter {
+  align-items: center;
+}
+
+ui-wrap.crossEnd {
+  align-items: flex-end;
+}
+
+/* =========================================================
+   TEXT DIRECTION
+========================================================= */
+
+ui-wrap.ltr {
+  direction: ltr;
+}
+
+ui-wrap.rtl {
+  direction: rtl;
+}
+
+/* =========================================================
+   VERTICAL DIRECTION
+========================================================= */
+
+ui-wrap.verticalDown {
+  flex-wrap: wrap;
+}
+
+ui-wrap.verticalUp {
+  flex-wrap: wrap-reverse;
+}
+
+ui-scroll-view {
+  display: block;
+  position: relative;
+  overflow: auto;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+}
+
+ui-column > ui-scroll-view {
+  align-self: stretch;
+}
+
+/* Webkit Scrollbars */
+
+ui-scroll-view::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+ui-scroll-view::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+}
+
+ui-scroll-view::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* extra iframs which mostly need for user*/
+@keyframes rotateClockwise {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotateCounterClockwise {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}

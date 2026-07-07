@@ -1,0 +1,69 @@
+@RPCService
+server class SalesOrderService {
+    static SalesOrder createSalesOrder(SalesOrder salesOrder) {
+        if (salesOrder == null) {
+            throw Exception('SalesOrder cannot be null');
+        }
+        salesOrder.status = SalesOrderStatus.Draft;
+        Database.save(salesOrder);
+        return salesOrder;
+    }
+
+    static SalesOrder updateSalesOrder(SalesOrder salesOrder) {
+        if (salesOrder == null) {
+            throw Exception('SalesOrder cannot be null');
+        }
+        Database.save(salesOrder);
+        return salesOrder;
+    }
+
+    static void deleteSalesOrder(SalesOrder salesOrder) {
+        if (salesOrder == null) {
+            return;
+        }
+        Database.delete(salesOrder);
+    }
+
+    static SalesOrder confirmSalesOrder(SalesOrder salesOrder) {
+        if (salesOrder == null) {
+            throw Exception('SalesOrder cannot be null');
+        }
+        salesOrder.status = SalesOrderStatus.Confirmed;
+        Database.save(salesOrder);
+        return salesOrder;
+    }
+
+    static SalesOrder cancelSalesOrder(SalesOrder salesOrder) {
+        if (salesOrder == null) {
+            throw Exception('SalesOrder cannot be null');
+        }
+        salesOrder.status = SalesOrderStatus.Cancelled;
+        Database.save(salesOrder);
+        return salesOrder;
+    }
+
+    static SalesOrderLine createSalesOrderLine(SalesOrderLine salesOrderLine) {
+        if (salesOrderLine == null) {
+            throw Exception('SalesOrderLine cannot be null');
+        }
+        salesOrderLine.lineTotal = (salesOrderLine.quantity * salesOrderLine.unitPrice) - salesOrderLine.discount;
+        Database.save(salesOrderLine);
+        return salesOrderLine;
+    }
+
+    static SalesOrderLine updateSalesOrderLine(SalesOrderLine salesOrderLine) {
+        if (salesOrderLine == null) {
+            throw Exception('SalesOrderLine cannot be null');
+        }
+        salesOrderLine.lineTotal = (salesOrderLine.quantity * salesOrderLine.unitPrice) - salesOrderLine.discount;
+        Database.save(salesOrderLine);
+        return salesOrderLine;
+    }
+
+    static void deleteSalesOrderLine(SalesOrderLine salesOrderLine) {
+        if (salesOrderLine == null) {
+            return;
+        }
+        Database.delete(salesOrderLine);
+    }
+}

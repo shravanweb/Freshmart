@@ -1,0 +1,15 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'AdjustmentStatus'
+    options [
+        {
+            name 'Draft'
+        }
+        {
+            name 'Confirmed'
+        }
+        {
+            name 'Cancelled'
+        }
+    ]
+}

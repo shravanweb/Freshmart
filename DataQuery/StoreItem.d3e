@@ -1,0 +1,14 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'StoreItem'
+    query `Store.all
+    .where((row) => row == inputs.store)`
+    inputs [
+        {
+            name 'store'
+            type Store
+            required true
+        }
+    ]
+    enableSync true
+}

@@ -1,0 +1,39 @@
+Widget {
+    package 'inventory.management.system'
+    name 'StatusBadgeWidget'
+    description 'Colored status chip for OptionSet values'
+    properties [
+        {
+            name 'status'
+            type String
+            required true
+        }
+        {
+            name 'optionSetType'
+            type String
+        }
+    ]
+    build Container {
+        name 'badgeRef'
+        styles [
+GlassPanelStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '4 10'
+        }
+        child TextView {
+            name 'statusRef'
+            data {
+                data `optionSetType != null && optionSetType.isNotEmpty ? status + ' (' + optionSetType + ')' : status`
+                textStyle {
+                    color '@c4'
+                    fontSize '12'
+                    fontWeight 'w600'
+                }
+            }
+        }
+    }
+}

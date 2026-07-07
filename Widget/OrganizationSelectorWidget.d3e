@@ -1,0 +1,97 @@
+Widget {
+    package 'inventory.management.system'
+    name 'OrganizationSelectorWidget'
+    description 'Bootstrap organization picker for admin'
+    properties [
+        {
+            name 'selectedOrganization'
+            type Organization
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+            GlassPanelStyle
+        ]
+        tags [
+            'glassCard'
+        ]
+        child Column {
+            name 'selectorColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                TextView {
+                    name 'titleRef'
+                    data {
+                        data 'Select Organization'
+                        margin '0 0 16 0'
+                        textStyle {
+                            color '@c4'
+                            fontSize '18'
+                            fontWeight 'w600'
+                        }
+                    }
+                }
+                Container {
+                    name 'listRef'
+                    tags [
+                        'glassPanel'
+                    ]
+                    data {
+                        padding '16'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data 'Bind AllOrganizations query in Page'
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+                TextButton {
+                    name 'selectRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Continue'
+                        margin '16 0 0 0'
+                        disable `selectedOrganization == null`
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSelectHandler'
+            type OnEvent
+            on selectRef
+            event onPressed
+            block ```
+                if (selectedOrganization != null) {
+                    onSelect(selectedOrganization);
+                }
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onSelect'
+            params [
+                {
+                    name 'organization'
+                    type Organization
+                }
+            ]
+        }
+    ]
+}

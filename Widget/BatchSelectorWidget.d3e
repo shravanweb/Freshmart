@@ -1,0 +1,101 @@
+Widget {
+    package 'inventory.management.system'
+    name 'BatchSelectorWidget'
+    description 'FIFO batch picker for product and warehouse'
+    properties [
+        {
+            name 'product'
+            type Product
+            required true
+        }
+        {
+            name 'warehouse'
+            type Warehouse
+            required true
+        }
+        {
+            name 'selectedBatchNumber'
+            type String
+            internal true
+        }
+    ]
+    build Container {
+        name 'pickerRef'
+        styles [
+GlassPanelStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '16'
+        }
+        child Column {
+            name 'pickerColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                TextView {
+                    name 'labelRef'
+                    tags [
+                        'fieldLabel'
+                    ]
+                    data {
+                        data 'Batch'
+                    }
+                }
+                Container {
+                    name 'listRef'
+                    data {
+                        padding '8 0'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data `product.name + ' @ ' + warehouse.name`
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+                TextButton {
+                    name 'selectRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Select Batch'
+                        disable `selectedBatchNumber == null || selectedBatchNumber.isEmpty`
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSelectHandler'
+            type OnEvent
+            on selectRef
+            event onPressed
+            block ```
+                onBatchSelected(selectedBatchNumber);
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onBatchSelected'
+            params [
+                {
+                    name 'batchNumber'
+                    type String
+                }
+            ]
+        }
+    ]
+}

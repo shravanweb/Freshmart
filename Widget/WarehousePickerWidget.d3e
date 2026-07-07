@@ -1,0 +1,102 @@
+Widget {
+    package 'inventory.management.system'
+    name 'WarehousePickerWidget'
+    description 'Warehouse selector filtered by organization and store'
+    properties [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'store'
+            type Store
+        }
+        {
+            name 'selectedWarehouse'
+            type Warehouse
+            internal true
+        }
+    ]
+    build Container {
+        name 'pickerRef'
+        styles [
+GlassPanelStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '16'
+        }
+        child Column {
+            name 'pickerColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                TextView {
+                    name 'labelRef'
+                    tags [
+                        'fieldLabel'
+                    ]
+                    data {
+                        data 'Warehouse'
+                    }
+                }
+                Container {
+                    name 'listRef'
+                    data {
+                        padding '8 0'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data `organization.name + (store != null ? ' · ' + store.name : '')`
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+                TextButton {
+                    name 'selectRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Select Warehouse'
+                        disable `selectedWarehouse == null`
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSelectHandler'
+            type OnEvent
+            on selectRef
+            event onPressed
+            block ```
+                if (selectedWarehouse != null) {
+                    onWarehouseSelected(selectedWarehouse);
+                }
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onWarehouseSelected'
+            params [
+                {
+                    name 'warehouse'
+                    type Warehouse
+                }
+            ]
+        }
+    ]
+}

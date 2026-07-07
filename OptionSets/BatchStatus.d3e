@@ -1,0 +1,18 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'BatchStatus'
+    options [
+        {
+            name 'Active'
+        }
+        {
+            name 'Depleted'
+        }
+        {
+            name 'Expired'
+        }
+        {
+            name 'Quarantined'
+        }
+    ]
+}

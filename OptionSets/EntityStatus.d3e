@@ -1,0 +1,15 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'EntityStatus'
+    options [
+        {
+            name 'Active'
+        }
+        {
+            name 'Inactive'
+        }
+        {
+            name 'Archived'
+        }
+    ]
+}

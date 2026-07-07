@@ -1,0 +1,248 @@
+Page {
+    package 'inventory.management.system'
+    name 'StockBatchFormPage'
+    description 'Create and edit stock batches'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'stockBatch'
+            type StockBatch
+            required true
+        }
+        {
+            name 'isEditMode'
+            type Boolean
+            computed true
+            internal true
+            computation `stockBatch != null && stockBatch.saveStatus != DBSaveStatus.New`
+        }
+        {
+            name 'batchNumber'
+            type String
+            internal true
+        }
+        {
+            name 'quantityOnHand'
+            type String
+            internal true
+        }
+        {
+            name 'unitCost'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            internal true
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `isEditMode ? 'Edit Stock Batch' : 'New Stock Batch'`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Container {
+                                    name 'cardRef'
+                                    tags [
+                                        'glassCard'
+                                    ]
+                                    data {
+                                        width '640'
+                                    }
+                                    child Column {
+                                        name 'formColumnRef'
+                                        data {
+                                            crossAxisAlignment 'stretch'
+                                        }
+                                        children [
+                                            IMSInputFieldWidget {
+                                                name 'batchNumberFieldRef'
+                                                data {
+                                                    label 'Batch Number'
+                                                    text `batchNumber`
+                                                    placeHolder 'BATCH-001'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer1Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'quantityFieldRef'
+                                                data {
+                                                    label 'Quantity On Hand'
+                                                    text `quantityOnHand`
+                                                    placeHolder '0'
+                                                    keyboardType 'number'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer2Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'unitCostFieldRef'
+                                                data {
+                                                    label 'Unit Cost'
+                                                    text `unitCost`
+                                                    placeHolder '0.00'
+                                                    keyboardType 'number'
+                                                }
+                                            }
+                                            Row {
+                                                name 'actionsRowRef'
+                                                data {
+                                                    mainAxisAlignment 'end'
+                                                    mainAxisSize 'max'
+                                                    margin '24 0 0 0'
+                                                }
+                                                children [
+                                                    TextButton {
+                                                        name 'cancelRef'
+                                                        tags [
+                                                            'secondary'
+                                                        ]
+                                                        data {
+                                                            label 'Cancel'
+                                                            margin '0 8 0 0'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'saveRef'
+                                                        tags [
+                                                            'primary'
+                                                        ]
+                                                        data {
+                                                            label `isEditMode ? 'Update' : 'Create'`
+                                                            disable `isLoading`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                batchNumber = stockBatch.batchNumber;
+                quantityOnHand = stockBatch.quantityOnHand.toString();
+                unitCost = stockBatch.unitCost.toString();
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                navigator.pushStockBatchListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                isLoading = true;
+                stockBatch.organization = organization;
+                stockBatch.batchNumber = batchNumber;
+                // TODO: D3EClass StockBatchService.createStockBatch / updateStockBatch
+                isLoading = false;
+                navigator.pushStockBatchListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

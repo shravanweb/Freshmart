@@ -1,0 +1,66 @@
+Model {
+    package 'inventory.management.system'
+    name 'GoodsReceipt'
+    master Organization
+    creatable true
+    display `receiptNumber`
+    properties [
+        {
+            name 'Receipt Number'
+            type String
+            required true
+            readType ReadOnly
+        }
+        {
+            name 'Purchase Order'
+            type PurchaseOrder
+            onDelete Clear
+        }
+        {
+            name 'Vendor'
+            type Vendor
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Receipt Date'
+            type Date
+            required true
+        }
+        {
+            name 'Status'
+            type GoodsReceiptStatus
+            required true
+            defaultValue `GoodsReceiptStatus.Draft`
+        }
+        {
+            name 'Notes'
+            type String
+            longText true
+        }
+        {
+            name 'Received By'
+            type User
+            readType ReadOnly
+            onDelete Clear
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Lines'
+            type GoodsReceiptLine
+            collection true
+            inverse true
+            inverseProperty goodsReceipt
+        }
+    ]
+}

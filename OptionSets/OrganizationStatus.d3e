@@ -1,0 +1,15 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'OrganizationStatus'
+    options [
+        {
+            name 'Active'
+        }
+        {
+            name 'Suspended'
+        }
+        {
+            name 'Archived'
+        }
+    ]
+}

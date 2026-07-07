@@ -1,0 +1,26 @@
+@RPCService
+server class StockBatchService {
+    static StockBatch createStockBatch(StockBatch stockBatch) {
+        if (stockBatch == null) {
+            throw Exception('StockBatch cannot be null');
+        }
+        stockBatch.createdAt = DateTime.now();
+        Database.save(stockBatch);
+        return stockBatch;
+    }
+
+    static StockBatch updateStockBatch(StockBatch stockBatch) {
+        if (stockBatch == null) {
+            throw Exception('StockBatch cannot be null');
+        }
+        Database.save(stockBatch);
+        return stockBatch;
+    }
+
+    static void deleteStockBatch(StockBatch stockBatch) {
+        if (stockBatch == null) {
+            return;
+        }
+        Database.delete(stockBatch);
+    }
+}

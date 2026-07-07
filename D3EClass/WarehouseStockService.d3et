@@ -1,0 +1,30 @@
+@RPCService
+server class WarehouseStockService {
+    static WarehouseStock createWarehouseStock(WarehouseStock warehouseStock) {
+        if (warehouseStock == null) {
+            throw Exception('WarehouseStock cannot be null');
+        }
+        warehouseStock.quantityAvailable = warehouseStock.quantityOnHand - warehouseStock.quantityReserved;
+        warehouseStock.stockValue = warehouseStock.quantityOnHand * warehouseStock.averageCost;
+        Database.save(warehouseStock);
+        return warehouseStock;
+    }
+
+    static WarehouseStock updateWarehouseStock(WarehouseStock warehouseStock) {
+        if (warehouseStock == null) {
+            throw Exception('WarehouseStock cannot be null');
+        }
+        warehouseStock.quantityAvailable = warehouseStock.quantityOnHand - warehouseStock.quantityReserved;
+        warehouseStock.stockValue = warehouseStock.quantityOnHand * warehouseStock.averageCost;
+        warehouseStock.lastMovementAt = DateTime.now();
+        Database.save(warehouseStock);
+        return warehouseStock;
+    }
+
+    static void deleteWarehouseStock(WarehouseStock warehouseStock) {
+        if (warehouseStock == null) {
+            return;
+        }
+        Database.delete(warehouseStock);
+    }
+}

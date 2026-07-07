@@ -1,0 +1,36 @@
+Model {
+    package 'inventory.management.system'
+    name 'UnitOfMeasure'
+    master Organization
+    creatable true
+    searchable true
+    display `name`
+    properties [
+        {
+            name 'Name'
+            type String
+            required true
+        }
+        {
+            name 'Symbol'
+            type String
+            required true
+        }
+        {
+            name 'Uom Type'
+            type UomType
+            required true
+        }
+        {
+            name 'Base Factor'
+            type Double
+            defaultValue `1.0`
+        }
+        {
+            name 'Status'
+            type EntityStatus
+            required true
+            defaultValue `EntityStatus.Active`
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'InvitationStatus'
+    options [
+        {
+            name 'Pending'
+        }
+        {
+            name 'Accepted'
+        }
+        {
+            name 'Expired'
+        }
+        {
+            name 'Revoked'
+        }
+    ]
+}

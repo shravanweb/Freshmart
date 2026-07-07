@@ -1,0 +1,50 @@
+Style {
+    package 'inventory.management.system'
+    name 'FormFieldStyle'
+    description 'Labeled input field wrapper'
+    items [
+        {
+            selector 'Container.formField'
+            values {
+                margin '0 0 16 0'
+            }
+        }
+        {
+            selector 'Container.formFieldInline'
+            values {
+                margin '0 0 12 0'
+            }
+        }
+        {
+            selector 'TextView.fieldLabel'
+            values {
+                textStyle {
+                    color '@c4'
+                    fontSize '14'
+                    fontWeight 'w500'
+                }
+                margin '0 0 4 0'
+            }
+        }
+        {
+            selector 'TextView.fieldLabelInline'
+            values {
+                textStyle {
+                    color '@c5'
+                    fontSize '14'
+                    fontWeight 'w500'
+                }
+            }
+        }
+        {
+            selector 'TextView.fieldError'
+            values {
+                textStyle {
+                    color 'FFE11D48'
+                    fontSize '12'
+                }
+                margin '4 0 0 0'
+            }
+        }
+    ]
+}

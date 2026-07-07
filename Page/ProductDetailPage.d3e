@@ -1,0 +1,357 @@
+Page {
+    package 'inventory.management.system'
+    name 'ProductDetailPage'
+    description 'Product detail with stock and batch tabs'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'product'
+            type Product
+            required true
+        }
+        {
+            name 'productData'
+            type ProductItem
+            computed true
+            computation `Query.getProductItem(ProductItemRequest(product: product)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'loadedProduct'
+            type Product
+            computed true
+            computation `productData != null && productData.items.isNotEmpty ? productData.items.first : product`
+            internal true
+        }
+        {
+            name 'stockData'
+            type WarehouseStockByProduct
+            computed true
+            computation `Query.getWarehouseStockByProduct(WarehouseStockByProductRequest(product: product)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'stockItems'
+            type WarehouseStock
+            collection true
+            computed true
+            computation `stockData != null ? stockData.items : []`
+            internal true
+        }
+        {
+            name 'statusLabel'
+            type String
+            computed true
+            computation `loadedProduct.status != null ? loadedProduct.status.name : ''`
+            internal true
+        }
+        {
+            name 'activeTab'
+            type String
+            internal true
+            defaultValue `'stock'`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `loadedProduct.name`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'detailColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'actionsRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                mainAxisSize 'max'
+                                                margin '0 0 16 0'
+                                            }
+                                            children [
+                                                StatusBadgeWidget {
+                                                    name 'statusBadgeRef'
+                                                    data {
+                                                        status `statusLabel`
+                                                        optionSetType 'ProductStatus'
+                                                    }
+                                                }
+                                                Row {
+                                                    name 'buttonsRowRef'
+                                                    data {
+                                                        mainAxisSize 'min'
+                                                    }
+                                                    children [
+                                                        TextButton {
+                                                            name 'editRef'
+                                                            tags [
+                                                                'primary'
+                                                            ]
+                                                            data {
+                                                                label 'Edit'
+                                                                margin '0 8 0 0'
+                                                            }
+                                                        }
+                                                        TextButton {
+                                                            name 'deleteRef'
+                                                            tags [
+                                                                'secondary'
+                                                            ]
+                                                            data {
+                                                                label 'Delete'
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                        Container {
+                                            name 'infoCardRef'
+                                            tags [
+                                                'glassCard'
+                                            ]
+                                            child Column {
+                                                name 'infoColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    TextView {
+                                                        name 'skuRef'
+                                                        data {
+                                                            data `'SKU: ' + (loadedProduct.sku ?? '')`
+                                                            margin '0 0 8 0'
+                                                        }
+                                                    }
+                                                    TextView {
+                                                        name 'categoryRef'
+                                                        data {
+                                                            data `'Category: ' + (loadedProduct.category != null ? loadedProduct.category.name : 'N/A')`
+                                                            margin '0 0 8 0'
+                                                        }
+                                                    }
+                                                    TextView {
+                                                        name 'priceRef'
+                                                        data {
+                                                            data `'Selling Price: ' + loadedProduct.sellingPrice.toString()`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                        Container {
+                                            name 'spacerRef'
+                                            data {
+                                                margin '0 0 16 0'
+                                            }
+                                        }
+                                        Row {
+                                            name 'tabsRowRef'
+                                            data {
+                                                mainAxisSize 'min'
+                                                margin '0 0 16 0'
+                                            }
+                                            children [
+                                                TextButton {
+                                                    name 'stockTabRef'
+                                                    tags [
+                                                        'primary'
+                                                    ]
+                                                    data {
+                                                        label 'Stock'
+                                                        margin '0 8 0 0'
+                                                    }
+                                                }
+                                                TextButton {
+                                                    name 'batchesTabRef'
+                                                    tags [
+                                                        'secondary'
+                                                    ]
+                                                    data {
+                                                        label 'Batches'
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        Container {
+                                            name 'tabContentRef'
+                                            tags [
+                                                'glassCard'
+                                            ]
+                                            child CIf {
+                                                name 'tabIfRef'
+                                                condition `activeTab == 'stock'`
+                                                then Column {
+                                                    name 'stockTabColumnRef'
+                                                    data {
+                                                        crossAxisAlignment 'stretch'
+                                                    }
+                                                    children [
+                                                        TextView {
+                                                            name 'stockTitleRef'
+                                                            data {
+                                                                data `'Warehouse Stock (' + stockItems.length.toString() + ')'`
+                                                                margin '0 0 12 0'
+                                                                textStyle {
+                                                                    color '@c4'
+                                                                    fontSize '18'
+                                                                    fontWeight 'w600'
+                                                                }
+                                                            }
+                                                        }
+                                                        CFor {
+                                                            name 'stockForRef'
+                                                            var 'stockItem'
+                                                            items `stockItems`
+                                                            type WarehouseStock
+                                                            item TextView {
+                                                                name 'stockRowRef'
+                                                                data {
+                                                                    data `(stockItem.warehouse != null ? stockItem.warehouse.name : 'Warehouse') + ' — Qty: ' + stockItem.quantityOnHand.toString()`
+                                                                    margin '0 0 8 0'
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                                else TextView {
+                                                    name 'batchesHintRef'
+                                                    data {
+                                                        data 'Bind AllStockBatches query for batch tab'
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onStockTabHandler'
+            type OnEvent
+            on stockTabRef
+            event onPressed
+            block ```
+                activeTab = 'stock';
+            ```
+        }
+        {
+            name 'onBatchesTabHandler'
+            type OnEvent
+            on batchesTabRef
+            event onPressed
+            block ```
+                activeTab = 'batches';
+            ```
+        }
+        {
+            name 'onEditHandler'
+            type OnEvent
+            on editRef
+            event onPressed
+            block ```
+                navigator.pushProductFormPage(user: user, product: loadedProduct, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onDeleteHandler'
+            type OnEvent
+            on deleteRef
+            event onPressed
+            block ```
+                // TODO: D3EClass ProductService.deleteProduct(loadedProduct)
+                navigator.pushProductListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

@@ -1,0 +1,47 @@
+Model {
+    package 'inventory.management.system'
+    name 'PurchaseOrderLine'
+    master PurchaseOrder
+    creatable true
+    display `lineNumber.toString()`
+    properties [
+        {
+            name 'Line Number'
+            type Integer
+            required true
+        }
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Ordered Quantity'
+            type Double
+            required true
+        }
+        {
+            name 'Received Quantity'
+            type Double
+            defaultValue `0.0`
+            readType ReadOnly
+        }
+        {
+            name 'Unit Price'
+            type Double
+            required true
+        }
+        {
+            name 'Line Total'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Uom'
+            type UnitOfMeasure
+            required true
+            onDelete Prevent
+        }
+    ]
+}

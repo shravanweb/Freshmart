@@ -1,0 +1,14 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'SupplierItem'
+    query `Vendor.all
+    .where((row) => row == inputs.vendor)`
+    inputs [
+        {
+            name 'vendor'
+            type Vendor
+            required true
+        }
+    ]
+    enableSync true
+}

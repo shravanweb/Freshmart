@@ -1,0 +1,1 @@
+alter table _dfile add column if not exists _count int8;

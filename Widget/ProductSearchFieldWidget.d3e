@@ -1,0 +1,56 @@
+Widget {
+    package 'inventory.management.system'
+    name 'ProductSearchFieldWidget'
+    description 'Autocomplete product search field'
+    properties [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'searchTerm'
+            type String
+        }
+    ]
+    build Container {
+        name 'searchRef'
+        styles [
+GlassPanelStyle
+            FormFieldStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '12 16'
+        }
+        child Column {
+            name 'searchColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSInputFieldWidget {
+                    name 'inputRef'
+                    data {
+                        label `organization != null ? 'Search products in ' + organization.name : 'Search products'`
+                        text `searchTerm`
+                        placeHolder 'SKU, name, or barcode'
+                    }
+                }
+            ]
+        }
+    }
+    events [
+        {
+            name 'onSelect'
+            params [
+                {
+                    name 'searchTerm'
+                    type String
+                }
+            ]
+        }
+    ]
+}

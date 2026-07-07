@@ -1,0 +1,14 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'SalesOrderItem'
+    query `SalesOrder.all
+    .where((row) => row == inputs.salesOrder)`
+    inputs [
+        {
+            name 'salesOrder'
+            type SalesOrder
+            required true
+        }
+    ]
+    enableSync true
+}

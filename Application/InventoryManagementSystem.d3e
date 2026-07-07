@@ -1,0 +1,16 @@
+Application {
+    package 'inventory.management.system'
+    name 'InventoryManagementSystem'
+    target ReactFrontEnd
+    root LandingPage
+    defaultTheme IMSTheme
+    styles [
+        PageBackgroundStyle
+        GlassPanelStyle
+        GlassCardStyle
+        PrimaryButtonStyle
+        FormFieldStyle
+        StatCardStyle
+        GlassSidebarStyle
+    ]
+}

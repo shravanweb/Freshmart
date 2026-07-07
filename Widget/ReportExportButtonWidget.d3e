@@ -1,0 +1,51 @@
+Widget {
+    package 'inventory.management.system'
+    name 'ReportExportButtonWidget'
+    description 'CSV export trigger for reports'
+    properties [
+        {
+            name 'reportData'
+            type String
+            collection true
+        }
+        {
+            name 'canExport'
+            type Boolean
+            computed true
+            computation `reportData != null && reportData.length > 0`
+            internal true
+        }
+    ]
+    build Container {
+        name 'exportWrapRef'
+        styles [
+            PrimaryButtonStyle
+        ]
+        child TextButton {
+            name 'exportRef'
+            tags [
+                'secondary'
+            ]
+            data {
+                label 'Export CSV'
+                disable `!canExport`
+            }
+        }
+    }
+    eventHandlers [
+        {
+            name 'onExportHandler'
+            type OnEvent
+            on exportRef
+            event onPressed
+            block ```
+                onExport();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onExport'
+        }
+    ]
+}

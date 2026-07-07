@@ -1,0 +1,56 @@
+Model {
+    package 'inventory.management.system'
+    name 'WarehouseStock'
+    master Organization
+    creatable true
+    display `product.name + ' @ ' + warehouse.name`
+    properties [
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Quantity On Hand'
+            type Double
+            required true
+            defaultValue `0.0`
+        }
+        {
+            name 'Quantity Reserved'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Quantity Available'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Average Cost'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Stock Value'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Last Movement At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Low Stock Notified At'
+            type DateTime
+        }
+    ]
+}

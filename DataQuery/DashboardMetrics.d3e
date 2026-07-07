@@ -1,0 +1,15 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'DashboardMetrics'
+    query `WarehouseStock.all
+    .where((row) => row.organization == inputs.organization)
+    .orderBy((row) => row.stockValue, asc: false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+    ]
+    enableSync true
+}

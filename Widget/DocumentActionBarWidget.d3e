@@ -1,0 +1,186 @@
+Widget {
+    package 'inventory.management.system'
+    name 'DocumentActionBarWidget'
+    description 'Workflow action buttons for transactional documents'
+    properties [
+        {
+            name 'document'
+            type String
+            required true
+        }
+        {
+            name 'allowedActions'
+            type String
+            collection true
+        }
+        {
+            name 'canSubmit'
+            type Boolean
+            computed true
+            computation `allowedActions != null && allowedActions.contains('submit')`
+            internal true
+        }
+        {
+            name 'canApprove'
+            type Boolean
+            computed true
+            computation `allowedActions != null && allowedActions.contains('approve')`
+            internal true
+        }
+        {
+            name 'canCancel'
+            type Boolean
+            computed true
+            computation `allowedActions != null && allowedActions.contains('cancel')`
+            internal true
+        }
+        {
+            name 'canConfirm'
+            type Boolean
+            computed true
+            computation `allowedActions != null && allowedActions.contains('confirm')`
+            internal true
+        }
+    ]
+    build Container {
+        name 'barRef'
+        styles [
+            GlassPanelStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '12 16'
+        }
+        child Row {
+            name 'actionsRowRef'
+            data {
+                mainAxisAlignment 'end'
+                mainAxisSize 'max'
+                crossAxisAlignment 'center'
+            }
+            children [
+                TextView {
+                    name 'docLabelRef'
+                    data {
+                        data `document`
+                        margin '0 16 0 0'
+                        textStyle {
+                            color '@c5'
+                            fontSize '13'
+                        }
+                    }
+                }
+                CIf {
+                    name 'submitIfRef'
+                    condition `canSubmit`
+                    then TextButton {
+                        name 'submitRef'
+                        tags [
+                            'primary'
+                        ]
+                        data {
+                            label 'Submit'
+                            margin '0 8 0 0'
+                        }
+                    }
+                }
+                CIf {
+                    name 'approveIfRef'
+                    condition `canApprove`
+                    then TextButton {
+                        name 'approveRef'
+                        tags [
+                            'primary'
+                        ]
+                        data {
+                            label 'Approve'
+                            margin '0 8 0 0'
+                        }
+                    }
+                }
+                CIf {
+                    name 'confirmIfRef'
+                    condition `canConfirm`
+                    then TextButton {
+                        name 'confirmRef'
+                        tags [
+                            'primary'
+                        ]
+                        data {
+                            label 'Confirm'
+                            margin '0 8 0 0'
+                        }
+                    }
+                }
+                CIf {
+                    name 'cancelIfRef'
+                    condition `canCancel`
+                    then TextButton {
+                        name 'cancelRef'
+                        tags [
+                            'secondary'
+                        ]
+                        data {
+                            label 'Cancel'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSubmitHandler'
+            type OnEvent
+            on submitRef
+            event onPressed
+            block ```
+                onSubmit();
+            ```
+        }
+        {
+            name 'onApproveHandler'
+            type OnEvent
+            on approveRef
+            event onPressed
+            block ```
+                onApprove();
+            ```
+        }
+        {
+            name 'onConfirmHandler'
+            type OnEvent
+            on confirmRef
+            event onPressed
+            block ```
+                onConfirm();
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                onCancel();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onSubmit'
+        }
+        {
+            name 'onApprove'
+        }
+        {
+            name 'onCancel'
+        }
+        {
+            name 'onConfirm'
+        }
+    ]
+}

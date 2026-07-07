@@ -1,0 +1,39 @@
+Model {
+    package 'inventory.management.system'
+    name 'SalesOrderLine'
+    master SalesOrder
+    creatable true
+    display `product.name`
+    properties [
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Quantity'
+            type Double
+            required true
+        }
+        {
+            name 'Unit Price'
+            type Double
+            required true
+        }
+        {
+            name 'Discount'
+            type Double
+            defaultValue `0.0`
+        }
+        {
+            name 'Line Total'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Batch Number'
+            type String
+        }
+    ]
+}

@@ -1,0 +1,122 @@
+Widget {
+    package 'inventory.management.system'
+    name 'LowStockTableWidget'
+    description 'Low stock items table for dashboard'
+    properties [
+        {
+            name 'items'
+            type WarehouseStock
+            collection true
+        }
+        {
+            name 'rowCountLabel'
+            type String
+            computed true
+            computation `items != null ? items.length.toString() + ' items' : '0 items'`
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassCardFlat'
+        ]
+        child Column {
+            name 'sectionColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                Row {
+                    name 'headerRowRef'
+                    data {
+                        mainAxisAlignment 'spaceBetween'
+                        crossAxisAlignment 'center'
+                        mainAxisSize 'max'
+                    }
+                    children [
+                        TextView {
+                            name 'titleRef'
+                            data {
+                                data 'Low Stock Items'
+                                textStyle {
+                                    color '@c4'
+                                    fontSize '18'
+                                    fontWeight 'w600'
+                                }
+                            }
+                        }
+                        TextButton {
+                            name 'createPoRef'
+                            tags [
+                                'primary'
+                            ]
+                            data {
+                                label 'Create PO'
+                            }
+                        }
+                    ]
+                }
+                TextView {
+                    name 'countRef'
+                    data {
+                        data `rowCountLabel`
+                        margin '8 0 16 0'
+                        textStyle {
+                            color '@c5'
+                            fontSize '13'
+                        }
+                    }
+                }
+                Container {
+                    name 'tableRef'
+                    tags [
+                        'glassPanel'
+                    ]
+                    data {
+                        padding '16'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data 'Bind warehouse stock rows from LowStockItems query'
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onCreatePoHandler'
+            type OnEvent
+            on createPoRef
+            event onPressed
+            block ```
+                onCreatePO();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onViewProduct'
+            params [
+                {
+                    name 'product'
+                    type Product
+                }
+            ]
+        }
+        {
+            name 'onCreatePO'
+        }
+    ]
+}

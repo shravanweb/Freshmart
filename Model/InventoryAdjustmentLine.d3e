@@ -1,0 +1,38 @@
+Model {
+    package 'inventory.management.system'
+    name 'InventoryAdjustmentLine'
+    master InventoryAdjustment
+    creatable true
+    display `product.name`
+    properties [
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Quantity Before'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Quantity Change'
+            type Double
+            required true
+        }
+        {
+            name 'Quantity After'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Batch Number'
+            type String
+        }
+        {
+            name 'Unit Cost'
+            type Double
+        }
+    ]
+}

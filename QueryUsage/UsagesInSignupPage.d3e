@@ -1,0 +1,14 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'registerInventoryManagementSystemUser'
+        'SignupPage'
+        'eventHandlers_onSignupHandler_block'
+    ]
+    struct LoginResult
+    usage [
+        '*'
+        'userObject.*'
+    ]
+}

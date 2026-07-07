@@ -1,0 +1,138 @@
+Widget {
+    package 'inventory.management.system'
+    name 'InviteUserFormWidget'
+    description 'User invitation form'
+    properties [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'email'
+            type String
+            internal true
+        }
+        {
+            name 'selectedRole'
+            type AppUserRole
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassCard'
+        ]
+        child Column {
+            name 'formColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                TextView {
+                    name 'titleRef'
+                    data {
+                        data `organization != null ? 'Invite User to ' + organization.name : 'Invite User'`
+                        margin '0 0 16 0'
+                        textStyle {
+                            color '@c4'
+                            fontSize '18'
+                            fontWeight 'w600'
+                        }
+                    }
+                }
+                IMSInputFieldWidget {
+                    name 'emailFieldRef'
+                    data {
+                        label 'Email'
+                        text `email`
+                        placeHolder 'colleague@company.com'
+                        keyboardType 'emailAddress'
+                    }
+                }
+                Container {
+                    name 'spacerRef'
+                    data {
+                        margin '0 0 16 0'
+                    }
+                }
+                Container {
+                    name 'roleFieldRef'
+                    tags [
+                        'formField'
+                    ]
+                    child Column {
+                        name 'roleColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                        }
+                        children [
+                            TextView {
+                                name 'roleLabelRef'
+                                tags [
+                                    'fieldLabel'
+                                ]
+                                data {
+                                    data 'Role'
+                                }
+                            }
+                            TextView {
+                                name 'roleHintRef'
+                                data {
+                                    data 'Bind AppUserRole picker in Page'
+                                    textStyle {
+                                        color '@c5'
+                                        fontSize '14'
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+                TextButton {
+                    name 'inviteRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Send Invitation'
+                        margin '24 0 0 0'
+                        disable `email == null || email.isEmpty || selectedRole == null`
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInviteHandler'
+            type OnEvent
+            on inviteRef
+            event onPressed
+            block ```
+                onInvite(email, selectedRole);
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onInvite'
+            params [
+                {
+                    name 'email'
+                    type String
+                }
+                {
+                    name 'role'
+                    type AppUserRole
+                }
+            ]
+        }
+    ]
+}

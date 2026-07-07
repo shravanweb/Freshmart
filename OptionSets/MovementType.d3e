@@ -1,0 +1,30 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'MovementType'
+    options [
+        {
+            name 'PurchaseReceipt'
+        }
+        {
+            name 'SalesIssue'
+        }
+        {
+            name 'TransferOut'
+        }
+        {
+            name 'TransferIn'
+        }
+        {
+            name 'Adjustment'
+        }
+        {
+            name 'ReturnIn'
+        }
+        {
+            name 'ReturnOut'
+        }
+        {
+            name 'OpeningBalance'
+        }
+    ]
+}

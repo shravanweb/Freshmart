@@ -1,0 +1,36 @@
+Model {
+    package 'inventory.management.system'
+    name 'NotificationTemplate'
+    master Organization
+    creatable true
+    searchable true
+    display `templateCode`
+    properties [
+        {
+            name 'Template Code'
+            type String
+            required true
+        }
+        {
+            name 'Channel'
+            type NotificationChannel
+            required true
+        }
+        {
+            name 'Subject'
+            type String
+        }
+        {
+            name 'Body Template'
+            type String
+            required true
+            longText true
+        }
+        {
+            name 'Status'
+            type EntityStatus
+            required true
+            defaultValue `EntityStatus.Active`
+        }
+    ]
+}

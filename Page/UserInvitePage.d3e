@@ -1,0 +1,85 @@
+Page {
+    package 'inventory.management.system'
+    name 'UserInvitePage'
+    description 'Invite a new user to the organization'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Column {
+            name 'contentColumnRef'
+            data {
+                mainAxisSize 'max'
+                mainAxisAlignment 'center'
+                crossAxisAlignment 'center'
+            }
+            children [
+                Container {
+                    name 'contentRef'
+                    tags [
+                        'pageContent'
+                    ]
+                    data {
+                        alignment 'center'
+                        padding '32'
+                    }
+                    child InviteUserFormWidget {
+                        name 'inviteFormRef'
+                        data {
+                            organization `organization`
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInviteHandler'
+            type OnEvent
+            on inviteFormRef
+            event onInvite
+            block ```
+                // TODO: D3EClass UserInvitationService.inviteUser(email, role, organization)
+                navigator.pushUserListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

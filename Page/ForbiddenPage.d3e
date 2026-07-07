@@ -1,0 +1,45 @@
+Page {
+    package 'inventory.management.system'
+    name 'ForbiddenPage'
+    description 'Access denied page'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassCardStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        data {
+            alignment 'center'
+        }
+        child EmptyStateWidget {
+            name 'emptyRef'
+            data {
+                title 'Access Denied'
+                message 'You do not have permission to view this page.'
+                actionLabel 'Go to Dashboard'
+            }
+        }
+    }
+    eventHandlers [
+        {
+            name 'onActionHandler'
+            type OnEvent
+            on emptyRef
+            event onAction
+            block ```
+                navigator.pushDashboardPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

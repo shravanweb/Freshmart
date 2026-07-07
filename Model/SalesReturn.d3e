@@ -1,0 +1,65 @@
+Model {
+    package 'inventory.management.system'
+    name 'SalesReturn'
+    master Organization
+    creatable true
+    display `returnNumber`
+    properties [
+        {
+            name 'Sales Order'
+            type SalesOrder
+            onDelete Clear
+        }
+        {
+            name 'Store'
+            type Store
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Return Number'
+            type String
+            required true
+        }
+        {
+            name 'Return Date'
+            type DateTime
+            required true
+        }
+        {
+            name 'Status'
+            type SalesReturnStatus
+            required true
+            defaultValue `SalesReturnStatus.Draft`
+        }
+        {
+            name 'Reason'
+            type ReturnReason
+            required true
+        }
+        {
+            name 'Refund Amount'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Processed By'
+            type User
+            readType ReadOnly
+            onDelete Clear
+        }
+        {
+            name 'Lines'
+            type SalesReturnLine
+            collection true
+            inverse true
+            inverseProperty salesReturn
+        }
+    ]
+}

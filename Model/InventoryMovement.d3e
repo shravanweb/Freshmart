@@ -1,0 +1,80 @@
+Model {
+    package 'inventory.management.system'
+    name 'InventoryMovement'
+    master Organization
+    creatable true
+    searchable true
+    display `movementNumber`
+    properties [
+        {
+            name 'Movement Number'
+            type String
+            required true
+        }
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Movement Type'
+            type MovementType
+            required true
+        }
+        {
+            name 'Quantity'
+            type Double
+            required true
+        }
+        {
+            name 'Direction'
+            type MovementDirection
+            required true
+        }
+        {
+            name 'Reference Type'
+            type MovementReferenceType
+            required true
+        }
+        {
+            name 'Reference Id'
+            type String
+            required true
+        }
+        {
+            name 'Batch Number'
+            type String
+        }
+        {
+            name 'Unit Cost'
+            type Double
+        }
+        {
+            name 'Balance After'
+            type Double
+            required true
+        }
+        {
+            name 'Movement Date'
+            type DateTime
+            required true
+        }
+        {
+            name 'Performed By'
+            type User
+            onDelete Clear
+        }
+        {
+            name 'Notes'
+            type String
+            longText true
+        }
+    ]
+}

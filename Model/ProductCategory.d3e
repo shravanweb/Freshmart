@@ -1,0 +1,50 @@
+Model {
+    package 'inventory.management.system'
+    name 'ProductCategory'
+    master Organization
+    creatable true
+    searchable true
+    display `name`
+    properties [
+        {
+            name 'Parent Category'
+            type ProductCategory
+            onDelete Clear
+        }
+        {
+            name 'Child Categories'
+            type ProductCategory
+            collection true
+            inverse true
+            inverseProperty parentCategory
+        }
+        {
+            name 'Products'
+            type Product
+            collection true
+            inverse true
+            inverseProperty category
+        }
+        {
+            name 'Name'
+            type String
+            required true
+        }
+        {
+            name 'Code'
+            type String
+            required true
+        }
+        {
+            name 'Description'
+            type String
+            longText true
+        }
+        {
+            name 'Status'
+            type EntityStatus
+            required true
+            defaultValue `EntityStatus.Active`
+        }
+    ]
+}

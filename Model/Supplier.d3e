@@ -1,0 +1,67 @@
+Model {
+    package 'inventory.management.system'
+    name 'Vendor'
+    master Organization
+    creatable true
+    searchable true
+    display `name`
+    properties [
+        {
+            name 'Name'
+            type String
+            required true
+        }
+        {
+            name 'Code'
+            type String
+            required true
+        }
+        {
+            name 'Contact Person'
+            type String
+        }
+        {
+            name 'Email'
+            type String
+        }
+        {
+            name 'Phone'
+            type String
+        }
+        {
+            name 'Address'
+            type String
+            longText true
+        }
+        {
+            name 'Payment Terms'
+            type String
+        }
+        {
+            name 'Tax Id'
+            type String
+        }
+        {
+            name 'Rating'
+            type Integer
+        }
+        {
+            name 'Contacts'
+            type SupplierContact
+            collection true
+            inverse true
+            inverseProperty vendor
+        }
+        {
+            name 'Status'
+            type EntityStatus
+            required true
+            defaultValue `EntityStatus.Active`
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+    ]
+}

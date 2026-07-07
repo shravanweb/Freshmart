@@ -1,0 +1,27 @@
+StyleTheme {
+    package 'inventory.management.system'
+    name 'IMSTheme'
+    description 'BuildACompleteInventory light theme — amber/orange accent on stone surface'
+    color 'FFFAFAF9'
+    font 'Inter'
+    fontSize 15.0
+    colors [
+        { color '@c1' hexCode 'FFF59E0B' description 'Primary amber-500' }
+        { color '@c2' hexCode 'FFF97316' description 'Secondary orange-500' }
+        { color '@c3' hexCode 'FFFBBF24' description 'Accent amber-400' }
+        { color '@c4' hexCode 'FF0F172A' description 'Text primary slate-900' }
+        { color '@c5' hexCode 'FF64748B' description 'Text muted slate-500' }
+        { color '@c6' hexCode 'FFE7E5E4' description 'Border stone-200' }
+        { color '@c7' hexCode 'FFC62828' description 'Error red' }
+        { color '@c8' hexCode 'FF22C55E' description 'Success emerald' }
+        { color '@c9' hexCode 'FFF5F5F4' description 'Surface stone-100' }
+        { color '@c10' hexCode 'D9FFFFFF' description 'Glass surface white 85%' }
+        { color '@c11' hexCode 'FFFFEDD5' description 'Stat orange-100' }
+        { color '@c12' hexCode 'FFD1FAE5' description 'Stat emerald-100' }
+        { color '@c13' hexCode 'FFFEF3C7' description 'Stat amber-100' }
+        { color '@c14' hexCode 'D9FFFFFF' description 'Glass border' }
+        { color '@c15' hexCode 'FFFFFBEB' description 'Surface amber-50' }
+        { color '@c16' hexCode 'FFFFF1F2' description 'Stat rose-50' }
+        { color '@c25' hexCode 'FFFFFFFF' description 'On-primary text white' }
+    ]
+}

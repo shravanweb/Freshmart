@@ -1,0 +1,49 @@
+@RPCService
+server class NotificationService {
+    static InAppNotification createInAppNotification(InAppNotification inAppNotification) {
+        if (inAppNotification == null) {
+            throw Exception('InAppNotification cannot be null');
+        }
+        inAppNotification.createdAt = DateTime.now();
+        Database.save(inAppNotification);
+        return inAppNotification;
+    }
+
+    static InAppNotification updateInAppNotification(InAppNotification inAppNotification) {
+        if (inAppNotification == null) {
+            throw Exception('InAppNotification cannot be null');
+        }
+        Database.save(inAppNotification);
+        return inAppNotification;
+    }
+
+    static void deleteInAppNotification(InAppNotification inAppNotification) {
+        if (inAppNotification == null) {
+            return;
+        }
+        Database.delete(inAppNotification);
+    }
+
+    static NotificationTemplate createNotificationTemplate(NotificationTemplate notificationTemplate) {
+        if (notificationTemplate == null) {
+            throw Exception('NotificationTemplate cannot be null');
+        }
+        Database.save(notificationTemplate);
+        return notificationTemplate;
+    }
+
+    static NotificationTemplate updateNotificationTemplate(NotificationTemplate notificationTemplate) {
+        if (notificationTemplate == null) {
+            throw Exception('NotificationTemplate cannot be null');
+        }
+        Database.save(notificationTemplate);
+        return notificationTemplate;
+    }
+
+    static void deleteNotificationTemplate(NotificationTemplate notificationTemplate) {
+        if (notificationTemplate == null) {
+            return;
+        }
+        Database.delete(notificationTemplate);
+    }
+}

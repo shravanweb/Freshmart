@@ -1,0 +1,15 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'StockAlertType'
+    options [
+        {
+            name 'LowStock'
+        }
+        {
+            name 'OutOfStock'
+        }
+        {
+            name 'ExpirySoon'
+        }
+    ]
+}

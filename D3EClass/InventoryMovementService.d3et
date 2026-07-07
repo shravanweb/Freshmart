@@ -1,0 +1,28 @@
+@RPCService
+server class InventoryMovementService {
+    static InventoryMovement createInventoryMovement(InventoryMovement inventoryMovement) {
+        if (inventoryMovement == null) {
+            throw Exception('InventoryMovement cannot be null');
+        }
+        if (inventoryMovement.movementDate == null) {
+            inventoryMovement.movementDate = DateTime.now();
+        }
+        Database.save(inventoryMovement);
+        return inventoryMovement;
+    }
+
+    static InventoryMovement updateInventoryMovement(InventoryMovement inventoryMovement) {
+        if (inventoryMovement == null) {
+            throw Exception('InventoryMovement cannot be null');
+        }
+        Database.save(inventoryMovement);
+        return inventoryMovement;
+    }
+
+    static void deleteInventoryMovement(InventoryMovement inventoryMovement) {
+        if (inventoryMovement == null) {
+            return;
+        }
+        Database.delete(inventoryMovement);
+    }
+}

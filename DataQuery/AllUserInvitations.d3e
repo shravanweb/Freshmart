@@ -1,0 +1,16 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'AllUserInvitations'
+    query `UserInvitation.all
+    .where((row) => row.organization == inputs.organization)
+    .orderBy((row) => row.expiresAt, asc: false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

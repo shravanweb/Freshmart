@@ -1,0 +1,28 @@
+@RPCService
+server class AuditLogService {
+    static AuditLog createAuditLog(AuditLog auditLog) {
+        if (auditLog == null) {
+            throw Exception('AuditLog cannot be null');
+        }
+        if (auditLog.performedAt == null) {
+            auditLog.performedAt = DateTime.now();
+        }
+        Database.save(auditLog);
+        return auditLog;
+    }
+
+    static AuditLog updateAuditLog(AuditLog auditLog) {
+        if (auditLog == null) {
+            throw Exception('AuditLog cannot be null');
+        }
+        Database.save(auditLog);
+        return auditLog;
+    }
+
+    static void deleteAuditLog(AuditLog auditLog) {
+        if (auditLog == null) {
+            return;
+        }
+        Database.delete(auditLog);
+    }
+}

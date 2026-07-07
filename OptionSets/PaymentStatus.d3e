@@ -1,0 +1,18 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'PaymentStatus'
+    options [
+        {
+            name 'Unpaid'
+        }
+        {
+            name 'PartiallyPaid'
+        }
+        {
+            name 'Paid'
+        }
+        {
+            name 'Refunded'
+        }
+    ]
+}

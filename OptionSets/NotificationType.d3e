@@ -1,0 +1,21 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'NotificationType'
+    options [
+        {
+            name 'LowStock'
+        }
+        {
+            name 'Expiry'
+        }
+        {
+            name 'PurchaseApproval'
+        }
+        {
+            name 'TransferApproval'
+        }
+        {
+            name 'System'
+        }
+    ]
+}

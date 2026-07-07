@@ -1,0 +1,14 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'OrganizationItem'
+    query `Organization.all
+    .where((row) => row == inputs.organization)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+    ]
+    enableSync true
+}

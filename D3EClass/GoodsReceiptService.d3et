@@ -1,0 +1,59 @@
+@RPCService
+server class GoodsReceiptService {
+    static GoodsReceipt createGoodsReceipt(GoodsReceipt goodsReceipt) {
+        if (goodsReceipt == null) {
+            throw Exception('GoodsReceipt cannot be null');
+        }
+        goodsReceipt.createdAt = DateTime.now();
+        goodsReceipt.status = GoodsReceiptStatus.Draft;
+        Database.save(goodsReceipt);
+        return goodsReceipt;
+    }
+
+    static GoodsReceipt updateGoodsReceipt(GoodsReceipt goodsReceipt) {
+        if (goodsReceipt == null) {
+            throw Exception('GoodsReceipt cannot be null');
+        }
+        Database.save(goodsReceipt);
+        return goodsReceipt;
+    }
+
+    static void deleteGoodsReceipt(GoodsReceipt goodsReceipt) {
+        if (goodsReceipt == null) {
+            return;
+        }
+        Database.delete(goodsReceipt);
+    }
+
+    static GoodsReceipt confirmGoodsReceipt(GoodsReceipt goodsReceipt) {
+        if (goodsReceipt == null) {
+            throw Exception('GoodsReceipt cannot be null');
+        }
+        goodsReceipt.status = GoodsReceiptStatus.Confirmed;
+        Database.save(goodsReceipt);
+        return goodsReceipt;
+    }
+
+    static GoodsReceiptLine createGoodsReceiptLine(GoodsReceiptLine goodsReceiptLine) {
+        if (goodsReceiptLine == null) {
+            throw Exception('GoodsReceiptLine cannot be null');
+        }
+        Database.save(goodsReceiptLine);
+        return goodsReceiptLine;
+    }
+
+    static GoodsReceiptLine updateGoodsReceiptLine(GoodsReceiptLine goodsReceiptLine) {
+        if (goodsReceiptLine == null) {
+            throw Exception('GoodsReceiptLine cannot be null');
+        }
+        Database.save(goodsReceiptLine);
+        return goodsReceiptLine;
+    }
+
+    static void deleteGoodsReceiptLine(GoodsReceiptLine goodsReceiptLine) {
+        if (goodsReceiptLine == null) {
+            return;
+        }
+        Database.delete(goodsReceiptLine);
+    }
+}

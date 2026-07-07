@@ -1,0 +1,89 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onWarehouseStockByProductChange'
+        'ProductDetailPage'
+        'stockData_synchronise'
+    ]
+    struct WarehouseStockByProduct
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUserProfileByUserChange'
+        'ProductDetailPage'
+        'userProfileData_synchronise'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onProductItemChange'
+        'ProductDetailPage'
+        'productData_synchronise'
+    ]
+    struct ProductItem
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getProductItem'
+        'ProductDetailPage'
+        'properties_productData_computation'
+    ]
+    struct ProductItem
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUserProfileByUser'
+        'ProductDetailPage'
+        'properties_userProfileData_computation'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getWarehouseStockByProduct'
+        'ProductDetailPage'
+        'properties_stockData_computation'
+    ]
+    struct WarehouseStockByProduct
+    usage [
+        '*'
+        'items.*'
+    ]
+}

@@ -1,0 +1,17 @@
+Project {
+    package 'inventory.management.system'
+    description 'BuildACompleteInventory is a multi-tenant inventory management platform for retail and warehouse operations with catalog, stock, procurement, sales, alerts, reports, and audit workflows.'
+    name 'InventoryManagementSystem'
+    securitySettings {
+    }
+    domain 'inventory.management.system'
+    dependencies [
+        {
+            package 'studio.d3e.charts'
+        }
+        {
+            package 'd3e.core'
+            version '0.1.225'
+        }
+    ]
+}

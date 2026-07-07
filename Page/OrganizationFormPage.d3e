@@ -1,0 +1,352 @@
+Page {
+    package 'inventory.management.system'
+    name 'OrganizationFormPage'
+    description 'Create and edit organizations'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'org'
+            type Organization
+            required true
+        }
+        {
+            name 'orgData'
+            type OrganizationItem
+            computed true
+            computation `isEditMode ? Query.getOrganizationItem(OrganizationItemRequest(organization: org)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'isEditMode'
+            type Boolean
+            computed true
+            internal true
+            computation `org != null && org.saveStatus != DBSaveStatus.New`
+        }
+        {
+            name 'name'
+            type String
+            internal true
+        }
+        {
+            name 'code'
+            type String
+            internal true
+        }
+        {
+            name 'legalName'
+            type String
+            internal true
+        }
+        {
+            name 'email'
+            type String
+            internal true
+        }
+        {
+            name 'phone'
+            type String
+            internal true
+        }
+        {
+            name 'address'
+            type String
+            internal true
+        }
+        {
+            name 'currency'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            internal true
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `isEditMode ? 'Edit Organization' : 'New Organization'`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Container {
+                                    name 'cardRef'
+                                    tags [
+                                        'glassCard'
+                                    ]
+                                    data {
+                                        width '640'
+                                    }
+                                    child Column {
+                                        name 'formColumnRef'
+                                        data {
+                                            crossAxisAlignment 'stretch'
+                                        }
+                                        children [
+                                            IMSInputFieldWidget {
+                                                name 'nameFieldRef'
+                                                data {
+                                                    label 'Name'
+                                                    text `name`
+                                                    placeHolder 'Organization name'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer1Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'codeFieldRef'
+                                                data {
+                                                    label 'Code'
+                                                    text `code`
+                                                    placeHolder 'Unique code'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer2Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'legalNameFieldRef'
+                                                data {
+                                                    label 'Legal Name'
+                                                    text `legalName`
+                                                    placeHolder 'Registered legal name'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer3Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'emailFieldRef'
+                                                data {
+                                                    label 'Email'
+                                                    text `email`
+                                                    placeHolder 'contact@company.com'
+                                                    keyboardType 'emailAddress'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer4Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'phoneFieldRef'
+                                                data {
+                                                    label 'Phone'
+                                                    text `phone`
+                                                    placeHolder 'Phone number'
+                                                    keyboardType 'phone'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer5Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'addressFieldRef'
+                                                data {
+                                                    label 'Address'
+                                                    text `address`
+                                                    placeHolder 'Business address'
+                                                }
+                                            }
+                                            Container {
+                                                name 'spacer6Ref'
+                                                data {
+                                                    margin '0 0 16 0'
+                                                }
+                                            }
+                                            IMSInputFieldWidget {
+                                                name 'currencyFieldRef'
+                                                data {
+                                                    label 'Currency'
+                                                    text `currency`
+                                                    placeHolder 'USD'
+                                                }
+                                            }
+                                            Row {
+                                                name 'actionsRowRef'
+                                                data {
+                                                    mainAxisAlignment 'end'
+                                                    mainAxisSize 'max'
+                                                    margin '24 0 0 0'
+                                                }
+                                                children [
+                                                    TextButton {
+                                                        name 'cancelRef'
+                                                        tags [
+                                                            'secondary'
+                                                        ]
+                                                        data {
+                                                            label 'Cancel'
+                                                            margin '0 8 0 0'
+                                                        }
+                                                    }
+                                                    TextButton {
+                                                        name 'saveRef'
+                                                        tags [
+                                                            'primary'
+                                                        ]
+                                                        data {
+                                                            label `isEditMode ? 'Update' : 'Create'`
+                                                            disable `isLoading`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                if (isEditMode && orgData != null && orgData.items.isNotEmpty) {
+                    Organization loaded = orgData.items.first;
+                    name = loaded.name;
+                    code = loaded.code;
+                    legalName = loaded.legalName;
+                    email = loaded.email;
+                    phone = loaded.phone;
+                    address = loaded.address;
+                    currency = loaded.currency;
+                } else {
+                    name = org.name;
+                    code = org.code;
+                    legalName = org.legalName;
+                    email = org.email;
+                    phone = org.phone;
+                    address = org.address;
+                    currency = org.currency != null ? org.currency : 'USD';
+                }
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                navigator.pushOrganizationListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                isLoading = true;
+                org.name = name;
+                org.code = code;
+                org.legalName = legalName;
+                org.email = email;
+                org.phone = phone;
+                org.address = address;
+                org.currency = currency;
+                // TODO: D3EClass OrganizationService.createOrganization / updateOrganization
+                isLoading = false;
+                navigator.pushOrganizationListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

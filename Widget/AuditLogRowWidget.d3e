@@ -1,0 +1,86 @@
+Widget {
+    package 'inventory.management.system'
+    name 'AuditLogRowWidget'
+    description 'Single audit log row display'
+    properties [
+        {
+            name 'auditLog'
+            type AuditLog
+            required true
+        }
+        {
+            name 'summaryLabel'
+            type String
+            computed true
+            computation `auditLog.entityType + ' · ' + auditLog.entityId`
+            internal true
+        }
+        {
+            name 'actionLabel'
+            type String
+            computed true
+            computation `auditLog.action != null ? auditLog.action.name : ''`
+            internal true
+        }
+    ]
+    build Container {
+        name 'rowRef'
+        styles [
+GlassPanelStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '12 16'
+            margin '0 0 8 0'
+        }
+        child Row {
+            name 'contentRowRef'
+            data {
+                mainAxisAlignment 'spaceBetween'
+                crossAxisAlignment 'center'
+                mainAxisSize 'max'
+            }
+            children [
+                Column {
+                    name 'leftColRef'
+                    data {
+                        crossAxisAlignment 'start'
+                    }
+                    children [
+                        TextView {
+                            name 'summaryRef'
+                            data {
+                                data `summaryLabel`
+                                textStyle {
+                                    color '@c4'
+                                    fontSize '14'
+                                    fontWeight 'w600'
+                                }
+                            }
+                        }
+                        TextView {
+                            name 'actionRef'
+                            data {
+                                data `actionLabel`
+                                margin '4 0 0 0'
+                                textStyle {
+                                    color '@c5'
+                                    fontSize '13'
+                                }
+                            }
+                        }
+                    ]
+                }
+                DateTimeView {
+                    name 'dateRef'
+                    data {
+                        value `auditLog.performedAt`
+                        format 'MMM d, yyyy HH:mm'
+                    }
+                }
+            ]
+        }
+    }
+}

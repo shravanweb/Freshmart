@@ -1,0 +1,47 @@
+Model {
+    package 'inventory.management.system'
+    name 'UserInvitation'
+    master Organization
+    creatable true
+    searchable true
+    display `email`
+    properties [
+        {
+            name 'Email'
+            type String
+            required true
+        }
+        {
+            name 'App Role'
+            type AppUserRole
+            required true
+        }
+        {
+            name 'Invited By'
+            type User
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Token'
+            type String
+            required true
+            unique true
+        }
+        {
+            name 'Status'
+            type InvitationStatus
+            required true
+            defaultValue `InvitationStatus.Pending`
+        }
+        {
+            name 'Expires At'
+            type DateTime
+            required true
+        }
+        {
+            name 'Accepted At'
+            type DateTime
+        }
+    ]
+}

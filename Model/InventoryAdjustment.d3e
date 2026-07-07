@@ -1,0 +1,54 @@
+Model {
+    package 'inventory.management.system'
+    name 'InventoryAdjustment'
+    master Organization
+    creatable true
+    display `adjustmentNumber`
+    properties [
+        {
+            name 'Adjustment Number'
+            type String
+            required true
+        }
+        {
+            name 'Warehouse'
+            type Warehouse
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Adjustment Date'
+            type Date
+            required true
+        }
+        {
+            name 'Reason'
+            type AdjustmentReason
+            required true
+        }
+        {
+            name 'Status'
+            type AdjustmentStatus
+            required true
+            defaultValue `AdjustmentStatus.Draft`
+        }
+        {
+            name 'Notes'
+            type String
+            longText true
+        }
+        {
+            name 'Adjusted By'
+            type User
+            readType ReadOnly
+            onDelete Clear
+        }
+        {
+            name 'Lines'
+            type InventoryAdjustmentLine
+            collection true
+            inverse true
+            inverseProperty inventoryAdjustment
+        }
+    ]
+}

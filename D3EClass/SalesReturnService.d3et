@@ -1,0 +1,60 @@
+@RPCService
+server class SalesReturnService {
+    static SalesReturn createSalesReturn(SalesReturn salesReturn) {
+        if (salesReturn == null) {
+            throw Exception('SalesReturn cannot be null');
+        }
+        salesReturn.status = SalesReturnStatus.Draft;
+        Database.save(salesReturn);
+        return salesReturn;
+    }
+
+    static SalesReturn updateSalesReturn(SalesReturn salesReturn) {
+        if (salesReturn == null) {
+            throw Exception('SalesReturn cannot be null');
+        }
+        Database.save(salesReturn);
+        return salesReturn;
+    }
+
+    static void deleteSalesReturn(SalesReturn salesReturn) {
+        if (salesReturn == null) {
+            return;
+        }
+        Database.delete(salesReturn);
+    }
+
+    static SalesReturn confirmSalesReturn(SalesReturn salesReturn) {
+        if (salesReturn == null) {
+            throw Exception('SalesReturn cannot be null');
+        }
+        salesReturn.status = SalesReturnStatus.Confirmed;
+        Database.save(salesReturn);
+        return salesReturn;
+    }
+
+    static SalesReturnLine createSalesReturnLine(SalesReturnLine salesReturnLine) {
+        if (salesReturnLine == null) {
+            throw Exception('SalesReturnLine cannot be null');
+        }
+        salesReturnLine.lineTotal = salesReturnLine.quantity * salesReturnLine.unitPrice;
+        Database.save(salesReturnLine);
+        return salesReturnLine;
+    }
+
+    static SalesReturnLine updateSalesReturnLine(SalesReturnLine salesReturnLine) {
+        if (salesReturnLine == null) {
+            throw Exception('SalesReturnLine cannot be null');
+        }
+        salesReturnLine.lineTotal = salesReturnLine.quantity * salesReturnLine.unitPrice;
+        Database.save(salesReturnLine);
+        return salesReturnLine;
+    }
+
+    static void deleteSalesReturnLine(SalesReturnLine salesReturnLine) {
+        if (salesReturnLine == null) {
+            return;
+        }
+        Database.delete(salesReturnLine);
+    }
+}

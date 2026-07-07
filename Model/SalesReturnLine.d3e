@@ -1,0 +1,34 @@
+Model {
+    package 'inventory.management.system'
+    name 'SalesReturnLine'
+    master SalesReturn
+    creatable true
+    display `product.name`
+    properties [
+        {
+            name 'Product'
+            type Product
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Quantity'
+            type Double
+            required true
+        }
+        {
+            name 'Unit Price'
+            type Double
+            required true
+        }
+        {
+            name 'Line Total'
+            type Double
+            readType ReadOnly
+        }
+        {
+            name 'Batch Number'
+            type String
+        }
+    ]
+}

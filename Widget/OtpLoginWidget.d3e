@@ -1,0 +1,165 @@
+Widget {
+    package 'inventory.management.system'
+    name 'OtpLoginWidget'
+    description 'OTP send and verify form'
+    properties [
+        {
+            name 'email'
+            type String
+            required true
+        }
+        {
+            name 'otp'
+            type String
+            internal true
+        }
+        {
+            name 'otpSent'
+            type Boolean
+            defaultValue `false`
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            defaultValue `false`
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'glassCard'
+        ]
+        child Column {
+            name 'formColumnRef'
+            data {
+                mainAxisSize 'min'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                TextView {
+                    name 'titleRef'
+                    data {
+                        data 'OTP Login'
+                        textAlign 'center'
+                        margin '0 0 24 0'
+                        textStyle {
+                            color '@c4'
+                            fontSize '20'
+                            fontWeight 'w700'
+                        }
+                    }
+                }
+                IMSInputFieldWidget {
+                    name 'emailFieldRef'
+                    data {
+                        label 'Email'
+                        text `email`
+                        placeHolder 'you@company.com'
+                        keyboardType 'emailAddress'
+                    }
+                }
+                CIf {
+                    name 'otpFieldIfRef'
+                    condition `otpSent`
+                    then Column {
+                        name 'otpColumnRef'
+                        children [
+                            Container {
+                                name 'spacerRef'
+                                data {
+                                    margin '0 0 16 0'
+                                }
+                            }
+                            IMSInputFieldWidget {
+                                name 'otpFieldRef'
+                                data {
+                                    label 'One-time password'
+                                    text `otp`
+                                    placeHolder 'Enter OTP'
+                                }
+                            }
+                        ]
+                    }
+                }
+                TextButton {
+                    name 'sendOtpRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label `otpSent ? 'Resend OTP' : 'Send OTP'`
+                        disable `isLoading`
+                        margin '24 0 0 0'
+                    }
+                }
+                CIf {
+                    name 'verifyIfRef'
+                    condition `otpSent`
+                    then TextButton {
+                        name 'verifyRef'
+                        tags [
+                            'primary'
+                        ]
+                        data {
+                            label 'Verify OTP'
+                            disable `isLoading`
+                            margin '12 0 0 0'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSendOtpPressedHandler'
+            type OnEvent
+            on sendOtpRef
+            event onPressed
+            block ```
+                onSendOtp(email);
+                otpSent = true;
+            ```
+        }
+        {
+            name 'onVerifyPressedHandler'
+            type OnEvent
+            on verifyRef
+            event onPressed
+            block ```
+                onVerifyOtp(email, otp);
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onSendOtp'
+            params [
+                {
+                    name 'email'
+                    type String
+                }
+            ]
+        }
+        {
+            name 'onVerifyOtp'
+            params [
+                {
+                    name 'email'
+                    type String
+                }
+                {
+                    name 'otp'
+                    type String
+                }
+            ]
+        }
+    ]
+}

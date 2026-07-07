@@ -1,0 +1,28 @@
+@RPCService
+server class WarehouseService {
+    static Warehouse createWarehouse(Warehouse warehouse) {
+        if (warehouse == null) {
+            throw Exception('Warehouse cannot be null');
+        }
+        warehouse.createdAt = DateTime.now();
+        warehouse.updatedAt = DateTime.now();
+        Database.save(warehouse);
+        return warehouse;
+    }
+
+    static Warehouse updateWarehouse(Warehouse warehouse) {
+        if (warehouse == null) {
+            throw Exception('Warehouse cannot be null');
+        }
+        warehouse.updatedAt = DateTime.now();
+        Database.save(warehouse);
+        return warehouse;
+    }
+
+    static void deleteWarehouse(Warehouse warehouse) {
+        if (warehouse == null) {
+            return;
+        }
+        Database.delete(warehouse);
+    }
+}

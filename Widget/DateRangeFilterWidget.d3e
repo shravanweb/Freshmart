@@ -1,0 +1,134 @@
+Widget {
+    package 'inventory.management.system'
+    name 'DateRangeFilterWidget'
+    description 'Report date range filter'
+    properties [
+        {
+            name 'startDate'
+            type DateTime
+            internal true
+        }
+        {
+            name 'endDate'
+            type DateTime
+            internal true
+        }
+    ]
+    build Container {
+        name 'filterRef'
+        styles [
+            GlassPanelStyle
+            FormFieldStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '12 16'
+        }
+        child Row {
+            name 'filterRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'center'
+            }
+            children [
+                Column {
+                    name 'startColRef'
+                    data {
+                        crossAxisAlignment 'start'
+                        mainAxisSize 'min'
+                        expand 'true'
+                    }
+                    children [
+                        TextView {
+                            name 'startLabelRef'
+                            tags [
+                                'fieldLabel'
+                            ]
+                            data {
+                                data 'Start Date'
+                            }
+                        }
+                        DateTimeField {
+                            name 'startRef'
+                            data {
+                                value `startDate`
+                                placeHolder 'Start'
+                            }
+                        }
+                    ]
+                }
+                Container {
+                    name 'spacerRef'
+                    data {
+                        margin '0 16 0 16'
+                    }
+                }
+                Column {
+                    name 'endColRef'
+                    data {
+                        crossAxisAlignment 'start'
+                        mainAxisSize 'min'
+                        expand 'true'
+                    }
+                    children [
+                        TextView {
+                            name 'endLabelRef'
+                            tags [
+                                'fieldLabel'
+                            ]
+                            data {
+                                data 'End Date'
+                            }
+                        }
+                        DateTimeField {
+                            name 'endRef'
+                            data {
+                                value `endDate`
+                                placeHolder 'End'
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onStartChangedHandler'
+            type OnEvent
+            on startRef
+            event onChanged
+            block ```
+                startDate = dateTime;
+                onChange(startDate, endDate);
+            ```
+        }
+        {
+            name 'onEndChangedHandler'
+            type OnEvent
+            on endRef
+            event onChanged
+            block ```
+                endDate = dateTime;
+                onChange(startDate, endDate);
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onChange'
+            params [
+                {
+                    name 'filterStart'
+                    type DateTime
+                }
+                {
+                    name 'filterEnd'
+                    type DateTime
+                }
+            ]
+        }
+    ]
+}

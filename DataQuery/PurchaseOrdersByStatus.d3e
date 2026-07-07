@@ -1,0 +1,21 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'PurchaseOrdersByStatus'
+    query `PurchaseOrder.all
+    .where((row) => row.organization == inputs.organization
+      && (inputs.status == null || row.status == inputs.status))
+    .orderBy((row) => row.orderDate, asc: false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'status'
+            type PurchaseOrderStatus
+        }
+    ]
+    enableSync true
+    needCount true
+}

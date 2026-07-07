@@ -1,0 +1,56 @@
+Model {
+    package 'inventory.management.system'
+    name 'UserProfile'
+    master Organization
+    creatable true
+    searchable true
+    display `displayName`
+    properties [
+        {
+            name 'User'
+            type User
+            required true
+            unique true
+            onDelete Prevent
+        }
+        {
+            name 'Display Name'
+            type String
+            required true
+        }
+        {
+            name 'Phone'
+            type String
+        }
+        {
+            name 'Avatar'
+            type DFile
+        }
+        {
+            name 'App Role'
+            type AppUserRole
+            required true
+        }
+        {
+            name 'Assigned Stores'
+            type Store
+            collection true
+        }
+        {
+            name 'Assigned Warehouses'
+            type Warehouse
+            collection true
+        }
+        {
+            name 'Status'
+            type EntityStatus
+            required true
+            defaultValue `EntityStatus.Active`
+        }
+        {
+            name 'Last Login At'
+            type DateTime
+            readType ReadOnly
+        }
+    ]
+}

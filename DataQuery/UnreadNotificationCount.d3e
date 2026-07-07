@@ -1,0 +1,20 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'UnreadNotificationCount'
+    query `InAppNotification.all
+    .where((row) => row.organization == inputs.organization && row.recipient == inputs.user && row.isRead == false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'user'
+            type User
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

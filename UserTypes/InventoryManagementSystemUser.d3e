@@ -1,0 +1,243 @@
+UserType {
+    package 'inventory.management.system'
+    name 'InventoryManagementSystemUser'
+    userModel User
+    loginSettings {
+        emailField email
+        passwordField password
+    }
+    modelAccess [
+        {
+            model User
+            allowCreate false
+            allowUpdate true
+            allowDelete false
+        }
+        {
+            model Organization
+            allowCreate true
+            allowUpdate true
+            allowDelete false
+        }
+        {
+            model Store
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model Warehouse
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model UnitOfMeasure
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model ProductCategory
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model Product
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model WarehouseStock
+            allowCreate false
+            allowUpdate true
+            allowDelete false
+        }
+        {
+            model StockBatch
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model Vendor
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model SupplierContact
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model PurchaseOrder
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model PurchaseOrderLine
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model GoodsReceipt
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model GoodsReceiptLine
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model StockTransfer
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model StockTransferLine
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model InventoryAdjustment
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model InventoryAdjustmentLine
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model InventoryMovement
+            allowCreate false
+            allowUpdate false
+            allowDelete false
+        }
+        {
+            model SalesOrder
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model SalesOrderLine
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model SalesReturn
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model SalesReturnLine
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model StockAlert
+            allowCreate false
+            allowUpdate true
+            allowDelete false
+        }
+        {
+            model AuditLog
+            allowCreate false
+            allowUpdate false
+            allowDelete false
+        }
+        {
+            model UserProfile
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model UserRole
+            allowCreate true
+            allowUpdate true
+            allowDelete false
+        }
+        {
+            model UserInvitation
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+        {
+            model InAppNotification
+            allowCreate false
+            allowUpdate true
+            allowDelete false
+        }
+        {
+            model NotificationTemplate
+            allowCreate true
+            allowUpdate true
+            allowDelete true
+        }
+    ]
+    queries [
+        { query AllAuditLogs }
+        { query AllGoodsReceipts }
+        { query AllInAppNotifications }
+        { query AllInventoryAdjustments }
+        { query AllInventoryMovements }
+        { query AllOrganizations }
+        { query AllProductCategories }
+        { query AllProducts }
+        { query AllPurchaseOrders }
+        { query AllSalesOrders }
+        { query AllSalesReturns }
+        { query AllStockAlerts }
+        { query AllStockBatches }
+        { query AllStockTransfers }
+        { query AllStores }
+        { query AllSuppliers }
+        { query AllUnitOfMeasures }
+        { query AllUserInvitations }
+        { query AllUserProfiles }
+        { query AllWarehouses }
+        { query DashboardMetrics }
+        { query ExpiringBatches }
+        { query GoodsReceiptItem }
+        { query InventoryMovementsByDateRange }
+        { query LowStockItems }
+        { query MovementReportRows }
+        { query OrganizationItem }
+        { query OutOfStockItems }
+        { query ProductItem }
+        { query ProductSearch }
+        { query ProductsByCategory }
+        { query PurchaseOrderItem }
+        { query PurchaseOrdersByStatus }
+        { query SalesOrderItem }
+        { query SalesOrdersByStore }
+        { query StockTransferItem }
+        { query StockValuationReport }
+        { query StoreItem }
+        { query SupplierItem }
+        { query UnreadNotificationCount }
+        { query UserProfileByUser }
+        { query WarehouseStockByProduct }
+        { query WarehouseStockByWarehouse }
+        { query WarehousesByStore }
+    ]
+}

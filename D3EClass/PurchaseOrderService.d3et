@@ -1,0 +1,70 @@
+@RPCService
+server class PurchaseOrderService {
+    static PurchaseOrder createPurchaseOrder(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder == null) {
+            throw Exception('PurchaseOrder cannot be null');
+        }
+        purchaseOrder.createdAt = DateTime.now();
+        purchaseOrder.status = PurchaseOrderStatus.Draft;
+        Database.save(purchaseOrder);
+        return purchaseOrder;
+    }
+
+    static PurchaseOrder updatePurchaseOrder(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder == null) {
+            throw Exception('PurchaseOrder cannot be null');
+        }
+        Database.save(purchaseOrder);
+        return purchaseOrder;
+    }
+
+    static void deletePurchaseOrder(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder == null) {
+            return;
+        }
+        Database.delete(purchaseOrder);
+    }
+
+    static PurchaseOrder submitPurchaseOrder(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder == null) {
+            throw Exception('PurchaseOrder cannot be null');
+        }
+        purchaseOrder.status = PurchaseOrderStatus.Submitted;
+        Database.save(purchaseOrder);
+        return purchaseOrder;
+    }
+
+    static PurchaseOrder cancelPurchaseOrder(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder == null) {
+            throw Exception('PurchaseOrder cannot be null');
+        }
+        purchaseOrder.status = PurchaseOrderStatus.Cancelled;
+        Database.save(purchaseOrder);
+        return purchaseOrder;
+    }
+
+    static PurchaseOrderLine createPurchaseOrderLine(PurchaseOrderLine purchaseOrderLine) {
+        if (purchaseOrderLine == null) {
+            throw Exception('PurchaseOrderLine cannot be null');
+        }
+        purchaseOrderLine.lineTotal = purchaseOrderLine.orderedQuantity * purchaseOrderLine.unitPrice;
+        Database.save(purchaseOrderLine);
+        return purchaseOrderLine;
+    }
+
+    static PurchaseOrderLine updatePurchaseOrderLine(PurchaseOrderLine purchaseOrderLine) {
+        if (purchaseOrderLine == null) {
+            throw Exception('PurchaseOrderLine cannot be null');
+        }
+        purchaseOrderLine.lineTotal = purchaseOrderLine.orderedQuantity * purchaseOrderLine.unitPrice;
+        Database.save(purchaseOrderLine);
+        return purchaseOrderLine;
+    }
+
+    static void deletePurchaseOrderLine(PurchaseOrderLine purchaseOrderLine) {
+        if (purchaseOrderLine == null) {
+            return;
+        }
+        Database.delete(purchaseOrderLine);
+    }
+}

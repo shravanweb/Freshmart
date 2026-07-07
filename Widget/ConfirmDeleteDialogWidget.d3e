@@ -1,0 +1,141 @@
+Widget {
+    package 'inventory.management.system'
+    name 'ConfirmDeleteDialogWidget'
+    description 'Delete confirmation dialog'
+    properties [
+        {
+            name 'entityName'
+            type String
+            required true
+        }
+        {
+            name 'message'
+            type String
+            required true
+        }
+    ]
+    build Container {
+        name 'dialogRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassCard'
+        ]
+        data {
+            width '480'
+        }
+        child Column {
+            name 'dialogColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                Row {
+                    name 'headerRowRef'
+                    data {
+                        mainAxisAlignment 'spaceBetween'
+                        crossAxisAlignment 'center'
+                        mainAxisSize 'max'
+                    }
+                    children [
+                        TextView {
+                            name 'titleRef'
+                            data {
+                                data `'Delete ' + entityName`
+                                textStyle {
+                                    color '@c4'
+                                    fontSize '18'
+                                    fontWeight 'w700'
+                                }
+                            }
+                        }
+                        IconButton {
+                            name 'closeRef'
+                            data {
+                                icon 'MaterialIcons.close'
+                            }
+                        }
+                    ]
+                }
+                TextView {
+                    name 'messageRef'
+                    data {
+                        data `message`
+                        margin '24 0 32 0'
+                        textStyle {
+                            color '@c5'
+                            fontSize '14'
+                        }
+                    }
+                }
+                Row {
+                    name 'actionsRef'
+                    data {
+                        mainAxisAlignment 'end'
+                        mainAxisSize 'max'
+                    }
+                    children [
+                        TextButton {
+                            name 'cancelRef'
+                            tags [
+                                'secondary'
+                            ]
+                            data {
+                                label 'Cancel'
+                                margin '0 12 0 0'
+                            }
+                        }
+                        TextButton {
+                            name 'confirmRef'
+                            tags [
+                                'destructive'
+                            ]
+                            data {
+                                label 'Delete'
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onCloseHandler'
+            type OnEvent
+            on closeRef
+            event onPressed
+            block ```
+                onCancel();
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                onCancel();
+            ```
+        }
+        {
+            name 'onConfirmHandler'
+            type OnEvent
+            on confirmRef
+            event onPressed
+            block ```
+                onConfirm();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onConfirm'
+        }
+        {
+            name 'onCancel'
+        }
+    ]
+}

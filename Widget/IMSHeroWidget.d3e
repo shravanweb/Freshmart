@@ -1,0 +1,76 @@
+Widget {
+    package 'inventory.management.system'
+    name 'IMSHeroWidget'
+    description 'Landing page hero section'
+    build Container {
+        name 'heroRef'
+        styles [
+GlassPanelStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '48 32'
+        }
+        child Column {
+            name 'heroColumnRef'
+            data {
+                mainAxisSize 'min'
+                crossAxisAlignment 'center'
+            }
+            children [
+                TextView {
+                    name 'titleRef'
+                    data {
+                        data 'BuildACompleteInventory'
+                        textAlign 'center'
+                        textStyle {
+                            color '@c4'
+                            fontSize '36'
+                            fontWeight 'w700'
+                        }
+                    }
+                }
+                TextView {
+                    name 'subtitleRef'
+                    data {
+                        data 'Multi-tenant inventory management for retail and warehouse operations'
+                        textAlign 'center'
+                        margin '16 0 32 0'
+                        textStyle {
+                            color '@c5'
+                            fontSize '16'
+                        }
+                    }
+                }
+                TextButton {
+                    name 'ctaRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Get Started'
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onCtaPressedHandler'
+            type OnEvent
+            on ctaRef
+            event onPressed
+            block ```
+                onGetStarted();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onGetStarted'
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'MovementDirection'
+    options [
+        {
+            name 'In'
+        }
+        {
+            name 'Out'
+        }
+    ]
+}

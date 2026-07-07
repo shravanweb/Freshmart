@@ -1,0 +1,25 @@
+@RPCService
+server class ProductCategoryService {
+    static ProductCategory createProductCategory(ProductCategory category) {
+        if (category == null) {
+            throw Exception('ProductCategory cannot be null');
+        }
+        Database.save(category);
+        return category;
+    }
+
+    static ProductCategory updateProductCategory(ProductCategory category) {
+        if (category == null) {
+            throw Exception('ProductCategory cannot be null');
+        }
+        Database.save(category);
+        return category;
+    }
+
+    static void deleteProductCategory(ProductCategory category) {
+        if (category == null) {
+            return;
+        }
+        Database.delete(category);
+    }
+}

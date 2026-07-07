@@ -1,0 +1,71 @@
+Model {
+    package 'inventory.management.system'
+    name 'Store'
+    master Organization
+    creatable true
+    searchable true
+    display `name`
+    properties [
+        {
+            name 'Name'
+            type String
+            required true
+        }
+        {
+            name 'Code'
+            type String
+            required true
+        }
+        {
+            name 'Store Type'
+            type StoreType
+            required true
+        }
+        {
+            name 'Address'
+            type String
+            longText true
+        }
+        {
+            name 'Phone'
+            type String
+        }
+        {
+            name 'Email'
+            type String
+        }
+        {
+            name 'Manager'
+            type User
+            onDelete Clear
+        }
+        {
+            name 'Default Warehouse'
+            type Warehouse
+            onDelete Clear
+        }
+        {
+            name 'Warehouses'
+            type Warehouse
+            collection true
+            inverse true
+            inverseProperty store
+        }
+        {
+            name 'Status'
+            type EntityStatus
+            required true
+            defaultValue `EntityStatus.Active`
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Updated At'
+            type DateTime
+            readType ReadOnly
+        }
+    ]
+}

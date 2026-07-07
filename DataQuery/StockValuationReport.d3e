@@ -1,0 +1,21 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'StockValuationReport'
+    query `WarehouseStock.all
+    .where((row) => row.organization == inputs.organization
+      && (inputs.warehouse == null || row.warehouse == inputs.warehouse))
+    .orderBy((row) => row.stockValue, asc: false)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'warehouse'
+            type Warehouse
+        }
+    ]
+    enableSync true
+    needCount true
+}

@@ -1,0 +1,227 @@
+Page {
+    package 'inventory.management.system'
+    name 'GoodsReceiptFormPage'
+    description 'Create and edit goods receipts'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'goodsReceipt'
+            type GoodsReceipt
+            required true
+        }
+        {
+            name 'receiptData'
+            type GoodsReceiptItem
+            computed true
+            computation `isEditMode ? Query.getGoodsReceiptItem(GoodsReceiptItemRequest(goodsReceipt: goodsReceipt)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'isEditMode'
+            type Boolean
+            computed true
+            internal true
+            computation `goodsReceipt != null && goodsReceipt.saveStatus != DBSaveStatus.New`
+        }
+        {
+            name 'notes'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            internal true
+            defaultValue `false`
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title `isEditMode ? 'Edit Goods Receipt' : 'New Goods Receipt'`
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'formColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Container {
+                                            name 'cardRef'
+                                            tags [
+                                                'glassCard'
+                                            ]
+                                            child IMSInputFieldWidget {
+                                                name 'notesFieldRef'
+                                                data {
+                                                    label 'Notes'
+                                                    text `notes`
+                                                    placeHolder 'Receipt notes'
+                                                }
+                                            }
+                                        }
+                                        Container {
+                                            name 'spacerRef'
+                                            data {
+                                                margin '0 0 16 0'
+                                            }
+                                        }
+                                        LineItemEditorWidget {
+                                            name 'lineItemsRef'
+                                            data {
+                                                mode 'edit'
+                                            }
+                                        }
+                                        Row {
+                                            name 'actionsRowRef'
+                                            data {
+                                                mainAxisAlignment 'end'
+                                                mainAxisSize 'max'
+                                                margin '24 0 0 0'
+                                            }
+                                            children [
+                                                TextButton {
+                                                    name 'cancelRef'
+                                                    tags [
+                                                        'secondary'
+                                                    ]
+                                                    data {
+                                                        label 'Cancel'
+                                                        margin '0 8 0 0'
+                                                    }
+                                                }
+                                                TextButton {
+                                                    name 'saveRef'
+                                                    tags [
+                                                        'primary'
+                                                    ]
+                                                    data {
+                                                        label `isEditMode ? 'Update' : 'Create'`
+                                                        disable `isLoading`
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onInit'
+            block ```
+                GoodsReceipt source = goodsReceipt;
+                if (isEditMode && receiptData != null && receiptData.items.isNotEmpty) {
+                    source = receiptData.items.first;
+                }
+                notes = source.notes;
+            ```
+        }
+        {
+            name 'onCancelHandler'
+            type OnEvent
+            on cancelRef
+            event onPressed
+            block ```
+                navigator.pushGoodsReceiptListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onSaveHandler'
+            type OnEvent
+            on saveRef
+            event onPressed
+            block ```
+                isLoading = true;
+                goodsReceipt.organization = organization;
+                goodsReceipt.notes = notes;
+                // TODO: D3EClass GoodsReceiptService.createGoodsReceipt / updateGoodsReceipt
+                isLoading = false;
+                navigator.pushGoodsReceiptListPage(user: user, target: 'main', replace: true);
+            ```
+        }
+    ]
+}

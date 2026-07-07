@@ -1,0 +1,15 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'GoodsReceiptStatus'
+    options [
+        {
+            name 'Draft'
+        }
+        {
+            name 'Confirmed'
+        }
+        {
+            name 'Cancelled'
+        }
+    ]
+}

@@ -1,0 +1,77 @@
+@RPCService
+server class StockTransferService {
+    static StockTransfer createStockTransfer(StockTransfer stockTransfer) {
+        if (stockTransfer == null) {
+            throw Exception('StockTransfer cannot be null');
+        }
+        stockTransfer.status = StockTransferStatus.Draft;
+        Database.save(stockTransfer);
+        return stockTransfer;
+    }
+
+    static StockTransfer updateStockTransfer(StockTransfer stockTransfer) {
+        if (stockTransfer == null) {
+            throw Exception('StockTransfer cannot be null');
+        }
+        Database.save(stockTransfer);
+        return stockTransfer;
+    }
+
+    static void deleteStockTransfer(StockTransfer stockTransfer) {
+        if (stockTransfer == null) {
+            return;
+        }
+        Database.delete(stockTransfer);
+    }
+
+    static StockTransfer submitStockTransfer(StockTransfer stockTransfer) {
+        if (stockTransfer == null) {
+            throw Exception('StockTransfer cannot be null');
+        }
+        stockTransfer.status = StockTransferStatus.Submitted;
+        Database.save(stockTransfer);
+        return stockTransfer;
+    }
+
+    static StockTransfer completeStockTransfer(StockTransfer stockTransfer) {
+        if (stockTransfer == null) {
+            throw Exception('StockTransfer cannot be null');
+        }
+        stockTransfer.status = StockTransferStatus.Completed;
+        stockTransfer.receivedAt = DateTime.now();
+        Database.save(stockTransfer);
+        return stockTransfer;
+    }
+
+    static StockTransfer cancelStockTransfer(StockTransfer stockTransfer) {
+        if (stockTransfer == null) {
+            throw Exception('StockTransfer cannot be null');
+        }
+        stockTransfer.status = StockTransferStatus.Cancelled;
+        Database.save(stockTransfer);
+        return stockTransfer;
+    }
+
+    static StockTransferLine createStockTransferLine(StockTransferLine stockTransferLine) {
+        if (stockTransferLine == null) {
+            throw Exception('StockTransferLine cannot be null');
+        }
+        Database.save(stockTransferLine);
+        return stockTransferLine;
+    }
+
+    static StockTransferLine updateStockTransferLine(StockTransferLine stockTransferLine) {
+        if (stockTransferLine == null) {
+            throw Exception('StockTransferLine cannot be null');
+        }
+        Database.save(stockTransferLine);
+        return stockTransferLine;
+    }
+
+    static void deleteStockTransferLine(StockTransferLine stockTransferLine) {
+        if (stockTransferLine == null) {
+            return;
+        }
+        Database.delete(stockTransferLine);
+    }
+}

@@ -1,0 +1,91 @@
+Model {
+    package 'inventory.management.system'
+    name 'Organization'
+    creatable true
+    searchable true
+    display `this.name`
+    properties [
+        {
+            name 'Name'
+            type String
+            required true
+            unique true
+        }
+        {
+            name 'Code'
+            type String
+            required true
+            unique true
+        }
+        {
+            name 'Legal Name'
+            type String
+        }
+        {
+            name 'Tax Id'
+            type String
+        }
+        {
+            name 'Email'
+            type String
+        }
+        {
+            name 'Phone'
+            type String
+        }
+        {
+            name 'Address'
+            type String
+            longText true
+        }
+        {
+            name 'Logo'
+            type DFile
+        }
+        {
+            name 'Currency'
+            type String
+            required true
+            defaultValue `'USD'`
+        }
+        {
+            name 'Timezone'
+            type String
+            defaultValue `'UTC'`
+        }
+        {
+            name 'Status'
+            type OrganizationStatus
+            required true
+            defaultValue `OrganizationStatus.Active`
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Updated At'
+            type DateTime
+            readType ReadOnly
+        }
+        {
+            name 'Created By'
+            type User
+            readType ReadOnly
+            onDelete Clear
+        }
+    ]
+    actions [
+        {
+            name 'setTimestamps'
+            runOn OnCreateAndUpdate
+            block ```
+                if (this.createdAt == null) {
+                    this.createdAt = DateTime.now();
+                }
+                this.updatedAt = DateTime.now();
+            ```
+        }
+    ]
+}

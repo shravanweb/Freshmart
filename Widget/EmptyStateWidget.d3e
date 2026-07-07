@@ -1,0 +1,105 @@
+Widget {
+    package 'inventory.management.system'
+    name 'EmptyStateWidget'
+    description 'Empty list placeholder with optional action'
+    properties [
+        {
+            name 'title'
+            type String
+            required true
+        }
+        {
+            name 'message'
+            type String
+            required true
+        }
+        {
+            name 'actionLabel'
+            type String
+        }
+        {
+            name 'hasAction'
+            type Boolean
+            computed true
+            computation `actionLabel != null && actionLabel.isNotEmpty`
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassCard'
+        ]
+        data {
+            padding '32'
+        }
+        child Column {
+            name 'emptyColumnRef'
+            data {
+                mainAxisAlignment 'center'
+                crossAxisAlignment 'center'
+                mainAxisSize 'min'
+            }
+            children [
+                TextView {
+                    name 'titleRef'
+                    data {
+                        data `title`
+                        textAlign 'center'
+                        textStyle {
+                            color '@c4'
+                            fontSize '18'
+                            fontWeight 'w600'
+                        }
+                    }
+                }
+                TextView {
+                    name 'messageRef'
+                    data {
+                        data `message`
+                        textAlign 'center'
+                        margin '12 0 0 0'
+                        textStyle {
+                            color '@c5'
+                            fontSize '14'
+                        }
+                    }
+                }
+                CIf {
+                    name 'actionIfRef'
+                    condition `hasAction`
+                    then TextButton {
+                        name 'actionRef'
+                        tags [
+                            'primary'
+                        ]
+                        data {
+                            label `actionLabel`
+                            margin '24 0 0 0'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onActionHandler'
+            type OnEvent
+            on actionRef
+            event onPressed
+            block ```
+                onAction();
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onAction'
+        }
+    ]
+}

@@ -1,0 +1,87 @@
+Widget {
+    package 'inventory.management.system'
+    name 'SupplierPickerWidget'
+    description 'Vendor autocomplete picker'
+    properties [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+        {
+            name 'searchTerm'
+            type String
+            internal true
+        }
+        {
+            name 'selectedSupplier'
+            type Vendor
+            internal true
+        }
+    ]
+    build Container {
+        name 'pickerRef'
+        styles [
+GlassPanelStyle
+            FormFieldStyle
+            PrimaryButtonStyle
+        ]
+        tags [
+            'glassPanel'
+        ]
+        data {
+            padding '16'
+        }
+        child Column {
+            name 'pickerColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSInputFieldWidget {
+                    name 'searchRef'
+                    data {
+                        label 'Vendor'
+                        text `searchTerm`
+                        placeHolder `organization != null ? 'Search suppliers in ' + organization.name : 'Search suppliers'`
+                    }
+                }
+                TextButton {
+                    name 'selectRef'
+                    tags [
+                        'primary'
+                    ]
+                    data {
+                        label 'Select Vendor'
+                        margin '12 0 0 0'
+                        disable `selectedSupplier == null`
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onSelectHandler'
+            type OnEvent
+            on selectRef
+            event onPressed
+            block ```
+                if (selectedSupplier != null) {
+                    onSupplierSelected(selectedSupplier);
+                }
+            ```
+        }
+    ]
+    events [
+        {
+            name 'onSupplierSelected'
+            params [
+                {
+                    name 'vendor'
+                    type Vendor
+                }
+            ]
+        }
+    ]
+}

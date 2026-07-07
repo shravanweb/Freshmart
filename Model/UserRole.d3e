@@ -1,0 +1,36 @@
+
+Model {
+    package 'inventory.management.system'
+    name 'UserRole'
+    master Organization
+    creatable true
+    searchable true
+    display `name`
+    properties [
+        {
+            name 'Name'
+            type String
+            required true
+        }
+        {
+            name 'Role Code'
+            type AppUserRole
+            required true
+        }
+        {
+            name 'Description'
+            type String
+            longText true
+        }
+        {
+            name 'Is System'
+            type Boolean
+            defaultValue `false`
+        }
+        {
+            name 'Permissions'
+            type String
+            longText true
+        }
+    ]
+}

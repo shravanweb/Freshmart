@@ -1,0 +1,24 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'StockTransferStatus'
+    options [
+        {
+            name 'Draft'
+        }
+        {
+            name 'Submitted'
+        }
+        {
+            name 'Approved'
+        }
+        {
+            name 'InTransit'
+        }
+        {
+            name 'Completed'
+        }
+        {
+            name 'Cancelled'
+        }
+    ]
+}

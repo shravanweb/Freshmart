@@ -1,0 +1,50 @@
+Model {
+    package 'inventory.management.system'
+    name 'InAppNotification'
+    master Organization
+    creatable true
+    searchable true
+    display `title`
+    properties [
+        {
+            name 'Recipient'
+            type User
+            required true
+            onDelete Prevent
+        }
+        {
+            name 'Title'
+            type String
+            required true
+        }
+        {
+            name 'Message'
+            type String
+            required true
+            longText true
+        }
+        {
+            name 'Notification Type'
+            type NotificationType
+            required true
+        }
+        {
+            name 'Reference Type'
+            type String
+        }
+        {
+            name 'Reference Id'
+            type String
+        }
+        {
+            name 'Is Read'
+            type Boolean
+            defaultValue `false`
+        }
+        {
+            name 'Created At'
+            type DateTime
+            readType ReadOnly
+        }
+    ]
+}

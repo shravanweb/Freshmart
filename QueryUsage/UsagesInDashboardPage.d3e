@@ -1,0 +1,239 @@
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onAllProductsChange'
+        'DashboardPage'
+        'productsData_synchronise'
+    ]
+    struct AllProducts
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onLowStockItemsChange'
+        'DashboardPage'
+        'lowStockData_synchronise'
+    ]
+    struct LowStockItems
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onOutOfStockItemsChange'
+        'DashboardPage'
+        'outOfStockData_synchronise'
+    ]
+    struct OutOfStockItems
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onExpiringBatchesChange'
+        'DashboardPage'
+        'expiringData_synchronise'
+    ]
+    struct ExpiringBatches
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onInventoryMovementsByDateRangeChange'
+        'DashboardPage'
+        'movementsData_synchronise'
+    ]
+    struct InventoryMovementsByDateRange
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onAllInAppNotificationsChange'
+        'DashboardPage'
+        'notificationsData_synchronise'
+    ]
+    struct AllInAppNotifications
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getAllProducts'
+        'DashboardPage'
+        'properties_productsData_computation'
+    ]
+    struct AllProducts
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getLowStockItems'
+        'DashboardPage'
+        'properties_lowStockData_computation'
+    ]
+    struct LowStockItems
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getOutOfStockItems'
+        'DashboardPage'
+        'properties_outOfStockData_computation'
+    ]
+    struct OutOfStockItems
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getExpiringBatches'
+        'DashboardPage'
+        'properties_expiringData_computation'
+    ]
+    struct ExpiringBatches
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getInventoryMovementsByDateRange'
+        'DashboardPage'
+        'properties_movementsData_computation'
+    ]
+    struct InventoryMovementsByDateRange
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getAllInAppNotifications'
+        'DashboardPage'
+        'properties_notificationsData_computation'
+    ]
+    struct AllInAppNotifications
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUserProfileByUserChange'
+        'DashboardPage'
+        'userProfileData_synchronise'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Subscription'
+        'onUnreadNotificationCountChange'
+        'DashboardPage'
+        'unreadNotificationsData_synchronise'
+    ]
+    struct UnreadNotificationCount
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUserProfileByUser'
+        'DashboardPage'
+        'properties_userProfileData_computation'
+    ]
+    struct UserProfileByUser
+    usage [
+        '*'
+        'items.*'
+    ]
+}
+
+QueryUsage {
+    package 'inventory.management.system'
+    query [
+        'Query'
+        'getUnreadNotificationCount'
+        'DashboardPage'
+        'properties_unreadNotificationsData_computation'
+    ]
+    struct UnreadNotificationCount
+    usage [
+        '*'
+        'items.*'
+    ]
+}

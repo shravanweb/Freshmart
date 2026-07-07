@@ -1,0 +1,28 @@
+@RPCService
+server class ProductService {
+    static Product createProduct(Product product) {
+        if (product == null) {
+            throw Exception('Product cannot be null');
+        }
+        product.createdAt = DateTime.now();
+        product.updatedAt = DateTime.now();
+        Database.save(product);
+        return product;
+    }
+
+    static Product updateProduct(Product product) {
+        if (product == null) {
+            throw Exception('Product cannot be null');
+        }
+        product.updatedAt = DateTime.now();
+        Database.save(product);
+        return product;
+    }
+
+    static void deleteProduct(Product product) {
+        if (product == null) {
+            return;
+        }
+        Database.delete(product);
+    }
+}

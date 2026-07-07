@@ -1,0 +1,72 @@
+Style {
+    package 'inventory.management.system'
+    name 'PrimaryButtonStyle'
+    description 'Primary CTA button'
+    items [
+        {
+            selector 'TextButton.primary'
+            values {
+                height '40'
+                padding '10 16'
+                decoration {
+                    gradientType 'LinearGradient'
+                    linearGradient {
+                        colors '@c1,@c2'
+                        stops '0.0,1.0'
+                        begin 'centerLeft'
+                        end 'centerRight'
+                    }
+                    borderRadius '12'
+                    boxShadow {
+                        color '40F59E0B'
+                        offset { dx '0' dy '4' }
+                        blurRadius '6'
+                        spreadRadius '0'
+                    }
+                }
+                textStyle {
+                    color '@c25'
+                    fontSize '14'
+                    fontWeight 'w600'
+                }
+            }
+        }
+        {
+            selector 'TextButton.secondary'
+            values {
+                height '40'
+                padding '10 16'
+                decoration {
+                    color '@c25'
+                    border {
+                        color '@c6'
+                        width '1'
+                        style 'solid'
+                    }
+                    borderRadius '12'
+                }
+                textStyle {
+                    color '@c4'
+                    fontSize '14'
+                    fontWeight 'w500'
+                }
+            }
+        }
+        {
+            selector 'TextButton.destructive'
+            values {
+                height '36'
+                padding '8 16'
+                decoration {
+                    color 'FFF43F5E'
+                    borderRadius '8'
+                }
+                textStyle {
+                    color '@c25'
+                    fontSize '14'
+                    fontWeight 'w600'
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+DataQuery {
+    package 'inventory.management.system'
+    name 'LowStockItems'
+    query `WarehouseStock.all
+    .where((row) => row.organization == inputs.organization)
+    .orderBy((row) => row.quantityOnHand, asc: true)`
+    inputs [
+        {
+            name 'organization'
+            type Organization
+            required true
+        }
+    ]
+    enableSync true
+    needCount true
+}

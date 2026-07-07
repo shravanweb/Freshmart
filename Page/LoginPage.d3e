@@ -1,0 +1,138 @@
+Page {
+    package 'inventory.management.system'
+    name 'LoginPage'
+    description 'Email and password login'
+    properties [
+        {
+            name 'email'
+            type String
+            internal true
+        }
+        {
+            name 'password'
+            type String
+            internal true
+        }
+        {
+            name 'isLoading'
+            type Boolean
+            defaultValue `false`
+            internal true
+        }
+        {
+            name 'errorMessage'
+            type String
+            internal true
+        }
+        {
+            name 'showOtp'
+            type Boolean
+            defaultValue `false`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassCardStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        data {
+            alignment 'center'
+        }
+        child Column {
+            name 'centerColumnRef'
+            data {
+                mainAxisSize 'max'
+                mainAxisAlignment 'center'
+                crossAxisAlignment 'center'
+            }
+            children [
+                CIf {
+                    name 'loginFormIfRef'
+                    condition `!showOtp`
+                    then LoginFormWidget {
+                        name 'loginFormRef'
+                        data {
+                            email `email`
+                            password `password`
+                            errorMessage `errorMessage`
+                            isLoading `isLoading`
+                        }
+                    }
+                    else OtpLoginWidget {
+                        name 'otpFormRef'
+                        data {
+                            email `email`
+                        }
+                    }
+                }
+                TextButton {
+                    name 'toggleOtpRef'
+                    data {
+                        label `showOtp ? 'Use password login' : 'Use OTP login'`
+                        margin '16 0 0 0'
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLoginHandler'
+            type OnEvent
+            on loginFormRef
+            event onLogin
+            block ```
+                isLoading = true;
+                errorMessage = '';
+                try {
+                    LoginResult result = Query.loginInventoryManagementSystemUserWithEmailAndPassword(
+                        email: this.email.toLowerCase(),
+                        password: this.password
+                    ).await;
+                    if (result.success) {
+                        navigator.pushDashboardPage(user: result.userObject as User, target: 'main', replace: true);
+                    } else {
+                        errorMessage = result.failureMessage;
+                    }
+                } catch (e) {
+                    errorMessage = 'Login failed: ' + e.toString();
+                }
+                isLoading = false;
+            ```
+        }
+        {
+            name 'onForgotPasswordHandler'
+            type OnEvent
+            on loginFormRef
+            event onForgotPassword
+            block ```
+                navigator.pushForgotPasswordPage();
+            ```
+        }
+        {
+            name 'onSignupHandler'
+            type OnEvent
+            on loginFormRef
+            event onSignup
+            block ```
+                navigator.pushSignupPage();
+            ```
+        }
+        {
+            name 'onToggleOtpHandler'
+            type OnEvent
+            on toggleOtpRef
+            event onPressed
+            block ```
+                showOtp = !showOtp;
+            ```
+        }
+    ]
+}

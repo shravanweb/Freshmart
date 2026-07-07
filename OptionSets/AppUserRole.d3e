@@ -1,0 +1,30 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'AppUserRole'
+    options [
+        {
+            name 'OrganizationAdmin'
+        }
+        {
+            name 'StoreManager'
+        }
+        {
+            name 'WarehouseManager'
+        }
+        {
+            name 'PurchaseManager'
+        }
+        {
+            name 'InventoryClerk'
+        }
+        {
+            name 'SalesStaff'
+        }
+        {
+            name 'Accountant'
+        }
+        {
+            name 'Viewer'
+        }
+    ]
+}

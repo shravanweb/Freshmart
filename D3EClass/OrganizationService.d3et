@@ -1,0 +1,28 @@
+@RPCService
+server class OrganizationService {
+    static Organization createOrganization(Organization organization) {
+        if (organization == null) {
+            throw Exception('Organization cannot be null');
+        }
+        organization.createdAt = DateTime.now();
+        organization.updatedAt = DateTime.now();
+        Database.save(organization);
+        return organization;
+    }
+
+    static Organization updateOrganization(Organization organization) {
+        if (organization == null) {
+            throw Exception('Organization cannot be null');
+        }
+        organization.updatedAt = DateTime.now();
+        Database.save(organization);
+        return organization;
+    }
+
+    static void deleteOrganization(Organization organization) {
+        if (organization == null) {
+            return;
+        }
+        Database.delete(organization);
+    }
+}

@@ -1,0 +1,227 @@
+Page {
+    package 'inventory.management.system'
+    name 'AuditLogListPage'
+    description 'Audit trail list'
+    properties [
+        {
+            name 'user'
+            type User
+            required true
+        }
+        {
+            name 'userProfileData'
+            type UserProfileByUser
+            computed true
+            computation `Query.getUserProfileByUser(UserProfileByUserRequest(user: user)).await`
+            internal true
+            synchronise true
+        }
+        {
+            name 'userProfile'
+            type UserProfile
+            computed true
+            computation `userProfileData != null ? userProfileData.items.first : null`
+            internal true
+        }
+        {
+            name 'organization'
+            type Organization
+            computed true
+            computation `userProfile != null ? userProfile.organization : null`
+            internal true
+        }
+        {
+            name 'searchTerm'
+            type String
+            internal true
+        }
+        {
+            name 'auditLogsData'
+            type AllAuditLogs
+            computed true
+            computation `organization != null ? Query.getAllAuditLogs(AllAuditLogsRequest(organization: organization)).await : null`
+            internal true
+            synchronise true
+        }
+        {
+            name 'auditLogs'
+            type AuditLog
+            collection true
+            computed true
+            computation `auditLogsData != null ? auditLogsData.items : []`
+            internal true
+        }
+        {
+            name 'itemCount'
+            type Integer
+            computed true
+            computation `auditLogsData != null ? auditLogsData.count : 0`
+            internal true
+        }
+        {
+            name 'filteredAuditLogs'
+            type AuditLog
+            collection true
+            computed true
+            computation `searchTerm == null || searchTerm.trim().isEmpty ? auditLogs : auditLogs.where((a) => a.entityType.toLowerCase().contains(searchTerm.toLowerCase()) || a.entityId.toLowerCase().contains(searchTerm.toLowerCase()) || a.action.name.toLowerCase().contains(searchTerm.toLowerCase())).toList()`
+            internal true
+        }
+    ]
+    build Container {
+        name 'pageRootRef'
+        styles [
+            PageBackgroundStyle
+            GlassPanelStyle
+            GlassCardStyle
+            GlassSidebarStyle
+            PrimaryButtonStyle
+            FormFieldStyle
+        ]
+        tags [
+            'pageBackground'
+        ]
+        child Row {
+            name 'shellRowRef'
+            data {
+                mainAxisSize 'max'
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                IMSidebarWidget {
+                    name 'sidebarRef'
+                    data {
+                        currentUser `user`
+                        userProfile `userProfile`
+                    }
+                }
+                Container {
+                    name 'mainRef'
+                    data {
+                        expand 'true'
+                    }
+                    child Column {
+                        name 'mainColumnRef'
+                        data {
+                            crossAxisAlignment 'stretch'
+                            mainAxisSize 'max'
+                        }
+                        children [
+                            IMSAppHeaderWidget {
+                                name 'headerRef'
+                                data {
+                                    title 'Audit Logs'
+                                    organization `organization`
+                                }
+                            }
+                            Container {
+                                name 'contentRef'
+                                tags [
+                                    'pageContent'
+                                ]
+                                data {
+                                    expand 'true'
+                                    vscroll 'true'
+                                    padding '24'
+                                }
+                                child Column {
+                                    name 'contentColumnRef'
+                                    data {
+                                        crossAxisAlignment 'stretch'
+                                    }
+                                    children [
+                                        Row {
+                                            name 'toolbarRowRef'
+                                            data {
+                                                mainAxisAlignment 'spaceBetween'
+                                                crossAxisAlignment 'center'
+                                                mainAxisSize 'max'
+                                                margin '0 0 16 0'
+                                            }
+                                            children [
+                                                TextView {
+                                                    name 'countRef'
+                                                    data {
+                                                        data `itemCount.toString() + ' audit entries'`
+                                                        textStyle {
+                                                            color '@c5'
+                                                            fontSize '14'
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                        IMSInputFieldWidget {
+                                            name 'searchRef'
+                                            data {
+                                                label 'Search'
+                                                text `searchTerm`
+                                                placeHolder 'Entity, action, or ID'
+                                            }
+                                        }
+                                        Container {
+                                            name 'listSpacerRef'
+                                            data {
+                                                margin '16 0 0 0'
+                                            }
+                                        }
+                                        CIf {
+                                            name 'emptyIfRef'
+                                            condition `filteredAuditLogs.isEmpty`
+                                            then EmptyStateWidget {
+                                                name 'emptyStateRef'
+                                                data {
+                                                    title 'No audit logs'
+                                                    message 'System activity will be recorded here.'
+                                                }
+                                            }
+                                            else Column {
+                                                name 'listColumnRef'
+                                                data {
+                                                    crossAxisAlignment 'stretch'
+                                                }
+                                                children [
+                                                    CFor {
+                                                        name 'listCForRef'
+                                                        var 'listItem'
+                                                        items `filteredAuditLogs`
+                                                        type AuditLog
+                                                        item AuditLogRowWidget {
+                                                            name 'auditRowRef'
+                                                            data {
+                                                                auditLog `listItem`
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    eventHandlers [
+        {
+            name 'onLogoutHandler'
+            type OnEvent
+            on headerRef
+            event onLogout
+            block ```
+                navigator.pushLoginPage(target: 'main', replace: true);
+            ```
+        }
+        {
+            name 'onProfileHandler'
+            type OnEvent
+            on headerRef
+            event onProfile
+            block ```
+                navigator.pushProfileSettingsPage(user: user, target: 'main', replace: false);
+            ```
+        }
+    ]
+}

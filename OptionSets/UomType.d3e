@@ -1,0 +1,12 @@
+OptionSet {
+    package 'inventory.management.system'
+    name 'UomType'
+    options [
+        {
+            name 'Base'
+        }
+        {
+            name 'Derived'
+        }
+    ]
+}

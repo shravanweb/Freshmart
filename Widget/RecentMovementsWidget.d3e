@@ -1,0 +1,98 @@
+Widget {
+    package 'inventory.management.system'
+    name 'RecentMovementsWidget'
+    description 'Recent inventory movements activity feed'
+    properties [
+        {
+            name 'movements'
+            type InventoryMovement
+            collection true
+        }
+        {
+            name 'movementCount'
+            type String
+            computed true
+            computation `movements != null ? movements.length.toString() : '0'`
+            internal true
+        }
+    ]
+    build Container {
+        name 'cardRef'
+        styles [
+GlassCardStyle
+        ]
+        tags [
+            'glassCardFlat'
+        ]
+        child Column {
+            name 'sectionColumnRef'
+            data {
+                crossAxisAlignment 'stretch'
+            }
+            children [
+                Row {
+                    name 'headerRowRef'
+                    data {
+                        mainAxisAlignment 'spaceBetween'
+                        crossAxisAlignment 'center'
+                        mainAxisSize 'max'
+                    }
+                    children [
+                        TextView {
+                            name 'titleRef'
+                            data {
+                                data 'Recent Movements'
+                                textStyle {
+                                    color '@c4'
+                                    fontSize '18'
+                                    fontWeight 'w600'
+                                }
+                            }
+                        }
+                        TextView {
+                            name 'countRef'
+                            data {
+                                data `movementCount + ' entries'`
+                                textStyle {
+                                    color '@c5'
+                                    fontSize '13'
+                                }
+                            }
+                        }
+                    ]
+                }
+                Container {
+                    name 'tableRef'
+                    tags [
+                        'glassPanel'
+                    ]
+                    data {
+                        margin '16 0 0 0'
+                        padding '16'
+                    }
+                    child TextView {
+                        name 'hintRef'
+                        data {
+                            data 'Bind movement rows from InventoryMovementsByDateRange query'
+                            textStyle {
+                                color '@c5'
+                                fontSize '14'
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    events [
+        {
+            name 'onViewMovement'
+            params [
+                {
+                    name 'movement'
+                    type InventoryMovement
+                }
+            ]
+        }
+    ]
+}
