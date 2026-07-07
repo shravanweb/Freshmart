@@ -12,8 +12,10 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 COPY --from=build /app/build/install/inventory.management.system ./
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh
 
 ENV SERVER_PORT=8080
 EXPOSE 8080
 
-CMD ["bin/inventory.management.system"]
+ENTRYPOINT ["./docker-entrypoint.sh"]

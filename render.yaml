@@ -1,0 +1,32 @@
+databases:
+  - name: freshmart-db
+    databaseName: inventorymanagementsystem
+    plan: free
+    region: singapore
+
+services:
+  - type: web
+    name: freshmart-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: build/SpringBoot/Dockerfile
+    dockerContext: build/SpringBoot
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: freshmart-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: freshmart-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: freshmart-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
