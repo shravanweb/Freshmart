@@ -238,7 +238,8 @@ export default class ProductApi {
       return [];
     }
     const data = (await response.json()) as { items?: string[] };
-    return (data.items ?? []).map((item) => resolveImageUrl(String(item)));
+    const items = Array.isArray(data.items) ? data.items : [];
+    return items.map((item) => resolveImageUrl(String(item)));
   }
 
   public static async uploadProductImages(
@@ -264,7 +265,8 @@ export default class ProductApi {
       throw new Error(message || `Image upload failed (${response.status})`);
     }
     const data = (await response.json()) as { items?: string[] };
-    return (data.items ?? []).map((item) => resolveImageUrl(String(item)));
+    const items = Array.isArray(data.items) ? data.items : [];
+    return items.map((item) => resolveImageUrl(String(item)));
   }
 
   public static async deleteProductImage(
