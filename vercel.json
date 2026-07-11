@@ -7,6 +7,6 @@
     "BACKEND_URL": "https://freshmart-api-afm5.onrender.com"
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!static|fonts|resource|favicon\\.ico|manifest\\.json|robots\\.txt|logo192\\.png|logo512\\.png).*)", "destination": "/index.html" }
   ]
 }
