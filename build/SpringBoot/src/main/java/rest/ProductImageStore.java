@@ -1,6 +1,8 @@
 package rest;
 
 import java.io.File;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -8,18 +10,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductImageStore {
   private static final String[] EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"};
 
+  @Value("${server.localstore:out}")
+  private String localStore;
+
   public File getProductsRootDirectory() {
-    Path fromCwd =
-        Paths.get(System.getProperty("user.dir"))
-            .resolve("../InventoryManagementSystem/public/images/products")
-            .normalize();
-    File dir = fromCwd.toFile();
+    File dir = Paths.get(localStore, "product-images").toAbsolutePath().normalize().toFile();
     if (!dir.exists()) {
       dir.mkdirs();
     }
@@ -76,7 +78,7 @@ public class ProductImageStore {
     imageFiles.sort(Comparator.comparing(File::getName));
     List<String> urls = new ArrayList<>();
     for (File file : imageFiles) {
-      urls.add("/images/products/" + productId + "/" + file.getName());
+      urls.add(buildImageUrl(productId, file.getName()));
     }
     return urls;
   }
@@ -86,13 +88,28 @@ public class ProductImageStore {
     return urls.isEmpty() ? null : urls.get(0);
   }
 
+  public File resolveImageFile(long productId, String filename) {
+    if (!isImageFile(filename) || filename.contains("/") || filename.contains("\\")) {
+      return null;
+    }
+    File target = new File(getProductDirectory(productId), filename);
+    return target.exists() && target.isFile() ? target : null;
+  }
+
+  public String buildImageUrl(long productId, String filename) {
+    return "/api/product-image/file?productId="
+        + productId
+        + "&filename="
+        + URLEncoder.encode(filename, StandardCharsets.UTF_8);
+  }
+
   public String saveImage(long productId, String originalFilename, byte[] bytes) throws Exception {
     File dir = getProductDirectory(productId);
     String ext = extensionFor(originalFilename);
     String filename = nextFilename(dir, ext);
     File target = new File(dir, filename);
     java.nio.file.Files.write(target.toPath(), bytes);
-    return "/images/products/" + productId + "/" + filename;
+    return buildImageUrl(productId, filename);
   }
 
   public boolean deleteImage(long productId, String filename) {

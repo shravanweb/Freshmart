@@ -46,12 +46,24 @@ function parseImageUrls(raw: Record<string, unknown>): string[] | undefined {
   }
   const urls: string[] = [];
   for (const item of value) {
-    const url = String(item);
-    if (url.length > 0) {
+    const url = resolvePublicAssetUrl(String(item));
+    if (url) {
       urls.push(url);
     }
   }
   return urls.length > 0 ? urls : undefined;
+}
+
+function resolvePublicAssetUrl(url?: string): string | undefined {
+  const trimmed = (url ?? "").trim();
+  if (!trimmed) {
+    return undefined;
+  }
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  const base = Env.get().resolvedHttpUrl.replace(/\/$/, "");
+  return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
 }
 
 function parseProduct(raw: Record<string, unknown>): PublicProductRecord {
@@ -68,7 +80,9 @@ function parseProduct(raw: Record<string, unknown>): PublicProductRecord {
     categoryId: raw.categoryId != null ? Number(raw.categoryId) : undefined,
     categoryName: raw.categoryName != null ? String(raw.categoryName) : undefined,
     categoryCode: raw.categoryCode != null ? String(raw.categoryCode) : undefined,
-    imageUrl: raw.imageUrl != null ? String(raw.imageUrl) : undefined,
+    imageUrl: resolvePublicAssetUrl(
+      raw.imageUrl != null ? String(raw.imageUrl) : undefined
+    ),
     imageUrls,
     uomSymbol: raw.uomSymbol != null ? String(raw.uomSymbol) : undefined,
     uomName: raw.uomName != null ? String(raw.uomName) : undefined,

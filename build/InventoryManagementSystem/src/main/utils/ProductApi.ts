@@ -65,6 +65,20 @@ function parseNumber(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function resolveImageUrl(url: string): string {
+  const trimmed = (url ?? "").trim();
+  if (!trimmed) return "";
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("blob:")
+  ) {
+    return trimmed;
+  }
+  const base = Env.get().resolvedHttpUrl.replace(/\/$/, "");
+  return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
+}
+
 function mapProduct(raw: Record<string, unknown>): ProductRecord {
   const category = (raw.category ?? {}) as Record<string, unknown>;
   return {
@@ -224,7 +238,7 @@ export default class ProductApi {
       return [];
     }
     const data = (await response.json()) as { items?: string[] };
-    return data.items ?? [];
+    return (data.items ?? []).map((item) => resolveImageUrl(String(item)));
   }
 
   public static async uploadProductImages(
@@ -250,7 +264,7 @@ export default class ProductApi {
       throw new Error(message || `Image upload failed (${response.status})`);
     }
     const data = (await response.json()) as { items?: string[] };
-    return data.items ?? [];
+    return (data.items ?? []).map((item) => resolveImageUrl(String(item)));
   }
 
   public static async deleteProductImage(

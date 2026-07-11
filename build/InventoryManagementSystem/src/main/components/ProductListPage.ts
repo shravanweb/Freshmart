@@ -274,8 +274,17 @@ class _ProductListPageState extends ObservableComponent<ProductListPageProps> {
   };
 
   private imageFilenameFromUrl(url: string): string {
+    try {
+      const parsed = new URL(url, window.location.origin);
+      const filename = parsed.searchParams.get("filename");
+      if (filename) {
+        return filename;
+      }
+    } catch {
+      // fall through to path parsing
+    }
     const parts = url.split("/");
-    return parts[parts.length - 1] ?? "";
+    return parts[parts.length - 1]?.split("?")[0] ?? "";
   }
 
   private clearFormImages(): void {

@@ -2,12 +2,18 @@ package rest;
 
 import d3e.core.CurrentUser;
 import d3e.core.RestControllerBase;
+import java.io.File;
 import java.util.List;
 import models.BaseUser;
 import models.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +50,35 @@ public class ProductImageController extends RestControllerBase {
     JSONObject response = new JSONObject();
     response.put("items", items);
     writeJsonToResponse(response.toString());
+  }
+
+  @GetMapping("/api/product-image/file")
+  public ResponseEntity<Resource> getProductImageFile(
+      @RequestParam("productId") Long productId, @RequestParam("filename") String filename) {
+    if (productId == null || productId <= 0 || filename == null || filename.isBlank()) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    File imageFile = productImageStore.resolveImageFile(productId, filename);
+    if (imageFile == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    Resource resource = new FileSystemResource(imageFile);
+    String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+    String lower = filename.toLowerCase();
+    if (lower.endsWith(".png")) {
+      contentType = MediaType.IMAGE_PNG_VALUE;
+    } else if (lower.endsWith(".webp")) {
+      contentType = "image/webp";
+    } else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
+      contentType = MediaType.IMAGE_JPEG_VALUE;
+    }
+
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
+        .contentType(MediaType.parseMediaType(contentType))
+        .body(resource);
   }
 
   @PostMapping("/api/product-image")
