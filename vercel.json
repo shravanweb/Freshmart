@@ -1,8 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install --prefix build/InventoryManagementSystem",
-  "buildCommand": "node scripts/write-production-settings.js && npm run build --prefix build/InventoryManagementSystem",
+  "buildCommand": "node scripts/write-production-settings.js && CI=false npm run build --prefix build/InventoryManagementSystem",
   "outputDirectory": "build/InventoryManagementSystem/build",
+  "env": {
+    "BACKEND_URL": "https://freshmart-api-afm5.onrender.com"
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

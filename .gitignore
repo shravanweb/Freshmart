@@ -37,3 +37,5 @@ hs_err_pid*
 # Diagnostics cache
 .d3e-diagnostics-meta.json
 .d3e-diagnostics.json
+.vercel
+.env.local
