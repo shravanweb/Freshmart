@@ -19,11 +19,17 @@ function bootstrap(settings) {
   ReactDOM.render(<MyApp />, document.getElementById("root"));
 }
 
-bootstrap(defaultSettings);
+async function main() {
+  let settings = defaultSettings;
+  try {
+    const response = await fetch("resource/settings.json");
+    if (response.ok) {
+      settings = await response.json();
+    }
+  } catch {
+    // Fall back to defaults for local dev without settings.json.
+  }
+  bootstrap(settings);
+}
 
-fetch("resource/settings.json")
-  .then((r) => r.json())
-  .then((settings) => {
-    Env.get().load(settings);
-  })
-  .catch(() => {});
+main();

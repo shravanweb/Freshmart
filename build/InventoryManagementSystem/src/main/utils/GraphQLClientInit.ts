@@ -9,12 +9,13 @@ import Env from "../classes/Env";
 
 export default class GraphQLClientInit {
   private static _client: ApolloClient<any>;
+  private static _uri = "";
   public static token: string;
   public static get(): ApolloClient<any> {
-    if (!GraphQLClientInit._client) {
-      const _httpLink = new HttpLink({
-        uri: Env.get().resolvedHttpUrl + "/api/native/graphql",
-      });
+    const uri = Env.get().resolvedHttpUrl + "/api/native/graphql";
+    if (!GraphQLClientInit._client || GraphQLClientInit._uri !== uri) {
+      GraphQLClientInit._uri = uri;
+      const _httpLink = new HttpLink({ uri });
       const _auth = new ApolloLink((operation, forward) => {
         if (GraphQLClientInit.token != null) {
           operation.setContext({
