@@ -114,7 +114,8 @@ export default class LandingCatalogApi {
       .map((item) => ({
         ...item,
         imageUrl: resolvePublicAssetUrl(item.imageUrl),
-      }));
+      }))
+      .toList();
   }
 
   public static async getPublicProducts(

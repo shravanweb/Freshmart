@@ -13,6 +13,10 @@ services:
     dockerfilePath: build/SpringBoot/Dockerfile
     dockerContext: build/SpringBoot
     healthCheckPath: /actuator/health
+    disk:
+      name: freshmart-storage
+      mountPath: /app/out
+      sizeGB: 1
     envVars:
       - key: DATABASE_URL
         fromDatabase:
