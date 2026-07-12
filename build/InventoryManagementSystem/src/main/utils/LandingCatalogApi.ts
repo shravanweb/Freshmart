@@ -109,7 +109,12 @@ export default class LandingCatalogApi {
       items?: PublicCategoryRecord[];
     };
     const items = data.items ?? [];
-    return items.filter((item) => item.status === "Active");
+    return items
+      .filter((item) => item.status === "Active")
+      .map((item) => ({
+        ...item,
+        imageUrl: resolvePublicAssetUrl(item.imageUrl),
+      }));
   }
 
   public static async getPublicProducts(

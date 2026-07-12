@@ -96,6 +96,18 @@ export function categoryImageSlug(code: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+function resolveAssetUrl(url?: string): string {
+  const trimmed = (url ?? "").trim();
+  if (!trimmed) {
+    return "";
+  }
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  const base = Env.get().resolvedHttpUrl.replace(/\/$/, "");
+  return trimmed.startsWith("/") ? `${base}${trimmed}` : `${base}/${trimmed}`;
+}
+
 export default class CategoryApi {
   private static async client() {
     GraphQLClientInit.token = await LocalDataStore.get().getToken();
@@ -121,7 +133,7 @@ export default class CategoryApi {
     const match = (data.items ?? []).find(
       (item) => (item.code ?? "").trim().toLowerCase() === normalized
     );
-    return match?.imageUrl ?? "";
+    return resolveAssetUrl(match?.imageUrl);
   }
 
   public static async uploadCategoryImage(code: string, file: File): Promise<string> {
@@ -139,7 +151,7 @@ export default class CategoryApi {
       throw new Error(message || `Image upload failed (${response.status})`);
     }
     const data = (await response.json()) as { imageUrl?: string };
-    return data.imageUrl ?? "";
+    return resolveAssetUrl(data.imageUrl);
   }
 
   public static async getAllCategories(

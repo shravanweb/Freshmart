@@ -1,21 +1,22 @@
 package rest;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Locale;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CategoryImageStore {
   private static final String[] EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"};
 
+  @Value("${server.localstore:out}")
+  private String localStore;
+
   public File getCategoriesDirectory() {
-    Path fromCwd =
-        Paths.get(System.getProperty("user.dir"))
-            .resolve("../InventoryManagementSystem/public/images/categories")
-            .normalize();
-    File dir = fromCwd.toFile();
+    File dir = Paths.get(localStore, "category-images").toAbsolutePath().normalize().toFile();
     if (!dir.exists()) {
       dir.mkdirs();
     }
@@ -47,22 +48,35 @@ public class CategoryImageStore {
     return ".jpg";
   }
 
-  public String resolveImageUrl(String code) {
+  public String buildImageUrl(String code) {
+    return "/api/category-image/file?code="
+        + URLEncoder.encode(code.trim(), StandardCharsets.UTF_8);
+  }
+
+  public File resolveImageFile(String code) {
     String slug = toSlug(code);
     if (slug.isEmpty()) {
       return null;
     }
     File dir = getCategoriesDirectory();
     for (String ext : EXTENSIONS) {
-      if (new File(dir, slug + ext).exists()) {
-        return "/images/categories/" + slug + ext;
+      File target = new File(dir, slug + ext);
+      if (target.exists() && target.isFile()) {
+        return target;
       }
     }
     String legacy = legacyFileName(code);
-    if (legacy != null && new File(dir, legacy).exists()) {
-      return "/images/categories/" + legacy;
+    if (legacy != null) {
+      File target = new File(dir, legacy);
+      if (target.exists() && target.isFile()) {
+        return target;
+      }
     }
     return null;
+  }
+
+  public String resolveImageUrl(String code) {
+    return resolveImageFile(code) != null ? buildImageUrl(code) : null;
   }
 
   public File targetFile(String code, String originalFilename) {
