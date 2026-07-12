@@ -10,12 +10,84 @@ FreshMart is a grocery inventory and e-commerce platform with an admin back offi
 | API (backend) | https://freshmart-api-afm5.onrender.com |
 | Health check | https://freshmart-api-afm5.onrender.com/actuator/health |
 
-## Tech Stack
+## Technologies Used
 
-- **Frontend:** React 17, TypeScript, Apollo Client (GraphQL)
-- **Backend:** Spring Boot, GraphQL, REST APIs
-- **Database:** PostgreSQL
+### Frontend
+
+| Technology | Purpose |
+|---|---|
+| React 17 | UI framework |
+| TypeScript | Type-safe frontend code |
+| Apollo Client | GraphQL client for admin API |
+| GraphQL | Admin data queries and mutations |
+| RxJS | Reactive streams and subscriptions |
+| React Scripts (Create React App) | Build tooling and dev server |
+| Animate.css | UI animations |
+| date-fns | Date formatting |
+| http-proxy-middleware | Local dev proxy (`/api` → backend) |
+
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| Java 17 | Backend language |
+| Spring Boot 3 | REST API, dependency injection, web layer |
+| Spring Security | Authentication and authorization |
+| Spring JDBC | Database access |
+| GraphQL Java | GraphQL schema and resolver layer |
+| GraphiQL | GraphQL IDE (`/api/graphiql`) |
+| JWT (jjwt) | Token-based auth |
+| Spring WebSocket | Real-time subscriptions |
+| Flyway | Database migrations |
+| Lombok | Boilerplate reduction in Java models |
+| OpenPDF | PDF report generation |
+| Thumbnailator | Image resizing |
+| Jakarta Mail / SendGrid | OTP and notification emails |
+| Firebase Admin | Push notifications (optional) |
+| Gradle | Backend build tool |
+
+### Database & Storage
+
+| Technology | Purpose |
+|---|---|
+| PostgreSQL | Primary relational database |
+| Flyway SQL migrations | Schema versioning (`V0__postgresql_new_schema.sql`) |
+| Local filesystem (`server.localstore`) | Product and category image storage |
+
+### Platform & Architecture
+
+| Technology | Purpose |
+|---|---|
+| D3E Studio | Low-code model layer (`.d3e` definitions for pages, models, services) |
+| REST API | Public catalog and image upload endpoints |
+| GraphQL API | Admin back-office operations |
+
+### DevOps & Deployment
+
+| Technology | Purpose |
+|---|---|
+| Vercel | Frontend hosting and CI/CD |
+| Render | Backend API hosting |
+| Render PostgreSQL | Managed production database |
+| Docker | Backend container image (`eclipse-temurin:17`) |
+| GitHub | Source control and auto-deploy trigger |
+
+### Development Tools
+
+| Technology | Purpose |
+|---|---|
+| Node.js 18+ | Frontend runtime and npm |
+| npm | Frontend package manager |
+| Prettier | Code formatting |
+| Jest / Testing Library | Frontend tests |
+
+## Tech Stack (Summary)
+
+- **Frontend:** React 17, TypeScript, Apollo Client, GraphQL, RxJS
+- **Backend:** Java 17, Spring Boot 3, Spring Security, GraphQL Java, JWT
+- **Database:** PostgreSQL with Flyway migrations
 - **Deployment:** Vercel (frontend) + Render (backend + database)
+- **Platform:** D3E Studio + custom Spring Boot / React runtime
 
 ## Project Structure
 
