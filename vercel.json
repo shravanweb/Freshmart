@@ -4,7 +4,8 @@
   "buildCommand": "node scripts/write-production-settings.js && CI=false npm run build --prefix build/InventoryManagementSystem",
   "outputDirectory": "build/InventoryManagementSystem/build",
   "env": {
-    "BACKEND_URL": "https://freshmart-api-afm5.onrender.com"
+    "BACKEND_URL": "https://freshmart-api-afm5.onrender.com",
+    "CI": "false"
   },
   "rewrites": [
     { "source": "/((?!static|fonts|resource|favicon\\.ico|manifest\\.json|robots\\.txt|logo192\\.png|logo512\\.png).*)", "destination": "/index.html" }
